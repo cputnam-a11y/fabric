@@ -17,8 +17,9 @@
 package net.fabricmc.fabric.mixin.item;
 
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
@@ -32,18 +33,14 @@ import net.minecraft.util.math.BlockPos;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class AbstractFurnaceBlockEntityMixin {
-	@Unique
-	private static final ThreadLocal<ItemStack> REMAINDER_STACK = new ThreadLocal<>();
 
 	@Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;getItem()Lnet/minecraft/item/Item;"), allow = 1)
-	private static void getStackRemainder(ServerWorld world, BlockPos pos, BlockState state, AbstractFurnaceBlockEntity blockEntity, CallbackInfo ci, @Local(ordinal = 0) ItemStack itemStack) {
-		REMAINDER_STACK.set(itemStack.getRecipeRemainder());
+	private static void getStackRemainder(ServerWorld world, BlockPos pos, BlockState state, AbstractFurnaceBlockEntity blockEntity, CallbackInfo ci, @Local(ordinal = 0) ItemStack itemStack, @Share("remainder") LocalRef<ItemStack> remainderRef) {
+		remainderRef.set(itemStack.getRecipeRemainder());
 	}
 
 	@ModifyArg(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/collection/DefaultedList;set(ILjava/lang/Object;)Ljava/lang/Object;"), index = 1, allow = 1)
-	private static <E> E setStackRemainder(E element) {
-		E remainder = (E) REMAINDER_STACK.get();
-		REMAINDER_STACK.remove();
-		return remainder;
+	private static <E> E setStackRemainder(E element, @Share("remainder") LocalRef<ItemStack> remainderRef) {
+		return (E) remainderRef.get();
 	}
 }
