@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.client.rendering.fluid;
 
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -108,9 +110,9 @@ public class FluidRendererMixin {
 	}
 
 	@Redirect(at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;getBlock()Lnet/minecraft/block/Block;"), method = "render")
-	public Block getOverlayBlock(BlockState state) {
+	public Block getOverlayBlock(BlockState state, @Share("neighborBlock") LocalRef<Block> neighborBlockRef) {
 		Block block = state.getBlock();
-		fabric_neighborBlock.set(block);
+		neighborBlockRef.set(block);
 
 		// An if-statement follows, we don't want this anymore and 'null' makes
 		// its condition always false (due to instanceof)
@@ -118,8 +120,8 @@ public class FluidRendererMixin {
 	}
 
 	@ModifyVariable(at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/block/BlockState;getBlock()Lnet/minecraft/block/Block;", shift = At.Shift.AFTER), method = "render", ordinal = 0)
-	public Sprite modSideSpriteForOverlay(Sprite chk) {
-		Block block = fabric_neighborBlock.get();
+	public Sprite modSideSpriteForOverlay(Sprite chk, @Share("neighborBlock") LocalRef<Block> neighborBlockRef) {
+		Block block = neighborBlockRef.get();
 
 		if (FluidRenderHandlerRegistry.INSTANCE.isBlockTransparent(block)) {
 			FluidRenderHandlerInfo info = FluidRenderingImpl.getCurrentInfo();
