@@ -54,8 +54,6 @@ public class FluidRendererMixin {
 	@Shadow
 	private Sprite waterOverlaySprite;
 
-	private final ThreadLocal<Block> fabric_neighborBlock = new ThreadLocal<>();
-
 	@Inject(at = @At("RETURN"), method = "onResourceReload")
 	public void onResourceReloadReturn(CallbackInfo info) {
 		FluidRenderer self = (FluidRenderer) (Object) this;
