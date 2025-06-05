@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.registry.sync.registryentrylists;
-
-import java.util.concurrent.ConcurrentMap;
+package net.fabricmc.fabric.mixin.registry.sync.entrylists;
 
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntryList;
 
-@Mixin(RegistryKey.class)
-public interface RegistryKeyAccessor {
-	@Accessor("INSTANCES")
-	static ConcurrentMap<?, RegistryKey<?>> getInstances() {
-		throw new AssertionError("Mixin failed to apply");
-	}
+import net.fabricmc.fabric.api.event.registry.entrylists.DependentRegistryEntryList;
+
+@Mixin(RegistryEntryList.class)
+interface RegistryEntryListMixin<T> extends DependentRegistryEntryList<T> {
 }

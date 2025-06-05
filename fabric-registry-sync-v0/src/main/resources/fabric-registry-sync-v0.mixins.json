@@ -19,12 +19,12 @@
     "SerializedChunkMixin",
     "SimpleRegistryAccessor",
     "SimpleRegistryMixin",
-    "registryentrylists.RegistryEntryListNamedMixin",
-    "registryentrylists.PacketCodecs$25Mixin",
-    "registryentrylists.RegistryEntryListCodecMixin",
-    "registryentrylists.RegistryEntryListMixin",
-    "registryentrylists.RegistryKeyAccessor",
-    "registryentrylists.TagKeyMixin"
+    "entrylists.RegistryEntryListNamedMixin",
+    "entrylists.PacketCodecs$25Mixin",
+    "entrylists.RegistryEntryListCodecMixin",
+    "entrylists.RegistryEntryListMixin",
+    "entrylists.RegistryKeyAccessor",
+    "entrylists.TagKeyMixin"
   ],
   "injectors": {
     "defaultRequire": 1

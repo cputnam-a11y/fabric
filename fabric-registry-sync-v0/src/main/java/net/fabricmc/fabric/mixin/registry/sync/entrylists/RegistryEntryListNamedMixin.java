@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.registry.sync.registryentrylists;
+package net.fabricmc.fabric.mixin.registry.sync.entrylists;
 
 import java.util.List;
 

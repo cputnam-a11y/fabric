@@ -26,7 +26,7 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.tag.TagKey;
 
-import net.fabricmc.fabric.mixin.registry.sync.registryentrylists.RegistryKeyAccessor;
+import net.fabricmc.fabric.mixin.registry.sync.entrylists.RegistryKeyAccessor;
 
 record RegistryWrapperFromRegistryEntryLookup<T>(RegistryEntryLookup<T> entryLookup) implements RegistryWrapper<T> {
 	/**
