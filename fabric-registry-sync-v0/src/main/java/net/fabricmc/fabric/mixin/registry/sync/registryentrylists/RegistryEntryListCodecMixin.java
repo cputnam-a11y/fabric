@@ -20,6 +20,7 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
+import net.fabricmc.fabric.impl.registry.sync.registryentrylists.CustomRegistryEntryListSerializerRegistryImpl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +35,6 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryListCodec;
 
 import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryList;
-import net.fabricmc.fabric.impl.registry.sync.registryentrylists.CustomRegistryEntryListImpl;
 
 @SuppressWarnings("unchecked")
 @Mixin(RegistryEntryListCodec.class)
@@ -47,7 +47,7 @@ class RegistryEntryListCodecMixin {
 			at = @At("TAIL")
 	)
 	private <T> void bindFabricCodec(RegistryKey<? extends Registry<T>> registry, Codec<RegistryEntry<T>> entryCodec, boolean alwaysSerializeAsList, CallbackInfo ci) {
-		fabric$codec = CustomRegistryEntryListImpl.SERIALIZER_CODEC.dispatch(
+		fabric$codec = CustomRegistryEntryListSerializerRegistryImpl.SERIALIZER_CODEC.dispatch(
 				"fabric:type",
 				CustomRegistryEntryList::getSerializer,
 				serializer -> serializer.createCodec(registry, entryCodec, alwaysSerializeAsList)
@@ -77,7 +77,7 @@ class RegistryEntryListCodecMixin {
 			cancellable = true
 	)
 	private <T, E> void decodeCustomWithCustomCodec(DynamicOps<T> ops, T input, CallbackInfoReturnable<DataResult<Pair<RegistryEntryList<E>, T>>> cir) {
-		if (CustomRegistryEntryListImpl.isSerializedCustomRegistryEntryList(ops, input)) {
+		if (CustomRegistryEntryListSerializerRegistryImpl.isSerializedCustomRegistryEntryList(ops, input)) {
 			cir.setReturnValue(
 					fabric$codec.decode(ops, input).map(
 							pair -> pair.mapFirst(

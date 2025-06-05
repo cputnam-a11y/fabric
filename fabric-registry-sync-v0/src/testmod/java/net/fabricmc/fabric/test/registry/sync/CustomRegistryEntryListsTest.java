@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.test.registry.sync;
 
 import com.mojang.logging.LogUtils;
+import net.fabricmc.fabric.api.event.registry.DefaultCustomRegistryEntryLists;
 import org.slf4j.Logger;
 
 import net.minecraft.block.Block;
@@ -28,7 +29,6 @@ import net.minecraft.registry.tag.BlockTags;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryList;
 
 public class CustomRegistryEntryListsTest implements ModInitializer {
 	private static final Logger LOGGER = LogUtils.getLogger();
@@ -49,7 +49,7 @@ public class CustomRegistryEntryListsTest implements ModInitializer {
 			RegistryEntry<Block> coral = registries.getOrThrow(RegistryKeys.BLOCK).getEntry(Blocks.BRAIN_CORAL_BLOCK);
 			RegistryEntry<Block> log = registries.getOrThrow(RegistryKeys.BLOCK).getEntry(Blocks.OAK_LOG);
 
-			RegistryEntryList<Block> union = CustomRegistryEntryList.union(
+			RegistryEntryList<Block> union = DefaultCustomRegistryEntryLists.union(
 					anvils,
 					corals
 			);
@@ -57,7 +57,7 @@ public class CustomRegistryEntryListsTest implements ModInitializer {
 			warnIfFalse(union.contains(anvil), "CustomRegistryEntryList.union doesn't contain anvil");
 			warnIfFalse(union.contains(coral), "CustomRegistryEntryList.union doesn't contain brain coral");
 
-			RegistryEntryList<Block> intersection = CustomRegistryEntryList.intersection(
+			RegistryEntryList<Block> intersection = DefaultCustomRegistryEntryLists.intersection(
 					anvils,
 					corals
 			);
@@ -65,7 +65,7 @@ public class CustomRegistryEntryListsTest implements ModInitializer {
 			warnIfFalse(!intersection.contains(anvil), "CustomRegistryEntryList.intersection contains anvil");
 			warnIfFalse(!intersection.contains(coral), "CustomRegistryEntryList.intersection contains brain coral");
 
-			RegistryEntryList<Block> inverse = CustomRegistryEntryList.inverse(
+			RegistryEntryList<Block> inverse = DefaultCustomRegistryEntryLists.inverse(
 					registries.getOrThrow(RegistryKeys.BLOCK),
 					union
 			);
@@ -74,7 +74,7 @@ public class CustomRegistryEntryListsTest implements ModInitializer {
 			warnIfFalse(!inverse.contains(coral), "CustomRegistryEntryList.inverse contains brain coral");
 			warnIfFalse(inverse.contains(log), "CustomRegistryEntryList.inverse doesn't contain oak log");
 
-			RegistryEntryList<Block> universal = CustomRegistryEntryList.universal(
+			RegistryEntryList<Block> universal = DefaultCustomRegistryEntryLists.universal(
 					registries.getOrThrow(RegistryKeys.BLOCK)
 			);
 
@@ -82,7 +82,7 @@ public class CustomRegistryEntryListsTest implements ModInitializer {
 			warnIfFalse(universal.contains(coral), "CustomRegistryEntryList.universal doesn't contain brain coral");
 			warnIfFalse(universal.contains(log), "CustomRegistryEntryList.universal doesn't contain oak log");
 
-			RegistryEntryList<Block> subtraction = CustomRegistryEntryList.subtraction(
+			RegistryEntryList<Block> subtraction = DefaultCustomRegistryEntryLists.subtraction(
 					registries.getOrThrow(RegistryKeys.BLOCK),
 					universal,
 					RegistryEntryList.of(registries.getOrThrow(RegistryKeys.BLOCK).getEntry(Blocks.ANVIL))

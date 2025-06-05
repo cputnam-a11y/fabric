@@ -22,6 +22,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import io.netty.buffer.ByteBuf;
+import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializer;
+import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializerRegistry;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -55,7 +58,7 @@ class PacketCodecs$25Mixin<V> {
 	RegistryKey<? extends Registry<V>> field_54511;
 
 	@Unique
-	HashMap<CustomRegistryEntryList.CustomRegistryEntryListSerializer, PacketCodec<RegistryByteBuf, CustomRegistryEntryList<V>>> cache = new HashMap<>();
+	HashMap<CustomRegistryEntryListSerializer, PacketCodec<RegistryByteBuf, CustomRegistryEntryList<V>>> cache = new HashMap<>();
 
 	private PacketCodecs$25Mixin() {
 	}
@@ -95,7 +98,7 @@ class PacketCodecs$25Mixin<V> {
 		}
 
 		Identifier identifier = Identifier.PACKET_CODEC.decode(buf);
-		CustomRegistryEntryList.CustomRegistryEntryListSerializer serializer = CustomRegistryEntryList.getSerializer(identifier);
+		CustomRegistryEntryListSerializer serializer = CustomRegistryEntryListSerializerRegistry.getSerializer(identifier);
 
 		if (serializer == null) {
 			throw new IllegalStateException("Unknown CustomRegistryEntryListSerializer: " + identifier);

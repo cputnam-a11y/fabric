@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.network.RegistryByteBuf;

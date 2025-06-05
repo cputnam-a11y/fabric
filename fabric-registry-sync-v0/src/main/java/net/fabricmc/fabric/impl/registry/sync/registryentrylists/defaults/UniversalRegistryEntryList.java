@@ -25,6 +25,7 @@ import java.util.stream.Stream;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.block.Blocks;
