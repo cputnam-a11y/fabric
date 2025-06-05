@@ -41,7 +41,7 @@
     "fabric-api:module-lifecycle": "stable",
     "loom:injected_interfaces": {
       "net/minecraft/class_2378": ["net/fabricmc/fabric/api/event/registry/FabricRegistry"],
-      "net/minecraft/class_6885": ["net/fabricmc/fabric/api/event/registry/DependentRegistryEntryList<TT;>"]
+      "net/minecraft/class_6885": ["net/fabricmc/fabric/api/event/registry/entrylists/DependentRegistryEntryList<TT;>"]
     }
   }
 }

@@ -20,7 +20,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import net.fabricmc.fabric.impl.registry.sync.registryentrylists.CustomRegistryEntryListSerializerRegistryImpl;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +33,8 @@ import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryListCodec;
 
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryList;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
+import net.fabricmc.fabric.impl.registry.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
 
 @SuppressWarnings("unchecked")
 @Mixin(RegistryEntryListCodec.class)

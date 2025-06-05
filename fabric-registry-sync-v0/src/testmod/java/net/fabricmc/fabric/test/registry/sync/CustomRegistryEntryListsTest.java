@@ -17,7 +17,6 @@
 package net.fabricmc.fabric.test.registry.sync;
 
 import com.mojang.logging.LogUtils;
-import net.fabricmc.fabric.api.event.registry.DefaultCustomRegistryEntryLists;
 import org.slf4j.Logger;
 
 import net.minecraft.block.Block;
@@ -29,6 +28,7 @@ import net.minecraft.registry.tag.BlockTags;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import net.fabricmc.fabric.api.event.registry.entrylists.DefaultCustomRegistryEntryLists;
 
 public class CustomRegistryEntryListsTest implements ModInitializer {
 	private static final Logger LOGGER = LogUtils.getLogger();

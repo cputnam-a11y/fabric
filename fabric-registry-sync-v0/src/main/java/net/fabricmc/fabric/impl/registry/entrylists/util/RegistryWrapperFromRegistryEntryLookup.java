@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.sync.registryentrylists.util;
+package net.fabricmc.fabric.impl.registry.entrylists.util;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -28,11 +28,10 @@ import net.minecraft.registry.tag.TagKey;
 
 import net.fabricmc.fabric.mixin.registry.sync.registryentrylists.RegistryKeyAccessor;
 
-@SuppressWarnings("unchecked")
 record RegistryWrapperFromRegistryEntryLookup<T>(RegistryEntryLookup<T> entryLookup) implements RegistryWrapper<T> {
 	/**
-	 * @see RegistryWrapperUtils#castOrCreateFromEntryLookup(RegistryEntryLookup)
 	 * @param entryLookup the entry lookup backing this wrapper
+	 * @see RegistryWrapperUtils#castOrCreateFromEntryLookup(RegistryEntryLookup)
 	 */
 	RegistryWrapperFromRegistryEntryLookup {
 		if (entryLookup instanceof RegistryWrapper<T>) {
@@ -41,27 +40,21 @@ record RegistryWrapperFromRegistryEntryLookup<T>(RegistryEntryLookup<T> entryLoo
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Stream<RegistryEntry.Reference<T>> streamEntries() {
 		return RegistryKeyAccessor
 				.getInstances()
 				.values()
 				.stream()
-				.flatMap(
-						key -> entryLookup
-								.getOptional((RegistryKey<T>) key)
-								.stream()
-				);
+				.flatMap(key -> entryLookup.getOptional((RegistryKey<T>) key).stream());
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Stream<RegistryEntryList.Named<T>> getTags() {
-		return TagKeyCache
-				.stream()
-				.flatMap(
-						key -> entryLookup
-								.getOptional((TagKey<T>) key)
-								.stream()
-				);
+		return TagKeyCache.stream().flatMap(
+				key -> entryLookup.getOptional((TagKey<T>) key).stream()
+		);
 	}
 
 	@Override

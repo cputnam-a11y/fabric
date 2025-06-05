@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.api.event.registry;
+package net.fabricmc.fabric.api.event.registry.entrylists;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
 import com.google.common.collect.MapMaker;
 import org.jetbrains.annotations.ApiStatus;
@@ -31,33 +31,35 @@ import net.minecraft.registry.entry.RegistryEntryList;
 @ApiStatus.NonExtendable
 public interface DependentRegistryEntryList<T> {
 	// creating a cycle in the graph will lead to stack overflow, do with this knowledge what you will
-	Map<RegistryEntryList<?>, List<RegistryEntryList<?>>> DEPENDENCIES = new MapMaker()
-			.weakKeys()
-			.weakValues()
-			.makeMap();
+	Map<RegistryEntryList<?>, Set<RegistryEntryList<?>>> DEPENDENCIES = new MapMaker().weakKeys().makeMap();
 
-	default List<RegistryEntryList<T>> getDependencies() {
-		return Collections.unmodifiableList(castToT(DEPENDENCIES.get(this.asSelf())));
+	default Set<RegistryEntryList<T>> getDependencies() {
+		return Collections.unmodifiableSet(castToT(DEPENDENCIES.get(this.asSelf())));
 	}
 
 	/**
-	 * Unregisters a dependency.
+	 * Unregisters a dependency on this.
 	 * Does nothing is the dependency is not registered.
 	 *
 	 * @param dependency the dependency to unregister
 	 */
 	default void unregisterDependency(RegistryEntryList<T> dependency) {
-		List<RegistryEntryList<T>> dependencies = castToT(DEPENDENCIES.get(this.asSelf()));
+		Set<RegistryEntryList<T>> dependencies = castToT(DEPENDENCIES.get(this.asSelf()));
 
 		if (dependencies != null) {
 			dependencies.remove(dependency);
 		}
 	}
 
+	/**
+	 * registers a dependency on this.
+	 *
+	 * @param dependency the dependency to register
+	 */
 	default void registerDependency(RegistryEntryList<T> dependency) {
 		DEPENDENCIES.computeIfAbsent(
 						this.asSelf(),
-						k -> new ArrayList<>()
+						k -> Collections.newSetFromMap(new WeakHashMap<>())
 				)
 				.add(dependency);
 	}
@@ -66,8 +68,7 @@ public interface DependentRegistryEntryList<T> {
 	 * Invalidate dependents is called by this list when it is invalidated.
 	 */
 	private void invalidateDependents() {
-		DEPENDENCIES.getOrDefault(this.asSelf(), List.of())
-				.forEach(DependentRegistryEntryList::invalidate);
+		DEPENDENCIES.getOrDefault(this.asSelf(), Set.of()).forEach(DependentRegistryEntryList::invalidate);
 	}
 
 	/**
@@ -85,7 +86,7 @@ public interface DependentRegistryEntryList<T> {
 
 	// why can't java just have field generics or something?
 	@SuppressWarnings("unchecked")
-	private static <T> List<RegistryEntryList<T>> castToT(List<RegistryEntryList<?>> entryList) {
-		return (List<RegistryEntryList<T>>) (Object) entryList;
+	private static <T> Set<RegistryEntryList<T>> castToT(Set<RegistryEntryList<?>> entryList) {
+		return (Set<RegistryEntryList<T>>) (Object) entryList;
 	}
 }

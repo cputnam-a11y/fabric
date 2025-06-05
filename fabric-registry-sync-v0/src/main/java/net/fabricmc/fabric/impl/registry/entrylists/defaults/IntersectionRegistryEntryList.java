@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.sync.registryentrylists.defaults;
+package net.fabricmc.fabric.impl.registry.entrylists.defaults;
 
 import java.util.List;
 import java.util.Set;
@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializer;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.network.RegistryByteBuf;
@@ -35,7 +34,8 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryListCodec;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryList;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
 
 public class IntersectionRegistryEntryList<T> extends MultiPartRegistryEntryList<T> {
 	public static final CustomRegistryEntryListSerializer SERIALIZER = new Serializer();

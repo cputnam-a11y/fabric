@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.sync.registryentrylists.defaults;
+package net.fabricmc.fabric.impl.registry.entrylists.defaults;
 
-import net.fabricmc.fabric.impl.registry.sync.registryentrylists.CustomRegistryEntryListSerializerRegistryImpl;
-import net.fabricmc.fabric.impl.registry.sync.registryentrylists.util.RegistryWrapperUtils;
+import java.util.List;
+import java.util.Objects;
 
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.entry.RegistryEntryList;
 
-import java.util.List;
-import java.util.Objects;
+import net.fabricmc.fabric.impl.registry.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
+import net.fabricmc.fabric.impl.registry.entrylists.util.RegistryWrapperUtils;
 
 public class DefaultCustomRegistryEntryListsImpl {
 	private static boolean initialized = false;

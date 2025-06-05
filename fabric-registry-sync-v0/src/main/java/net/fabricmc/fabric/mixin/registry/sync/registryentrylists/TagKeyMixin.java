@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.minecraft.registry.tag.TagKey;
 
-import net.fabricmc.fabric.impl.registry.sync.registryentrylists.util.TagKeyCache;
+import net.fabricmc.fabric.impl.registry.entrylists.util.TagKeyCache;
 
 @Mixin(TagKey.class)
 class TagKeyMixin {

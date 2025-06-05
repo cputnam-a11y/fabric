@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.sync.registryentrylists.util;
+package net.fabricmc.fabric.impl.registry.entrylists.util;
 
 import java.util.stream.Stream;
 
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.MapCodec;
@@ -34,6 +32,9 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.RegistryWrapper;
 
+/**
+ * Utility class for working with {@link RegistryWrapper}s.
+ */
 public class RegistryWrapperUtils {
 	/**
 	 * gets a {@link RegistryWrapper} from a {@link RegistryEntryLookup}.
@@ -51,10 +52,19 @@ public class RegistryWrapperUtils {
 		return new RegistryWrapperFromRegistryEntryLookup<>(registryEntryLookup);
 	}
 
+	/**
+	 * Creates a {@link MapCodec} for a {@link RegistryWrapper} based on the provided {@link RegistryKey}.
+	 * the Wrapper is not encoded in any way and is fetched from the RegistryOps on decode.
+	 *
+	 * @param registryKey the key of the registry to create a wrapper for
+	 * @param <V>         the type of elements in the registry
+	 * @return a MapCodec that can decode a {@link RegistryWrapper} from the registry key
+	 */
 	public static <V> MapCodec<RegistryWrapper<V>> createMapCodec(RegistryKey<? extends Registry<V>> registryKey) {
 		return new MapCodec<>() {
 			@Override
 			public <T> Stream<T> keys(DynamicOps<T> ops) {
+				// no keys, this doesn't touch this input or the output
 				return Stream.empty();
 			}
 
@@ -72,33 +82,20 @@ public class RegistryWrapperUtils {
 
 			@Override
 			public <T> RecordBuilder<T> encode(RegistryWrapper<V> input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
+				// No need to encode
 				return prefix;
 			}
 		};
 	}
 
-	public static <V> Codec<RegistryWrapper<V>> createCodec(RegistryKey<? extends Registry<V>> registryKey) {
-		return new Codec<>() {
-			@Override
-			public <T> DataResult<Pair<RegistryWrapper<V>, T>> decode(DynamicOps<T> ops, T input) {
-				if (!(ops instanceof RegistryOps<T> registryOps)) {
-					return DataResult.error(() -> "Can't access registry");
-				}
-
-				return registryOps.getEntryLookup(registryKey)
-						.map(RegistryWrapperUtils::castOrCreateFromEntryLookup)
-						.map(it -> new Pair<>(it, input))
-						.map(DataResult::success)
-						.orElseGet(() -> DataResult.error(() -> "Registry Not Found"));
-			}
-
-			@Override
-			public <T> DataResult<T> encode(RegistryWrapper<V> input, DynamicOps<T> ops, T prefix) {
-				return DataResult.success(prefix);
-			}
-		};
-	}
-
+	/**
+	 * Creates a {@link PacketCodec} for a {@link RegistryWrapper} based on the provided {@link RegistryKey}.
+	 * the Wrapper is not encoded in any way and is fetched from the RegistryByteBuf on decode.
+	 *
+	 * @param registryKey the key of the registry to create a wrapper for
+	 * @param <V>         the type of elements in the registry
+	 * @return a PacketCodec that can decode a {@link RegistryWrapper} from the registry key
+	 */
 	public static <V> PacketCodec<RegistryByteBuf, RegistryWrapper<V>> createPacketCodec(RegistryKey<? extends Registry<V>> registryKey) {
 		return new PacketCodec<>() {
 			@Override
@@ -108,7 +105,7 @@ public class RegistryWrapperUtils {
 
 			@Override
 			public void encode(RegistryByteBuf buf, RegistryWrapper<V> value) {
-				// No need to encode, as the registry is already present in the buffer
+				// No need to encode
 			}
 		};
 	}

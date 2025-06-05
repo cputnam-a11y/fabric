@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.sync.registryentrylists.defaults;
+package net.fabricmc.fabric.impl.registry.entrylists.defaults;
 
 import java.util.Iterator;
 import java.util.List;
@@ -34,7 +34,7 @@ import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.random.Random;
 
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryList;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
 
 public abstract class MultiPartRegistryEntryList<T> implements CustomRegistryEntryList<T> {
 	private final ImmutableList<RegistryEntryList<T>> parts;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.sync.registryentrylists.util;
+package net.fabricmc.fabric.impl.registry.entrylists.util;
 
 import java.util.Set;
 
@@ -28,11 +28,15 @@ import net.minecraft.util.Identifier;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.impl.networking.FabricRegistryByteBuf;
 
+/**
+ * Allows checking if a {@link RegistryByteBuf} has the registry sync module installed on the other side.
+ */
 public class ChannelUtil {
+	//this is a dummy, it should never actually be used
 	private static final PacketCodec<ByteBuf, CustomPayload> CODEC = PacketCodec.unit(null);
 
 	private static final CustomPayload.Id<CustomPayload> ID = new CustomPayload.Id<>(
-			Identifier.of("fabric", "is_installed")
+			Identifier.of("fabric", "is_installed_v0")
 	);
 
 	public static void init() {
@@ -40,7 +44,7 @@ public class ChannelUtil {
 		PayloadTypeRegistry.configurationS2C().register(ID, CODEC);
 	}
 
-	@SuppressWarnings({"BooleanMethodIsAlwaysInverted"})
+	@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 	public static boolean isInstalled(RegistryByteBuf buf) {
 		if (!(buf instanceof FabricRegistryByteBuf fabricRegistryByteBuf)) {
 			return false;

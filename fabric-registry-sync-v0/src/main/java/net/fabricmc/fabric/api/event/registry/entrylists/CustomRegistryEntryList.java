@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.api.event.registry;
+package net.fabricmc.fabric.api.event.registry.entrylists;
 
 import net.minecraft.registry.entry.RegistryEntryList;
 
 public interface CustomRegistryEntryList<T> extends RegistryEntryList<T> {
 	CustomRegistryEntryListSerializer getSerializer();
-
 }

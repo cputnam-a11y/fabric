@@ -22,9 +22,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializer;
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryListSerializerRegistry;
-
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -42,8 +39,10 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.event.registry.CustomRegistryEntryList;
-import net.fabricmc.fabric.impl.registry.sync.registryentrylists.util.ChannelUtil;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
+import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializerRegistry;
+import net.fabricmc.fabric.impl.registry.entrylists.util.ChannelUtil;
 
 @SuppressWarnings("unchecked")
 @Mixin(targets = "net.minecraft.network.codec.PacketCodecs$25")

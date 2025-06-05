@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import net.minecraft.registry.entry.RegistryEntryList;
 
-import net.fabricmc.fabric.api.event.registry.DependentRegistryEntryList;
+import net.fabricmc.fabric.api.event.registry.entrylists.DependentRegistryEntryList;
 
 @Mixin(RegistryEntryList.class)
 interface RegistryEntryListMixin<T> extends DependentRegistryEntryList<T> {
