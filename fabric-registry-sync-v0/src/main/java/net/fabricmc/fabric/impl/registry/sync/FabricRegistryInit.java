@@ -25,6 +25,8 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationNetworking;
 import net.fabricmc.fabric.impl.registry.sync.packet.DirectRegistryPacketHandler;
+import net.fabricmc.fabric.impl.registry.sync.registryentrylists.CustomRegistryEntryListImpl;
+import net.fabricmc.fabric.impl.registry.sync.registryentrylists.util.ChannelUtil;
 
 public class FabricRegistryInit implements ModInitializer {
 	@Override
@@ -211,5 +213,8 @@ public class FabricRegistryInit implements ModInitializer {
 		// Synced via PacketCodecs.registryValue
 		RegistryAttributeHolder.get(Registries.RECIPE_BOOK_CATEGORY)
 				.addAttribute(RegistryAttribute.SYNCED);
+
+		ChannelUtil.init();
+		CustomRegistryEntryListImpl.init();
 	}
 }
