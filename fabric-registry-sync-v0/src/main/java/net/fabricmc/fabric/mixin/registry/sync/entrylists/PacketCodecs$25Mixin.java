@@ -42,7 +42,7 @@ import net.minecraft.util.Identifier;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializerRegistry;
-import net.fabricmc.fabric.impl.registry.entrylists.util.ChannelUtil;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.util.ChannelUtil;
 
 @SuppressWarnings("unchecked")
 @Mixin(targets = "net.minecraft.network.codec.PacketCodecs$25")

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.entrylists;
+package net.fabricmc.fabric.impl.registry.sync.entrylists;
 
 import java.util.HashMap;
 import java.util.Map;

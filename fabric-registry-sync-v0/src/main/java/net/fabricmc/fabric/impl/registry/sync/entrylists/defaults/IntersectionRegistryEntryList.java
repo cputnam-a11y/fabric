@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.entrylists.defaults;
+package net.fabricmc.fabric.impl.registry.sync.entrylists.defaults;
 
 import java.util.List;
 import java.util.Set;

@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.impl.registry.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
 
 public interface CustomRegistryEntryListSerializerRegistry {
 	static void registerSerializer(@NotNull CustomRegistryEntryListSerializer serializer) {

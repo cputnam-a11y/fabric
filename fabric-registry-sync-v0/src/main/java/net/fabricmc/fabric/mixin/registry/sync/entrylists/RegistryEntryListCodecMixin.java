@@ -34,7 +34,7 @@ import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryListCodec;
 
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
-import net.fabricmc.fabric.impl.registry.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
 
 @SuppressWarnings("unchecked")
 @Mixin(RegistryEntryListCodec.class)

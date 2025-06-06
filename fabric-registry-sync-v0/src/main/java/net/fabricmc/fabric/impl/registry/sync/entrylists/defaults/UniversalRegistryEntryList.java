@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.impl.registry.entrylists.defaults;
+package net.fabricmc.fabric.impl.registry.sync.entrylists.defaults;
 
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +44,7 @@ import net.minecraft.util.math.random.Random;
 
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
-import net.fabricmc.fabric.impl.registry.entrylists.util.RegistryWrapperUtils;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.util.RegistryWrapperUtils;
 
 public record UniversalRegistryEntryList<T>(RegistryWrapper<T> source) implements CustomRegistryEntryList<T> {
 	public static final CustomRegistryEntryListSerializer SERIALIZER = new Serializer();

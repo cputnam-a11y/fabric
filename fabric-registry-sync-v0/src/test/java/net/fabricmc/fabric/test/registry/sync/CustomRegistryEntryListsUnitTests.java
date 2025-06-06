@@ -49,9 +49,9 @@ import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryListCodec;
 
-import net.fabricmc.fabric.impl.registry.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
-import net.fabricmc.fabric.impl.registry.entrylists.defaults.DefaultCustomRegistryEntryListsImpl;
-import net.fabricmc.fabric.impl.registry.entrylists.defaults.InverseRegistryEntryList;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.defaults.DefaultCustomRegistryEntryListsImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.defaults.InverseRegistryEntryList;
 
 public class CustomRegistryEntryListsUnitTests {
 	@BeforeAll

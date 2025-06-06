@@ -19,7 +19,7 @@ package net.fabricmc.fabric.api.event.registry.entrylists;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.entry.RegistryEntryList;
 
-import net.fabricmc.fabric.impl.registry.entrylists.defaults.DefaultCustomRegistryEntryListsImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.defaults.DefaultCustomRegistryEntryListsImpl;
 
 public class DefaultCustomRegistryEntryLists {
 	@SafeVarargs
