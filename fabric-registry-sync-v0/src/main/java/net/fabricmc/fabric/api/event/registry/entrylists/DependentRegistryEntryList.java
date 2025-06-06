@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-import com.google.common.collect.MapMaker;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
@@ -31,10 +30,10 @@ import net.minecraft.registry.entry.RegistryEntryList;
 @ApiStatus.NonExtendable
 public interface DependentRegistryEntryList<T> {
 	// creating a cycle in the graph will lead to stack overflow, do with this knowledge what you will
-	Map<RegistryEntryList<?>, Set<RegistryEntryList<?>>> DEPENDENCIES = new MapMaker().weakKeys().makeMap();
+	Map<RegistryEntryList<?>, Set<RegistryEntryList<?>>> DEPENDENCIES = new WeakHashMap<>();
 
 	default Set<RegistryEntryList<T>> getDependencies() {
-		return Collections.unmodifiableSet(castToT(DEPENDENCIES.get(this.asSelf())));
+		return Collections.unmodifiableSet(castToT(DEPENDENCIES.getOrDefault(this.asSelf(), Set.of())));
 	}
 
 	/**
