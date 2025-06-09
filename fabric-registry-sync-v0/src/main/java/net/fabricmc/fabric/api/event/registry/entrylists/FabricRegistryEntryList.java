@@ -28,7 +28,7 @@ import net.minecraft.registry.entry.RegistryEntryList;
 
 // Injected to RegistryEntryList<T>
 @ApiStatus.NonExtendable
-public interface DependentRegistryEntryList<T> {
+public interface FabricRegistryEntryList<T> {
 	// creating a cycle in the graph will lead to stack overflow, do with this knowledge what you will
 	Map<RegistryEntryList<?>, Set<RegistryEntryList<?>>> DEPENDENCIES = new WeakHashMap<>();
 
@@ -67,7 +67,7 @@ public interface DependentRegistryEntryList<T> {
 	 * Invalidate dependents is called by this list when it is invalidated.
 	 */
 	private void invalidateDependents() {
-		DEPENDENCIES.getOrDefault(this.asSelf(), Set.of()).forEach(DependentRegistryEntryList::invalidate);
+		DEPENDENCIES.getOrDefault(this.asSelf(), Set.of()).forEach(FabricRegistryEntryList::invalidate);
 	}
 
 	/**

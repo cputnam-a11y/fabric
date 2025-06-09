@@ -31,12 +31,12 @@ import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
 
-public class CustomRegistryEntryListSerializerRegistryImpl {
-	private CustomRegistryEntryListSerializerRegistryImpl() {
+public final class CustomRegistryEntryListSerializerImpl {
+	private CustomRegistryEntryListSerializerImpl() {
 		throw new UnsupportedOperationException();
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CustomRegistryEntryListSerializerRegistryImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomRegistryEntryListSerializerImpl.class);
 	private static final Map<Identifier, CustomRegistryEntryListSerializer> SERIALIZERS = new HashMap<>();
 	public static final Codec<CustomRegistryEntryListSerializer> SERIALIZER_CODEC = Identifier.CODEC.flatXmap(
 			id -> Optional.ofNullable(SERIALIZERS.get(id))

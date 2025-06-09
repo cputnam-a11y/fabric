@@ -18,6 +18,8 @@ package net.fabricmc.fabric.api.event.registry.entrylists;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -26,7 +28,17 @@ import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 
+import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerImpl;
+
 public interface CustomRegistryEntryListSerializer {
+	static void registerSerializer(@NotNull CustomRegistryEntryListSerializer serializer) {
+		CustomRegistryEntryListSerializerImpl.registerSerializer(serializer);
+	}
+
+	static @Nullable CustomRegistryEntryListSerializer getSerializer(Identifier id) {
+		return CustomRegistryEntryListSerializerImpl.getSerializer(id);
+	}
+
 	Identifier getIdentifier();
 
 	<T1> MapCodec<? extends CustomRegistryEntryList<T1>> createCodec(RegistryKey<? extends Registry<T1>> registryKey, Codec<RegistryEntry<T1>> entryCodec, boolean forceList);

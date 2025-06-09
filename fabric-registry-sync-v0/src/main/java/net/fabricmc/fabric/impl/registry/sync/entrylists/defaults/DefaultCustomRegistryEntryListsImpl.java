@@ -22,7 +22,7 @@ import java.util.Objects;
 import net.minecraft.registry.RegistryEntryLookup;
 import net.minecraft.registry.entry.RegistryEntryList;
 
-import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerImpl;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.util.RegistryWrapperUtils;
 
 public class DefaultCustomRegistryEntryListsImpl {
@@ -34,10 +34,10 @@ public class DefaultCustomRegistryEntryListsImpl {
 		}
 
 		initialized = true;
-		CustomRegistryEntryListSerializerRegistryImpl.registerSerializer(UnionRegistryEntryList.SERIALIZER);
-		CustomRegistryEntryListSerializerRegistryImpl.registerSerializer(IntersectionRegistryEntryList.SERIALIZER);
-		CustomRegistryEntryListSerializerRegistryImpl.registerSerializer(InverseRegistryEntryList.SERIALIZER);
-		CustomRegistryEntryListSerializerRegistryImpl.registerSerializer(UniversalRegistryEntryList.SERIALIZER);
+		CustomRegistryEntryListSerializerImpl.registerSerializer(UnionRegistryEntryList.SERIALIZER);
+		CustomRegistryEntryListSerializerImpl.registerSerializer(IntersectionRegistryEntryList.SERIALIZER);
+		CustomRegistryEntryListSerializerImpl.registerSerializer(InverseRegistryEntryList.SERIALIZER);
+		CustomRegistryEntryListSerializerImpl.registerSerializer(UniversalRegistryEntryList.SERIALIZER);
 	}
 
 	public static <T> RegistryEntryList<T> union(RegistryEntryList<T>[] parts) {

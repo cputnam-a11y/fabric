@@ -49,7 +49,7 @@ import net.minecraft.registry.RegistryOps;
 import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryListCodec;
 
-import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerRegistryImpl;
+import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerImpl;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.defaults.DefaultCustomRegistryEntryListsImpl;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.defaults.InverseRegistryEntryList;
 
@@ -70,7 +70,7 @@ public class CustomRegistryEntryListsUnitTests {
 		InverseRegistryEntryList<Block> customEntryList = new InverseRegistryEntryList<>(reg, entryList);
 		Codec<InverseRegistryEntryList<Block>> codec = swapType(RegistryEntryListCodec.create(reg.getKey(), reg.getEntryCodec(), false));
 		JsonElement serialized = Assertions.assertDoesNotThrow(() -> codec.encodeStart(ops, customEntryList).getOrThrow());
-		Assertions.assertTrue(CustomRegistryEntryListSerializerRegistryImpl.isSerializedCustomRegistryEntryList(ops, serialized));
+		Assertions.assertTrue(CustomRegistryEntryListSerializerImpl.isSerializedCustomRegistryEntryList(ops, serialized));
 		RegistryEntryList<Block> deserialized = Assertions.assertDoesNotThrow(() -> codec.parse(ops, serialized).getOrThrow());
 		Assertions.assertInstanceOf(InverseRegistryEntryList.class, deserialized);
 	}

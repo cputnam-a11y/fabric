@@ -41,7 +41,6 @@ import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
-import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializerRegistry;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.util.ChannelUtil;
 
 @SuppressWarnings("unchecked")
@@ -97,7 +96,7 @@ class PacketCodecs$25Mixin<V> {
 		}
 
 		Identifier identifier = Identifier.PACKET_CODEC.decode(buf);
-		CustomRegistryEntryListSerializer serializer = CustomRegistryEntryListSerializerRegistry.getSerializer(identifier);
+		CustomRegistryEntryListSerializer serializer = CustomRegistryEntryListSerializer.getSerializer(identifier);
 
 		if (serializer == null) {
 			throw new IllegalStateException("Unknown CustomRegistryEntryListSerializer: " + identifier);
