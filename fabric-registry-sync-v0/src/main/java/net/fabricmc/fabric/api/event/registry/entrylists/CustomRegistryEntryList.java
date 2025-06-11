@@ -18,6 +18,15 @@ package net.fabricmc.fabric.api.event.registry.entrylists;
 
 import net.minecraft.registry.entry.RegistryEntryList;
 
+/**
+ *
+ * @param <T> the type of elements contained by this list
+ */
 public interface CustomRegistryEntryList<T> extends RegistryEntryList<T> {
+	/**
+	 *
+	 * @return a registered serializer capable of serializing this list
+	 * @see CustomRegistryEntryListSerializer#registerSerializer
+	 */
 	CustomRegistryEntryListSerializer getSerializer();
 }

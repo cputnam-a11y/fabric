@@ -36,6 +36,12 @@ import net.minecraft.util.math.random.Random;
 
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
 
+/**
+ * A default template implementation of {@link RegistryEntryList} that derives it's contents from some set of backing lists.
+ * the resulting list is cached as a set and a list, to provide a consistent iteration order, and O(1) contains
+ *
+ * @param <T> type of entries held by this list
+ */
 public abstract class MultiPartRegistryEntryList<T> implements CustomRegistryEntryList<T> {
 	private final ImmutableList<RegistryEntryList<T>> parts;
 	@Nullable

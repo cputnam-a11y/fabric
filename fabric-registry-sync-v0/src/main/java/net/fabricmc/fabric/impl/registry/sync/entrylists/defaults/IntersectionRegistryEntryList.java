@@ -37,6 +37,13 @@ import net.minecraft.util.Identifier;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList;
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
 
+/**
+ * A default implementation of {@link RegistryEntryList} that contains everything in all of it's backing lists.
+ * the resulting list is cached as a set and a list, to provide a consistent iteration order, and O(1) contains
+ *
+ * @param <T> type of entries held by this list
+ */
+
 public class IntersectionRegistryEntryList<T> extends MultiPartRegistryEntryList<T> {
 	public static final CustomRegistryEntryListSerializer SERIALIZER = new Serializer();
 

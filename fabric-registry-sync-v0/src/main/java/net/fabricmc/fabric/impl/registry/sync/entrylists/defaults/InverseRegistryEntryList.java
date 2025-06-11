@@ -30,9 +30,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
@@ -52,6 +49,12 @@ import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.util.RegistryWrapperUtils;
 
+/**
+ * A default implementation of {@link RegistryEntryList} that contains everything not in a given list.
+ * A best effort is made to keep a cache of the values, to avoid iterating the registry for every call.
+ *
+ * @param <T> type of entries held by this list
+ */
 public class InverseRegistryEntryList<T> implements CustomRegistryEntryList<T> {
 	public static final CustomRegistryEntryListSerializer SERIALIZER = new Serializer();
 
@@ -128,9 +131,6 @@ public class InverseRegistryEntryList<T> implements CustomRegistryEntryList<T> {
 		if (this.cache == null) {
 			this.cache = this.wrapper
 					.streamEntries()
-					.filter(
-							it -> !(it.value().equals(Items.AIR) || it.value() == Blocks.AIR || it.value() == Fluids.EMPTY)
-					)
 					.filter(Predicate.not(this.opposite::contains))
 					.collect(Collectors.toUnmodifiableList());
 		}

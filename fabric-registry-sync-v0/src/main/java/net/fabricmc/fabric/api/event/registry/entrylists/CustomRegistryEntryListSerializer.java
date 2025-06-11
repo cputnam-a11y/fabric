@@ -31,14 +31,27 @@ import net.minecraft.util.Identifier;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.CustomRegistryEntryListSerializerImpl;
 
 public interface CustomRegistryEntryListSerializer {
+	/**
+	 * registers a {@link CustomRegistryEntryListSerializer}. this must be done before the list is used
+	 * @param serializer the serializer to register
+	 */
 	static void registerSerializer(@NotNull CustomRegistryEntryListSerializer serializer) {
 		CustomRegistryEntryListSerializerImpl.registerSerializer(serializer);
 	}
 
+	/**
+	 * gets a registered serializer.
+	 * @param id the identifier of the serializer
+	 * @return the serializer, or {@code null} if no serializer is registered with the given id
+	 */
 	static @Nullable CustomRegistryEntryListSerializer getSerializer(Identifier id) {
 		return CustomRegistryEntryListSerializerImpl.getSerializer(id);
 	}
 
+	/**
+	 * used to encode the entry list over the network, or in json.
+	 * @return the registry id of this serializer
+	 */
 	Identifier getIdentifier();
 
 	<T1> MapCodec<? extends CustomRegistryEntryList<T1>> createCodec(RegistryKey<? extends Registry<T1>> registryKey, Codec<RegistryEntry<T1>> entryCodec, boolean forceList);

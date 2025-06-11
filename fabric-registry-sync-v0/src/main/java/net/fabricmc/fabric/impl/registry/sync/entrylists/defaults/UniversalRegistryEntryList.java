@@ -27,15 +27,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import org.jetbrains.annotations.NotNull;
 
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.item.Items;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
 import net.minecraft.registry.entry.RegistryEntryOwner;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
@@ -46,16 +44,18 @@ import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryList
 import net.fabricmc.fabric.api.event.registry.entrylists.CustomRegistryEntryListSerializer;
 import net.fabricmc.fabric.impl.registry.sync.entrylists.util.RegistryWrapperUtils;
 
+/**
+ * A default implementation of {@link RegistryEntryList} that contains everything in a given registry
+ * No caching is done.
+ *
+ * @param <T> type of entries held by this list
+ */
 public record UniversalRegistryEntryList<T>(RegistryWrapper<T> source) implements CustomRegistryEntryList<T> {
 	public static final CustomRegistryEntryListSerializer SERIALIZER = new Serializer();
 
 	@Override
 	public Stream<RegistryEntry<T>> stream() {
-		return source.streamEntries()
-				.filter(
-						it -> !(it.value().equals(Items.AIR) || it.value() == Blocks.AIR || it.value() == Fluids.EMPTY)
-				)
-				.map(Function.identity());
+		return source.streamEntries().map(Function.identity());
 	}
 
 	@Override
