@@ -127,7 +127,7 @@ public class ClientGameTestTest implements FabricClientGameTest {
 	}
 
 	private static void enableDebugHud(ClientGameTestContext context) {
-		context.runOnClient(client -> client.inGameHud.getDebugHud().toggleDebugHud());
+		context.runOnClient(client -> client.debugHudEntryList.toggleF3Enabled());
 	}
 
 	private static void setPerspective(ClientGameTestContext context, Perspective perspective) {

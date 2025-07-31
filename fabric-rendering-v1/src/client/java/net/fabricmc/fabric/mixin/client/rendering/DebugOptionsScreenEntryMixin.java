@@ -16,26 +16,21 @@
 
 package net.fabricmc.fabric.mixin.client.rendering;
 
-import java.util.List;
-
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import net.minecraft.client.gui.hud.DebugHud;
+import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.client.rendering.v1.GatherDebugTextEvents;
+@Mixin(targets = "net/minecraft/client/gui/screen/DebugOptionsScreen$class_11647")
+public abstract class DebugOptionsScreenEntryMixin {
+	@WrapOperation(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Identifier;getPath()Ljava/lang/String;"))
+	private String showNamespace(Identifier instance, Operation<String> original) {
+		if (!Identifier.DEFAULT_NAMESPACE.equals(instance.getNamespace())) {
+			return instance.toString();
+		}
 
-@Mixin(DebugHud.class)
-abstract class DebugHudMixin {
-	@Inject(method = "getLeftText", at = @At("RETURN"))
-	protected void getLeftText(CallbackInfoReturnable<List<String>> ci) {
-		GatherDebugTextEvents.LEFT.invoker().onGatherLeftDebugText(ci.getReturnValue());
-	}
-
-	@Inject(method = "getRightText", at = @At("RETURN"))
-	protected void getRightText(CallbackInfoReturnable<List<String>> ci) {
-		GatherDebugTextEvents.RIGHT.invoker().onGatherRightDebugText(ci.getReturnValue());
+		return original.call(instance);
 	}
 }

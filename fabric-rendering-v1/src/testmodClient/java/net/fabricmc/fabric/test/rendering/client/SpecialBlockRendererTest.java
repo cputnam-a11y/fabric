@@ -27,7 +27,6 @@ import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.model.AllayEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
-import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.render.item.model.special.SpecialModelRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemDisplayContext;
@@ -49,8 +48,8 @@ public class SpecialBlockRendererTest implements ClientModInitializer {
 	public void onInitializeClient() {
 		SpecialBlockRendererRegistry.register(Blocks.TNT, new SpecialModelRenderer.Unbaked() {
 			@Override
-			public SpecialModelRenderer<?> bake(LoadedEntityModels entityModels) {
-				AllayEntityModel allayModel = new AllayEntityModel(entityModels.getModelPart(EntityModelLayers.ALLAY));
+			public SpecialModelRenderer<?> bake(SpecialModelRenderer.BakeContext ctx) {
+				AllayEntityModel allayModel = new AllayEntityModel(ctx.entityModelSet().getModelPart(EntityModelLayers.ALLAY));
 
 				return new SpecialModelRenderer<>() {
 					@Override

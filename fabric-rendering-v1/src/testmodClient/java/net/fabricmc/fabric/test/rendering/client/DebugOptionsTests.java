@@ -16,17 +16,16 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.GatherDebugTextEvents;
+import net.minecraft.client.gui.hud.debug.DebugHudEntries;
+import net.minecraft.util.Identifier;
 
-public class DebugTextTest implements ClientModInitializer {
+import net.fabricmc.api.ClientModInitializer;
+
+public class DebugOptionsTests implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		GatherDebugTextEvents.LEFT.register(lines -> {
-			lines.addLast("Custom Left Side Bottom Text");
-		});
-		GatherDebugTextEvents.RIGHT.register(lines -> {
-			lines.addFirst("Custom Right Side Top Text");
+		DebugHudEntries.register(Identifier.of("fabric-rendering", "example"), (lines, world, clientChunk, chunk) -> {
+			lines.addLine("Very important debug information");
 		});
 	}
 }
