@@ -28,62 +28,30 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry;
 
 public final class SpecialGuiElementRegistryImpl {
-	private static RegistrationHandler registrationHandler = new EarlyRegistrationHandler();
+	private static final List<SpecialGuiElementRegistry.Factory> FACTORIES = new ArrayList<>();
+	private static boolean frozen;
 
 	private SpecialGuiElementRegistryImpl() {
 	}
 
 	public static void register(SpecialGuiElementRegistry.Factory factory) {
-		registrationHandler.register(factory);
+		if (frozen) {
+			throw new IllegalStateException("Too late to register, GuiRenderer has already been initialized.");
+		}
+
+		FACTORIES.add(factory);
 	}
 
 	// Called after the vanilla special renderers are created.
 	public static void onReady(MinecraftClient client, VertexConsumerProvider.Immediate immediate,
 								Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
-		switch (registrationHandler) {
-		case EarlyRegistrationHandler handler -> registrationHandler = handler.onCreated(client, immediate, specialElementRenderers);
-		case LateRegistrationHandler handler -> throw new IllegalStateException("Already transitioned to late registration handler");
-		}
-	}
+		frozen = true;
 
-	private sealed interface RegistrationHandler permits EarlyRegistrationHandler, LateRegistrationHandler {
-		void register(SpecialGuiElementRegistry.Factory factory);
+		ContextImpl context = new ContextImpl(client, immediate);
 
-		default void applyFactory(SpecialGuiElementRegistry.Factory factory, SpecialGuiElementRegistry.Context context,
-									Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
+		for (SpecialGuiElementRegistry.Factory factory : FACTORIES) {
 			SpecialGuiElementRenderer<?> elementRenderer = factory.createSpecialRenderer(context);
 			specialElementRenderers.put(elementRenderer.getElementClass(), elementRenderer);
-		}
-	}
-
-	// Handle calls to register before the vanilla special renderers are created.
-	private static final class EarlyRegistrationHandler implements RegistrationHandler {
-		private List<SpecialGuiElementRegistry.Factory> pendingFactories = new ArrayList<>();
-
-		@Override
-		public void register(SpecialGuiElementRegistry.Factory factory) {
-			pendingFactories.add(factory);
-		}
-
-		// Transition to late registration handler after the vanilla special renderers are created.
-		public LateRegistrationHandler onCreated(MinecraftClient client, VertexConsumerProvider.Immediate immediate,
-												Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
-			var context = new ContextImpl(client, immediate);
-
-			for (SpecialGuiElementRegistry.Factory factory : pendingFactories) {
-				applyFactory(factory, context, specialElementRenderers);
-			}
-
-			return new LateRegistrationHandler(context, specialElementRenderers);
-		}
-	}
-
-	// Handle calls to register after the vanilla special renderers are created.
-	private record LateRegistrationHandler(SpecialGuiElementRegistry.Context context,
-														Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) implements RegistrationHandler {
-		@Override
-		public void register(SpecialGuiElementRegistry.Factory factory) {
-			applyFactory(factory, context, specialElementRenderers);
 		}
 	}
 
