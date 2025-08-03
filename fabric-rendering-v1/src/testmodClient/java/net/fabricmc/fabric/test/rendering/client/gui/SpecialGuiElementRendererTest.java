@@ -76,7 +76,7 @@ public class SpecialGuiElementRendererTest implements ClientModInitializer, Fabr
 	}
 
 	private static SignGuiElementRenderState createSignState(int x, WoodType woodType) {
-		Model signModel = SignBlockEntityRenderer.createSignModel(MinecraftClient.getInstance().getLoadedEntityModels(), woodType, true);
+		Model.SinglePartModel signModel = SignBlockEntityRenderer.createSignModel(MinecraftClient.getInstance().getLoadedEntityModels(), woodType, true);
 		return new SignGuiElementRenderState(signModel, woodType, x, 0, x + 20, 20, 10f, new ScreenRect(x, 0, x + 20, 20));
 	}
 

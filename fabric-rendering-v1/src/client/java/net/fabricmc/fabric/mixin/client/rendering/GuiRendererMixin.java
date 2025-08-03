@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,6 +32,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.class_11684;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
@@ -38,11 +40,12 @@ import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
 import net.minecraft.client.render.VertexConsumerProvider;
 
+import net.fabricmc.fabric.impl.client.rendering.GuiRendererExtensions;
 import net.fabricmc.fabric.impl.client.rendering.SpecialGuiElementRegistryImpl;
 import net.fabricmc.fabric.impl.client.rendering.SpecialGuiElementRendererPool;
 
 @Mixin(GuiRenderer.class)
-abstract class GuiRendererMixin {
+abstract class GuiRendererMixin implements GuiRendererExtensions {
 	@Shadow
 	@Final
 	@Mutable
@@ -53,11 +56,18 @@ abstract class GuiRendererMixin {
 
 	@Unique
 	private final Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRendererPool<?>> rendererPools = new HashMap<>();
+	@Unique
+	private class_11684 renderDispatcher = null;
 
 	@Inject(method = "<init>", at = @At(value = "RETURN"))
 	private void mutableSpecialElementRenderers(GuiRenderState state, VertexConsumerProvider.Immediate vertexConsumers, List<SpecialGuiElementRenderer<?>> specialElementRenderers, CallbackInfo ci) {
 		this.specialElementRenderers = new IdentityHashMap<>(this.specialElementRenderers);
-		SpecialGuiElementRegistryImpl.onReady(MinecraftClient.getInstance(), vertexConsumers, this.specialElementRenderers);
+	}
+
+	@Override
+	public void fabric_onReady(class_11684 renderDispatcher) {
+		this.renderDispatcher = renderDispatcher;
+		SpecialGuiElementRegistryImpl.onReady(MinecraftClient.getInstance(), vertexConsumers, renderDispatcher, this.specialElementRenderers);
 	}
 
 	@Inject(method = "prepareSpecialElements", at = @At("HEAD"))
@@ -72,8 +82,12 @@ abstract class GuiRendererMixin {
 
 	@ModifyVariable(method = "prepareSpecialElement", at = @At("STORE"))
 	private <T extends SpecialGuiElementRenderState> SpecialGuiElementRenderer<T> substitueSpecialElementRenderer(SpecialGuiElementRenderer<T> original, T elementState) {
+		if (original == null) {
+			return null;
+		}
+
 		SpecialGuiElementRendererPool<T> rendererPool = (SpecialGuiElementRendererPool<T>) rendererPools.computeIfAbsent(original.getElementClass(), k -> new SpecialGuiElementRendererPool<>());
-		return rendererPool.substitute(original, elementState, MinecraftClient.getInstance(), vertexConsumers);
+		return rendererPool.substitute(original, elementState, MinecraftClient.getInstance(), vertexConsumers, Objects.requireNonNull(renderDispatcher, "renderDispatcher"));
 	}
 
 	@Inject(method = "close", at = @At("RETURN"))

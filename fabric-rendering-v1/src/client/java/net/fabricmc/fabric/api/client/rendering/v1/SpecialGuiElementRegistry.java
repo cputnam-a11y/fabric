@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.ApiStatus;
 
+import net.minecraft.class_11684;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -61,5 +62,10 @@ public final class SpecialGuiElementRegistry {
 		 * @return the {@link MinecraftClient} instance.
 		 */
 		MinecraftClient client();
+
+		/**
+		 * @return the {@link class_11684} instance.
+		 */
+		class_11684 entityCommandRenderDispatcher();
 	}
 }

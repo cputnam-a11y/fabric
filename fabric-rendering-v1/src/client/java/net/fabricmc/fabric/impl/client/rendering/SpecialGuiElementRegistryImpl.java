@@ -25,6 +25,7 @@ import java.util.Map;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
 
+import net.minecraft.class_11684;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.BannerResultGuiElementRenderer;
 import net.minecraft.client.gui.render.BookModelGuiElementRenderer;
@@ -49,10 +50,6 @@ public final class SpecialGuiElementRegistryImpl {
 	private static final Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRegistry.Factory> REGISTERED_FACTORIES = new HashMap<>();
 	private static boolean frozen;
 
-	static {
-		registerVanillaFactories();
-	}
-
 	private SpecialGuiElementRegistryImpl() {
 	}
 
@@ -65,11 +62,12 @@ public final class SpecialGuiElementRegistryImpl {
 	}
 
 	// Called after the vanilla special renderers are created.
-	public static void onReady(MinecraftClient client, VertexConsumerProvider.Immediate immediate,
-								Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
+	public static void onReady(MinecraftClient client, VertexConsumerProvider.Immediate immediate, class_11684 renderDispatcher, Map<Class<? extends SpecialGuiElementRenderState>, SpecialGuiElementRenderer<?>> specialElementRenderers) {
 		frozen = true;
 
-		ContextImpl context = new ContextImpl(client, immediate);
+		registerVanillaFactories();
+
+		ContextImpl context = new ContextImpl(client, immediate, renderDispatcher);
 
 		for (SpecialGuiElementRegistry.Factory factory : FACTORIES) {
 			SpecialGuiElementRenderer<?> elementRenderer = factory.createSpecialRenderer(context);
@@ -79,18 +77,18 @@ public final class SpecialGuiElementRegistryImpl {
 	}
 
 	@Nullable("null for render states registered outside FAPI")
-	public static <S extends SpecialGuiElementRenderState> SpecialGuiElementRenderer<S> createNewRenderer(S state, MinecraftClient client, VertexConsumerProvider.Immediate immediate) {
+	public static <S extends SpecialGuiElementRenderState> SpecialGuiElementRenderer<S> createNewRenderer(S state, MinecraftClient client, VertexConsumerProvider.Immediate immediate, class_11684 renderDispatcher) {
 		SpecialGuiElementRegistry.Factory factory = REGISTERED_FACTORIES.get(state.getClass());
-		return factory == null ? null : (SpecialGuiElementRenderer<S>) factory.createSpecialRenderer(new ContextImpl(client, immediate));
+		return factory == null ? null : (SpecialGuiElementRenderer<S>) factory.createSpecialRenderer(new ContextImpl(client, immediate, renderDispatcher));
 	}
 
 	private static void registerVanillaFactories() {
 		// Vanilla creates its special element renderers in the GameRenderer constructor
-		REGISTERED_FACTORIES.put(EntityGuiElementRenderState.class, context -> new EntityGuiElementRenderer(context.vertexConsumers(), context.client().getEntityRenderDispatcher()));
+		REGISTERED_FACTORIES.put(EntityGuiElementRenderState.class, context -> new EntityGuiElementRenderer(context.vertexConsumers(), context.client().getEntityRenderDispatcher(), context.entityCommandRenderDispatcher()));
 		REGISTERED_FACTORIES.put(PlayerSkinGuiElementRenderState.class, context -> new PlayerSkinGuiElementRenderer(context.vertexConsumers()));
 		REGISTERED_FACTORIES.put(BookModelGuiElementRenderState.class, context -> new BookModelGuiElementRenderer(context.vertexConsumers()));
-		REGISTERED_FACTORIES.put(BannerResultGuiElementRenderState.class, context -> new BannerResultGuiElementRenderer(context.vertexConsumers()));
-		REGISTERED_FACTORIES.put(SignGuiElementRenderState.class, context -> new SignGuiElementRenderer(context.vertexConsumers()));
+		REGISTERED_FACTORIES.put(BannerResultGuiElementRenderState.class, context -> new BannerResultGuiElementRenderer(context.vertexConsumers(), context.client().method_72703()));
+		REGISTERED_FACTORIES.put(SignGuiElementRenderState.class, context -> new SignGuiElementRenderer(context.vertexConsumers(), context.client().method_72703()));
 		REGISTERED_FACTORIES.put(ProfilerChartGuiElementRenderState.class, context -> new ProfilerChartGuiElementRenderer(context.vertexConsumers()));
 	}
 
@@ -99,5 +97,5 @@ public final class SpecialGuiElementRegistryImpl {
 		return REGISTERED_FACTORIES.keySet();
 	}
 
-	record ContextImpl(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers) implements SpecialGuiElementRegistry.Context { }
+	record ContextImpl(MinecraftClient client, VertexConsumerProvider.Immediate vertexConsumers, class_11684 entityCommandRenderDispatcher) implements SpecialGuiElementRegistry.Context { }
 }
