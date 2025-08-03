@@ -28,6 +28,7 @@ import net.minecraft.client.gui.ScreenRect;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.render.fog.FogRenderer;
+import net.minecraft.util.DyeColor;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -48,7 +49,7 @@ public class SpecialGuiElementRendererTestWithNewGuiRenderer implements ClientMo
 			GuiRenderState newGuiRenderState = new GuiRenderState();
 			DrawContext newContext = new DrawContext(mc, newGuiRenderState);
 
-			newContext.state.addSpecialElement(new BannerGuiElementRenderState(60, 0, 80, 20, new ScreenRect(60, 0, 40, 20)));
+			newContext.state.addSpecialElement(new BannerGuiElementRenderState(DyeColor.BLUE, 60, 0, 80, 20, new ScreenRect(60, 0, 40, 20)));
 
 			GpuBufferSlice orgProjectionMatrixBuffer = RenderSystem.getProjectionMatrixBuffer();
 			ProjectionType orgProjectionType = RenderSystem.getProjectionType();
