@@ -39,7 +39,7 @@ public class FabricSpriteProviderImpl implements FabricSpriteProvider {
 
 	@Override
 	public SpriteAtlasTexture getAtlas() {
-		return MinecraftClient.getInstance().method_72703().method_73025(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
+		return MinecraftClient.getInstance().getAtlasManager().getAtlasTexture(SpriteAtlasTexture.PARTICLE_ATLAS_TEXTURE);
 	}
 
 	@Override

@@ -91,8 +91,8 @@ public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistr
 		LavaRenderHandler.INSTANCE.updateSprites(lavaSprites);
 
 		SpriteAtlasTexture texture = MinecraftClient.getInstance()
-				.method_72703()
-				.method_73025(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+				.getAtlasManager()
+				.getAtlasTexture(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
 
 		for (FluidRenderHandler handler : handlers.values()) {
 			handler.reloadTextures(texture);

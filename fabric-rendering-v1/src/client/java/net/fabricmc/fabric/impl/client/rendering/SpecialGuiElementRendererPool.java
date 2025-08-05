@@ -19,11 +19,11 @@ package net.fabricmc.fabric.impl.client.rendering;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.class_11684;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.gui.render.state.special.SpecialGuiElementRenderState;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.command.EntityRenderDispatcher;
 
 public final class SpecialGuiElementRendererPool<T extends SpecialGuiElementRenderState> implements AutoCloseable {
 	private int index = 0;
@@ -33,7 +33,7 @@ public final class SpecialGuiElementRendererPool<T extends SpecialGuiElementRend
 		index = 0;
 	}
 
-	public SpecialGuiElementRenderer<T> substitute(SpecialGuiElementRenderer<T> original, T elementState, MinecraftClient client, VertexConsumerProvider.Immediate immediate, class_11684 renderDispatcher) {
+	public SpecialGuiElementRenderer<T> substitute(SpecialGuiElementRenderer<T> original, T elementState, MinecraftClient client, VertexConsumerProvider.Immediate immediate, EntityRenderDispatcher entityRenderDispatcher) {
 		int index = this.index++;
 
 		if (index == 0) {
@@ -41,7 +41,7 @@ public final class SpecialGuiElementRendererPool<T extends SpecialGuiElementRend
 		} else if (index <= renderers.size()) {
 			return renderers.get(index - 1);
 		} else {
-			SpecialGuiElementRenderer<T> newRenderer = SpecialGuiElementRegistryImpl.createNewRenderer(elementState, client, immediate, renderDispatcher);
+			SpecialGuiElementRenderer<T> newRenderer = SpecialGuiElementRegistryImpl.createNewRenderer(elementState, client, immediate, entityRenderDispatcher);
 
 			if (newRenderer == null) {
 				// This renderer has been registered in an unofficial way (using mixins rather than through FAPI).

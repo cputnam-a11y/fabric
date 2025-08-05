@@ -16,8 +16,8 @@
 
 package net.fabricmc.fabric.impl.client.rendering;
 
-import net.minecraft.class_11684;
+import net.minecraft.client.render.entity.command.EntityRenderDispatcher;
 
 public interface GuiRendererExtensions {
-	void fabric_onReady(class_11684 renderDispatcher);
+	void fabric_onReady(EntityRenderDispatcher entityRenderDispatcher);
 }

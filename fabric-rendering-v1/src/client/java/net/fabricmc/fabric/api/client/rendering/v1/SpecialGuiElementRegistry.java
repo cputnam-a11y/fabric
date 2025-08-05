@@ -20,10 +20,10 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.ApiStatus;
 
-import net.minecraft.class_11684;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.SpecialGuiElementRenderer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.command.EntityRenderDispatcher;
 
 import net.fabricmc.fabric.impl.client.rendering.SpecialGuiElementRegistryImpl;
 
@@ -64,8 +64,8 @@ public final class SpecialGuiElementRegistry {
 		MinecraftClient client();
 
 		/**
-		 * @return the {@link class_11684} instance.
+		 * @return the {@link EntityRenderDispatcher} instance.
 		 */
-		class_11684 entityCommandRenderDispatcher();
+		EntityRenderDispatcher entityRenderDispatcher();
 	}
 }

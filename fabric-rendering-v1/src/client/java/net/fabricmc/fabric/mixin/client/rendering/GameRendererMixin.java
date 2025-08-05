@@ -23,12 +23,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.class_11684;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.render.BufferBuilderStorage;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.entity.command.EntityRenderDispatcher;
 import net.minecraft.client.render.item.HeldItemRenderer;
 
 import net.fabricmc.fabric.impl.client.rendering.GuiRendererExtensions;
@@ -41,11 +41,11 @@ public class GameRendererMixin {
 
 	@Shadow
 	@Final
-	private class_11684 field_61734;
+	private EntityRenderDispatcher entityRenderDispatcher;
 
 	@Inject(method = "<init>", at = @At(value = "RETURN"))
 	private void guiRendererReady(MinecraftClient client, HeldItemRenderer firstPersonHeldItemRenderer, BufferBuilderStorage buffers, BlockRenderManager blockRenderManager, CallbackInfo ci) {
 		GuiRendererExtensions guiRenderer = (GuiRendererExtensions) this.guiRenderer;
-		guiRenderer.fabric_onReady(this.field_61734);
+		guiRenderer.fabric_onReady(this.entityRenderDispatcher);
 	}
 }
