@@ -16,11 +16,11 @@
 
 package net.fabricmc.fabric.test.rendering.client;
 
-import net.minecraft.class_11785;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.entity.command.EntityRenderCommandQueue;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.command.RenderCommandQueue;
 import net.minecraft.client.render.entity.model.BipedEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
 import net.minecraft.client.render.entity.state.BipedEntityRenderState;
@@ -44,7 +44,7 @@ public class ArmorRenderingTests implements ClientModInitializer {
 	public void onInitializeClient() {
 		ArmorRenderer armorRenderer = new ArmorRenderer() {
 			@Override
-			public void render(MatrixStack matrices, EntityRenderCommandQueue entityRenderQueue, ItemStack stack, BipedEntityRenderState renderState, EquipmentSlot slot, int light, BipedEntityModel<BipedEntityRenderState> contextModel) {
+			public void render(MatrixStack matrices, OrderedRenderCommandQueue orderedRenderCommandQueue, ItemStack stack, BipedEntityRenderState renderState, EquipmentSlot slot, int light, BipedEntityModel<BipedEntityRenderState> contextModel) {
 				if (armorModel == null) {
 					armorModel = new BipedEntityModel<>(MinecraftClient.getInstance().getLoadedEntityModels().getModelPart(EntityModelLayers.PLAYER));
 				}
@@ -56,11 +56,11 @@ public class ArmorRenderingTests implements ClientModInitializer {
 				armorModel.rightArm.visible = slot == EquipmentSlot.CHEST;
 				armorModel.head.visible = slot == EquipmentSlot.HEAD;
 
-				class_11785 class11785 = entityRenderQueue.method_73529(0);
-				class11785.method_73490(armorModel, renderState, matrices, RenderLayer.getArmorCutoutNoCull(texture), light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF, null, 0, null);
+				RenderCommandQueue renderCommandQueue = orderedRenderCommandQueue.getBatchingQueue(0);
+				renderCommandQueue.submitModel(armorModel, renderState, matrices, RenderLayer.getArmorCutoutNoCull(texture), light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF, null, 0, null);
 
 				if (stack.hasGlint()) {
-					class11785.method_73490(armorModel, renderState, matrices, RenderLayer.getArmorEntityGlint(), light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF, null, 0, null);
+					renderCommandQueue.submitModel(armorModel, renderState, matrices, RenderLayer.getArmorEntityGlint(), light, OverlayTexture.DEFAULT_UV, 0xFFFFFFFF, null, 0, null);
 				}
 			}
 

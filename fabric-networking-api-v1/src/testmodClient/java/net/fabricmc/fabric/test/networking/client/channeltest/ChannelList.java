@@ -52,7 +52,7 @@ final class ChannelList extends EntryListWidget<ChannelList.Entry> {
 
 		@Override
 		public void render(DrawContext drawContext, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-			drawContext.drawTooltip(ChannelList.this.client.textRenderer, Text.literal(this.channel.toString()).formatted(Formatting.WHITE), method_73380(), method_73382());
+			drawContext.drawTooltip(ChannelList.this.client.textRenderer, Text.literal(this.channel.toString()).formatted(Formatting.WHITE), getContentX(), getContentY());
 		}
 	}
 }

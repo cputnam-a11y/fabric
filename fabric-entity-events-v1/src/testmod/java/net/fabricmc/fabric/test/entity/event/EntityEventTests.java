@@ -83,11 +83,11 @@ public final class EntityEventTests implements ModInitializer {
 		});
 
 		ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, alive) -> {
-			LOGGER.info("Copied data for {} from {} to {}", oldPlayer.getGameProfile().getName(), oldPlayer, newPlayer);
+			LOGGER.info("Copied data for {} from {} to {}", oldPlayer.getGameProfile().name(), oldPlayer, newPlayer);
 		});
 
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
-			LOGGER.info("Respawned {}, [{}, {}]", oldPlayer.getGameProfile().getName(), oldPlayer.getEntityWorld().getRegistryKey().getValue(), newPlayer.getEntityWorld().getRegistryKey().getValue());
+			LOGGER.info("Respawned {}, [{}, {}]", oldPlayer.getGameProfile().name(), oldPlayer.getEntityWorld().getRegistryKey().getValue(), newPlayer.getEntityWorld().getRegistryKey().getValue());
 		});
 
 		// No fall damage if holding a feather in the main hand
@@ -227,12 +227,12 @@ public final class EntityEventTests implements ModInitializer {
 
 		ServerPlayerEvents.JOIN.register(player -> {
 			assertOnServerThread(player.getServer());
-			LOGGER.info("Observed player {} joining the game", player.getGameProfile().getName());
+			LOGGER.info("Observed player {} joining the game", player.getGameProfile().name());
 		});
 
 		ServerPlayerEvents.LEAVE.register(player -> {
 			assertOnServerThread(player.getServer());
-			LOGGER.info("Observed player {} leaving the game", player.getGameProfile().getName());
+			LOGGER.info("Observed player {} leaving the game", player.getGameProfile().name());
 		});
 	}
 
