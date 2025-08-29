@@ -3,6 +3,7 @@
   "package": "net.fabricmc.fabric.mixin.client.gametest",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ChunkRenderTaskSchedulerMixin",
     "ClientChunkManagerAccessor",
     "ClientChunkManagerClientChunkMapAccessor",
     "ClientWorldAccessor",
@@ -23,9 +24,9 @@
     "screenshot.NativeImageMixin",
     "screenshot.RenderTickCounterConstantAccessor",
     "threading.ClientConnectionMixin",
+    "threading.MainMixin",
     "threading.MinecraftClientMixin",
     "threading.MinecraftServerMixin",
-    "threading.MainMixin",
     "threading.ThreadExecutorMixin",
     "world.CreateWorldScreenMixin"
   ],

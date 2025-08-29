@@ -454,11 +454,12 @@ tasks.register('runProductionClientGametest', net.fabricmc.loom.task.prod.Client
 	jvmArgs.addAll([
 		"-Dfabric.client.gametest",
 		"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
-		"-Dfabric-tag-conventions-v1.legacyTagWarning=fail"
+		"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
+		"-Dfabric.client.gametest.disableNetworkSynchronizer=true"
 	])
 	jvmArgs.addAll(debugArgs)
 
-	if (providers.environmentVariable("ENABLE_TRACY").present) {
+	if (providers.environmentVariable("ENABLE_TRACY").getOrNull() == "true") {
 		tracy {
 			tracyCapture = file("tracy-capture")
 			output = file("profile.tracy")
