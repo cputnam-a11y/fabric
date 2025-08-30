@@ -284,5 +284,10 @@
             <property name="query" value="//LITERAL_ASSERT"/>
             <message key="matchxpath.match" value="Avoid using 'assert'."/>
         </module>
+
+        <module name="MatchXpath">
+            <property name="query" value="//ANNOTATION/IDENT[@text='Debug']"/>
+            <message key="matchxpath.match" value="@Debug annotation is not allowed"/>
+        </module>
 	</module>
 </module>
