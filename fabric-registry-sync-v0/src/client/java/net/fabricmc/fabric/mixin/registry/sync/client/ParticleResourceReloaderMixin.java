@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.client.gametest;
+package net.fabricmc.fabric.mixin.registry.sync.client;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.client.render.chunk.ChunkBuilder;
-import net.minecraft.client.render.chunk.ChunkRenderTaskScheduler;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.class_11939;
+import net.minecraft.client.particle.ParticleFactory;
+import net.minecraft.registry.Registries;
 
-@Mixin(ChunkRenderTaskScheduler.class)
-public class ChunkRenderTaskSchedulerMixin {
+import net.fabricmc.fabric.impl.registry.sync.trackers.Int2ObjectMapTracker;
+
+@Mixin(class_11939.class)
+public class ParticleResourceReloaderMixin {
+	@Final
 	@Shadow
-	private volatile int size;
+	private Int2ObjectMap<ParticleFactory<?>> field_62628;
 
-	@Inject(method = "dequeueNearest", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;remove()V"))
-	private void cancelTask(Vec3d pos, CallbackInfoReturnable<ChunkBuilder.BuiltChunk.Task> cir) {
-		this.size--;
+	@Inject(method = "<init>", at = @At("RETURN"))
+	public void onInit(CallbackInfo info) {
+		Int2ObjectMapTracker.register(Registries.PARTICLE_TYPE, "ParticleManager.factories", field_62628);
 	}
 }
