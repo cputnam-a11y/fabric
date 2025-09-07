@@ -18,9 +18,9 @@ package net.fabricmc.fabric.impl.client.rendering.fluid;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
+import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
+import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Block;
@@ -45,7 +45,7 @@ import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
 public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistry {
 	private final Map<Fluid, FluidRenderHandler> handlers = new IdentityHashMap<>();
 	private final Map<Fluid, FluidRenderHandler> modHandlers = new IdentityHashMap<>();
-	private final ConcurrentMap<Block, Boolean> overlayBlocks = new ConcurrentHashMap<>();
+	private final Object2BooleanMap<Block> transparencyForOverlay = new Object2BooleanOpenHashMap<>();
 
 	{
 		handlers.put(Fluids.WATER, WaterRenderHandler.INSTANCE);
@@ -77,12 +77,12 @@ public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistr
 
 	@Override
 	public void setBlockTransparency(Block block, boolean transparent) {
-		overlayBlocks.put(block, transparent);
+		transparencyForOverlay.put(block, transparent);
 	}
 
 	@Override
 	public boolean isBlockTransparent(Block block) {
-		return overlayBlocks.computeIfAbsent(block, k -> k instanceof TranslucentBlock || k instanceof LeavesBlock);
+		return transparencyForOverlay.getOrDefault(block, block instanceof TranslucentBlock || block instanceof LeavesBlock);
 	}
 
 	public void onFluidRendererReload(FluidRenderer renderer, Sprite[] waterSprites, Sprite[] lavaSprites, Sprite waterOverlay) {
