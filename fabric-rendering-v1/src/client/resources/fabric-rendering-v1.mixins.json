@@ -12,6 +12,7 @@
     "ClientWorldMixin",
     "DebugOptionsScreenEntryMixin",
     "DimensionEffectsAccessor",
+    "DrawAccessor",
     "DrawContextMixin",
     "EntityModelLayersAccessor",
     "EntityModelsMixin",
@@ -24,6 +25,9 @@
     "LivingEntityRendererAccessor",
     "LivingEntityRendererMixin",
     "RenderLayersMixin",
+    "RenderPipelineBuilderMixin",
+    "RenderPipelineMixin",
+    "RenderPipelineSnippetMixin",
     "SpecialModelTypesMixin",
     "TooltipComponentMixin",
     "WorldRendererMixin"
