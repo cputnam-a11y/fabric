@@ -71,14 +71,14 @@ public abstract class WorldRendererMixin implements WorldRendererHooks {
 	@Unique private boolean isRendering = false;
 
 	@Inject(method = "render", at = @At("HEAD"))
-	private void beforeRender(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, GpuBufferSlice slice, Vector4f skyColor, boolean thinFog, CallbackInfo ci) {
+	private void beforeRender(ObjectAllocator objectAllocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f projectionMatrix, Matrix4f matrix4f2, GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci) {
 		context.prepare((WorldRenderer) (Object) this, tickCounter, renderBlockOutline, camera, this.client.gameRenderer, positionMatrix, projectionMatrix, bufferBuilders.getEntityVertexConsumers(), MinecraftClient.isFabulousGraphicsOrBetter(), world);
 		isRendering = true;
 		WorldRenderEvents.START.invoker().onStart(context);
 	}
 
-	@Inject(method = "setupTerrain", at = @At("RETURN"))
-	private void afterTerrainSetup(Camera camera, Frustum frustum, boolean hasForcedFrustum, boolean spectator, CallbackInfo ci) {
+	@Inject(method = "render", at = @At(value = "CONSTANT", args = "stringValue=setupFrameGraph"))
+	private void afterTerrainSetup(ObjectAllocator allocator, RenderTickCounter tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f matrix4f, Matrix4f projectionMatrix, Matrix4f matrix4f2, GpuBufferSlice gpuBufferSlice, Vector4f vector4f, boolean bl, CallbackInfo ci, @Local Frustum frustum) {
 		context.setFrustum(frustum);
 	}
 
@@ -112,7 +112,7 @@ public abstract class WorldRendererMixin implements WorldRendererHooks {
 		return matrixStack;
 	}
 
-	@Inject(method = "method_62214", at = @At(value = "CONSTANT", args = "stringValue=blockEntities", ordinal = 0))
+	@Inject(method = "method_62214", at = @At(value = "CONSTANT", args = "stringValue=submitBlockEntities", ordinal = 0))
 	private void afterEntities(CallbackInfo ci) {
 		WorldRenderEvents.AFTER_ENTITIES.invoker().afterEntities(context);
 	}
