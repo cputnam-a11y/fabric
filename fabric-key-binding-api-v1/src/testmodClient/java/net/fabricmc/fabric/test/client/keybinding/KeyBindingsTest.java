@@ -32,8 +32,8 @@ public class KeyBindingsTest implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		// Register 2 before 1, but in-game 1 should appear before 2 due to sorting. Both should appear after all vanilla categories.
-		KeyBinding.Category category2 = KeyBinding.Category.method_74698(Identifier.of("fabric-key-binding-api-v1-testmod", "test_category_2"));
-		KeyBinding.Category category1 = KeyBinding.Category.method_74698(Identifier.of("fabric-key-binding-api-v1-testmod", "test_category_1"));
+		KeyBinding.Category category2 = KeyBinding.Category.create(Identifier.of("fabric-key-binding-api-v1-testmod", "test_category_2"));
+		KeyBinding.Category category1 = KeyBinding.Category.create(Identifier.of("fabric-key-binding-api-v1-testmod", "test_category_1"));
 
 		KeyBinding binding1 = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.fabric-key-binding-api-v1-testmod.test_keybinding_1", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_P, category1));
 		KeyBinding binding2 = KeyBindingHelper.registerKeyBinding(new KeyBinding("key.fabric-key-binding-api-v1-testmod.test_keybinding_2", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_U, category1));
