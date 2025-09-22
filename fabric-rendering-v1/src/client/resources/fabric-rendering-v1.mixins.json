@@ -27,9 +27,16 @@
     "RenderPipelineBuilderMixin",
     "RenderPipelineMixin",
     "RenderPipelineSnippetMixin",
+    "RenderStateMixin",
     "SpecialModelTypesMixin",
     "TooltipComponentMixin",
-    "WorldRendererMixin"
+    "WorldRendererMixin",
+    "renderstate.ItemRenderStateLayerRenderStateMixin",
+    "renderstate.ItemRenderStateMixin",
+    "renderstate.SkyRenderStateMixin",
+    "renderstate.WeatherRenderStateMixin",
+    "renderstate.WorldBorderRenderStateMixin",
+    "renderstate.WorldRenderStateMixin"
   ],
   "injectors": {
     "defaultRequire": 1
