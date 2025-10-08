@@ -16,6 +16,7 @@
 
 package net.fabricmc.fabric.test.command.client;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
@@ -41,6 +42,7 @@ public final class ClientCommandTest implements ClientModInitializer {
 	private static final DynamicCommandExceptionType IS_NULL = new DynamicCommandExceptionType(x -> Text.literal("The " + x + " is null"));
 	private static final SimpleCommandExceptionType UNEXECUTABLE_EXECUTED = new SimpleCommandExceptionType(Text.literal("Executed an unexecutable command!"));
 
+	private boolean commandFlag = false;
 	private boolean wasTested = false;
 
 	@Override
@@ -90,6 +92,30 @@ public final class ClientCommandTest implements ClientModInitializer {
 						return 0;
 					})
 			));
+
+			// Command with condition that can be toggled
+			String commandWithCondition = "test_client_command_with_condition_toggle";
+			// The user should check whether the command is suggested iff the condition evaluates to true
+			// Initially, the command should not be suggested, as the command flag is initially false
+			dispatcher.register(ClientCommandManager.literal(commandWithCondition).requires(source -> commandFlag).executes(context -> {
+				context.getSource().sendFeedback(Text.literal("Expected: true, is: " + commandFlag));
+				return Command.SINGLE_SUCCESS;
+			}));
+			// After this command is first executed, the above command should now be suggested
+			// After this command is executed a second time, the above command should now not be suggested again, etc.
+			dispatcher.register(ClientCommandManager.literal("test_client_command_that_toggles_condition").executes(context -> {
+				commandFlag = !commandFlag;
+				ClientCommandManager.refreshCommandCompletions();
+				context.getSource().sendFeedback(Text.literal("Toggled command flag to " + commandFlag));
+
+				if (commandFlag) {
+					context.getSource().sendFeedback(Text.literal("The command " + commandWithCondition + " should now be suggested"));
+				} else {
+					context.getSource().sendFeedback(Text.literal("The command " + commandWithCondition + " should now not be suggested"));
+				}
+
+				return Command.SINGLE_SUCCESS;
+			}));
 
 			// Tests
 

@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.packet.s2c.play.CommandTreeS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.text.Texts;
 import net.minecraft.util.profiler.Profilers;
@@ -223,5 +224,9 @@ public final class ClientCommandInternals {
 				copyChildren(child, result, source, originalToCopy);
 			}
 		}
+	}
+
+	public interface LastReceivedCommandsPacketAccessor {
+		@Nullable CommandTreeS2CPacket fabric_api$getLastReceivedCommandsPacket();
 	}
 }

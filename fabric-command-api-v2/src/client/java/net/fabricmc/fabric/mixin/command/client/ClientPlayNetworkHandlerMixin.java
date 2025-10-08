@@ -17,9 +17,11 @@
 package net.fabricmc.fabric.mixin.command.client;
 
 import com.mojang.brigadier.CommandDispatcher;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -39,7 +41,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.impl.command.client.ClientCommandInternals;
 
 @Mixin(ClientPlayNetworkHandler.class)
-abstract class ClientPlayNetworkHandlerMixin {
+abstract class ClientPlayNetworkHandlerMixin implements ClientCommandInternals.LastReceivedCommandsPacketAccessor {
 	@Shadow
 	private CommandDispatcher<CommandSource> commandDispatcher;
 
@@ -54,6 +56,9 @@ abstract class ClientPlayNetworkHandlerMixin {
 	@Final
 	@Shadow
 	private DynamicRegistryManager.Immutable combinedDynamicRegistries;
+
+	@Unique
+	private @Nullable CommandTreeS2CPacket lastReceivedCommandsPacket = null;
 
 	@Inject(method = "onGameJoin", at = @At("RETURN"))
 	private void onGameJoin(GameJoinS2CPacket packet, CallbackInfo info) {
@@ -72,6 +77,11 @@ abstract class ClientPlayNetworkHandlerMixin {
 		ClientCommandInternals.addCommands((CommandDispatcher) commandDispatcher, (FabricClientCommandSource) commandSource);
 	}
 
+	@Inject(method = "onCommandTree", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetworkThreadUtils;forceMainThread(Lnet/minecraft/network/packet/Packet;Lnet/minecraft/network/listener/PacketListener;Lnet/minecraft/network/PacketApplyBatcher;)V", shift = At.Shift.AFTER))
+	private void setLastReceivedCommandsPacket(CommandTreeS2CPacket packet, CallbackInfo ci) {
+		this.lastReceivedCommandsPacket = packet;
+	}
+
 	@Inject(method = "runClickEventCommand", at = @At("HEAD"), cancellable = true)
 	private void onSendCommand(String command, Screen screen, CallbackInfo info) {
 		if (ClientCommandInternals.executeCommand(command)) {
@@ -84,5 +94,10 @@ abstract class ClientPlayNetworkHandlerMixin {
 		if (ClientCommandInternals.executeCommand(command)) {
 			info.cancel();
 		}
+	}
+
+	@Override
+	public @Nullable CommandTreeS2CPacket fabric_api$getLastReceivedCommandsPacket() {
+		return this.lastReceivedCommandsPacket;
 	}
 }
