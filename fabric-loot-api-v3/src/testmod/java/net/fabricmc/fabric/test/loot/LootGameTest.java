@@ -103,7 +103,7 @@ public final class LootGameTest {
 	public void testInlineTableModifyDrops(TestContext context) {
 		int seenAtStart = inlineLootTablesSeen;
 		MinecraftServer server = context.getWorld().getServer();
-		server.getCommandManager().executeWithPrefix(server.getCommandSource(), "loot spawn 0 0 0 loot {\"pools\":[{\"entries\":[], \"rolls\":1.0}]}");
+		server.getCommandManager().parseAndExecute(server.getCommandSource(), "loot spawn 0 0 0 loot {\"pools\":[{\"entries\":[], \"rolls\":1.0}]}");
 		int seenAtEnd = inlineLootTablesSeen;
 
 		context.assertTrue(seenAtStart < seenAtEnd, Text.literal("inline loot table should've been processed by MODIFY_DROPS"));

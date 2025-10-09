@@ -36,6 +36,6 @@ public final class RendererClientTest implements ClientModInitializer {
 
 		// We don't specify a material for the frame mesh,
 		// so it will use the default material, i.e. the one from RenderLayers.
-		BlockRenderLayerMap.putBlock(Registration.FRAME_BLOCK, BlockRenderLayer.CUTOUT_MIPPED);
+		BlockRenderLayerMap.putBlock(Registration.FRAME_BLOCK, BlockRenderLayer.CUTOUT);
 	}
 }

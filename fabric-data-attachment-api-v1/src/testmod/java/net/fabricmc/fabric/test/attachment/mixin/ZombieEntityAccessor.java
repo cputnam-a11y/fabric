@@ -21,9 +21,10 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.server.world.ServerWorld;
 
 @Mixin(ZombieEntity.class)
 public interface ZombieEntityAccessor {
 	@Invoker("convertTo")
-	void invokeConvertTo(EntityType<? extends ZombieEntity> entityType);
+	void invokeConvertTo(ServerWorld serverWorld, EntityType<? extends ZombieEntity> entityType);
 }

@@ -52,7 +52,7 @@ public class EntitySelectorGameTest {
 
 		context.expectEntitiesAround(EntityType.CREEPER, BlockPos.ORIGIN, 3, 2.0);
 		MinecraftServer server = context.getWorld().getServer();
-		server.getCommandManager().executeWithPrefix(server.getCommandSource(), command);
+		server.getCommandManager().parseAndExecute(server.getCommandSource(), command);
 		//context.assertTrue(result == 2, "Expected 2 entities killed, got " + result);
 		context.expectEntitiesAround(EntityType.CREEPER, BlockPos.ORIGIN, 1, 2.0);
 		context.complete();

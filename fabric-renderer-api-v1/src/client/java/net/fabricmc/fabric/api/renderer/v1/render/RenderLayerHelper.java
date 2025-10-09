@@ -34,7 +34,6 @@ public final class RenderLayerHelper {
 	public static RenderLayer getMovingBlockLayer(BlockRenderLayer layer) {
 		return switch (layer) {
 		case SOLID -> RenderLayer.getSolid();
-		case CUTOUT_MIPPED -> RenderLayer.getCutoutMipped();
 		case CUTOUT -> RenderLayer.getCutout();
 		case TRANSLUCENT -> RenderLayer.getTranslucentMovingBlock();
 		case TRIPWIRE -> RenderLayer.getTripwire();

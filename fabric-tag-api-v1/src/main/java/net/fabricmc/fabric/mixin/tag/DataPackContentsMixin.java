@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import net.minecraft.class_12096;
 import net.minecraft.registry.CombinedDynamicRegistries;
 import net.minecraft.registry.RegistryWrapper;
 import net.minecraft.registry.ServerDynamicRegistryType;
@@ -43,7 +44,7 @@ abstract class DataPackContentsMixin {
 	private CombinedDynamicRegistries<ServerDynamicRegistryType> dynamicRegistriesByType;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
-	private void storeDynamicRegistries(CombinedDynamicRegistries<ServerDynamicRegistryType> dynamicRegistries, RegistryWrapper.WrapperLookup registries, FeatureSet enabledFeatures, CommandManager.RegistrationEnvironment environment, List<?> pendingTagLoads, int functionPermissionLevel, CallbackInfo info) {
+	private void storeDynamicRegistries(CombinedDynamicRegistries<ServerDynamicRegistryType> dynamicRegistries, RegistryWrapper.WrapperLookup registries, FeatureSet enabledFeatures, CommandManager.RegistrationEnvironment environment, List<?> pendingTagLoads, class_12096 arg, CallbackInfo ci) {
 		dynamicRegistriesByType = dynamicRegistries;
 	}
 

@@ -54,7 +54,7 @@ public final class ModelBakeSettingsHelper {
 		Matrix4fc matrix = transformation.getMatrix();
 
 		if (MatrixUtil.isIdentity(matrix)) {
-			return ModelRotation.X0_Y0;
+			return ModelRotation.field_63619;
 		}
 
 		if (!uvLock) {

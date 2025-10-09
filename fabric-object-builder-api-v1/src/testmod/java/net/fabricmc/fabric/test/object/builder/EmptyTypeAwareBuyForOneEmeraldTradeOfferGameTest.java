@@ -36,7 +36,7 @@ public class EmptyTypeAwareBuyForOneEmeraldTradeOfferGameTest {
 		// Create a type-aware trade offer with no villager types specified
 		TradeOffers.Factory typeAwareFactory = new TradeOffers.TypeAwareBuyForOneEmeraldFactory(1, 12, 5, ImmutableMap.of());
 		// Create an offer with that factory to ensure it doesn't crash when a villager type is missing from the map
-		typeAwareFactory.create(villager, Random.create());
+		typeAwareFactory.create(context.getWorld(), villager, Random.create());
 
 		context.complete();
 	}

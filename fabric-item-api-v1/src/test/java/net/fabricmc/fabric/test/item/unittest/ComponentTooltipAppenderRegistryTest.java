@@ -73,8 +73,8 @@ public class ComponentTooltipAppenderRegistryTest {
 				When in Main Hand:
 				+3 Attack Damage
 				-2.4 Attack Speed
-				This Item is Sadder :'(
-				Unbreakable""", getTooltip(stack));
+				Unbreakable
+				This Item is Sadder :'(""", getTooltip(stack));
 	}
 
 	@Test

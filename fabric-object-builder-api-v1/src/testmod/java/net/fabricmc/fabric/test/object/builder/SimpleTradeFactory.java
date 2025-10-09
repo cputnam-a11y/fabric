@@ -16,7 +16,10 @@
 
 package net.fabricmc.fabric.test.object.builder;
 
+import org.jetbrains.annotations.Nullable;
+
 import net.minecraft.entity.Entity;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.village.TradeOffer;
 import net.minecraft.village.TradeOffers;
@@ -29,7 +32,7 @@ class SimpleTradeFactory implements TradeOffers.Factory {
 	}
 
 	@Override
-	public TradeOffer create(Entity entity, Random random) {
+	public @Nullable TradeOffer create(ServerWorld serverWorld, Entity entity, Random random) {
 		// ALWAYS supply a copy of the offer.
 		return this.offer.copy();
 	}

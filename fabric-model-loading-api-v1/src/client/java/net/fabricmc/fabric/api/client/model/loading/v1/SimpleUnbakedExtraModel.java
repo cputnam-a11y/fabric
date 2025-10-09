@@ -63,7 +63,7 @@ public final class SimpleUnbakedExtraModel<T> implements UnbakedExtraModel<T> {
 	 * @return The unbaked extra model.
 	 */
 	public static SimpleUnbakedExtraModel<BlockStateModel> blockStateModel(Identifier model) {
-		return blockStateModel(model, ModelRotation.X0_Y0);
+		return blockStateModel(model, ModelRotation.field_63619);
 	}
 
 	/**

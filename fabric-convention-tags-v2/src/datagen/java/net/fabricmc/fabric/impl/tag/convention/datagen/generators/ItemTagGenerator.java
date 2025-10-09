@@ -720,7 +720,7 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 				.addOptionalTag(ItemTags.ARMOR_ENCHANTABLE)
 				.addOptionalTag(ItemTags.EQUIPPABLE_ENCHANTABLE)
 				.addOptionalTag(ItemTags.WEAPON_ENCHANTABLE)
-				.addOptionalTag(ItemTags.SWORD_ENCHANTABLE)
+				.addOptionalTag(ItemTags.SWEEPING_ENCHANTABLE)
 				.addOptionalTag(ItemTags.MINING_ENCHANTABLE)
 				.addOptionalTag(ItemTags.MINING_LOOT_ENCHANTABLE)
 				.addOptionalTag(ItemTags.FISHING_ENCHANTABLE)
@@ -730,7 +730,9 @@ public final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
 				.addOptionalTag(ItemTags.MACE_ENCHANTABLE)
 				.addOptionalTag(ItemTags.FIRE_ASPECT_ENCHANTABLE)
 				.addOptionalTag(ItemTags.DURABILITY_ENCHANTABLE)
-				.addOptionalTag(ItemTags.VANISHING_ENCHANTABLE);
+				.addOptionalTag(ItemTags.VANISHING_ENCHANTABLE)
+				.addOptionalTag(ItemTags.LUNGE_ENCHANTABLE)
+				.addOptionalTag(ItemTags.MELEE_WEAPON_ENCHANTABLE);
 
 		// Deprecated tags below
 

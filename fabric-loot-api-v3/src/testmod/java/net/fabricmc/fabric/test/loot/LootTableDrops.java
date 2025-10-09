@@ -31,6 +31,7 @@ import net.minecraft.test.TestContext;
 import net.minecraft.text.Text;
 import net.minecraft.util.context.ContextParameter;
 import net.minecraft.util.context.ContextType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
 /**
@@ -100,7 +101,7 @@ public final class LootTableDrops {
 	 */
 	public static Builder entity(TestContext context, EntityType<?> type) {
 		Text name = Text.empty().append(type.getName()).append(" drops");
-		Entity contextEntity = context.spawnEntity(type, Vec3d.ZERO);
+		Entity contextEntity = context.spawnEntity(type, BlockPos.ORIGIN);
 		return new Builder(context, name, LootContextTypes.ENTITY, type.getLootTableKey().orElseThrow())
 				.set(LootContextParameters.THIS_ENTITY, contextEntity)
 				.set(LootContextParameters.ORIGIN, Vec3d.ZERO)

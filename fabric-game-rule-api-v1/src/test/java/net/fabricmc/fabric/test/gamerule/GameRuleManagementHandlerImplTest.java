@@ -40,6 +40,7 @@ import net.minecraft.server.dedicated.management.handler.GameRuleManagementHandl
 import net.minecraft.server.dedicated.management.network.ManagementConnectionId;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.GameRules;
+import net.minecraft.world.SaveProperties;
 
 import net.fabricmc.fabric.api.gamerule.v1.rule.DoubleRule;
 import net.fabricmc.fabric.api.gamerule.v1.rule.EnumRule;
@@ -56,7 +57,9 @@ public class GameRuleManagementHandlerImplTest {
 	@Test
 	void testUpdateDouble() {
 		MinecraftDedicatedServer server = mock(MinecraftDedicatedServer.class);
-		when(server.getGameRules()).thenReturn(GAME_RULES);
+		SaveProperties saveProperties = mock(SaveProperties.class);
+		when(server.getSaveProperties()).thenReturn(saveProperties);
+		when(saveProperties.getGameRules()).thenReturn(GAME_RULES);
 		GameRuleManagementHandler handler = new GameRuleManagementHandlerTestImpl(server, MANAGEMENT_LOGGER);
 
 		GameRuleRpcDispatcher.TypedRule result = handler.updateRule(new GameRuleRpcDispatcher.UntypedRule("oneToTenDouble", "5.5"), CONNECTION_ID);
@@ -73,7 +76,9 @@ public class GameRuleManagementHandlerImplTest {
 	@Test
 	void testUpdateEnum() {
 		MinecraftDedicatedServer server = mock(MinecraftDedicatedServer.class);
-		when(server.getGameRules()).thenReturn(GAME_RULES);
+		SaveProperties saveProperties = mock(SaveProperties.class);
+		when(server.getSaveProperties()).thenReturn(saveProperties);
+		when(saveProperties.getGameRules()).thenReturn(GAME_RULES);
 		GameRuleManagementHandler handler = new GameRuleManagementHandlerTestImpl(server, MANAGEMENT_LOGGER);
 
 		GameRuleRpcDispatcher.TypedRule result = handler.updateRule(new GameRuleRpcDispatcher.UntypedRule("cardinalDirection", "north"), CONNECTION_ID);
@@ -91,7 +96,9 @@ public class GameRuleManagementHandlerImplTest {
 	@Test
 	void testUpdateVanillaBoolean() {
 		MinecraftDedicatedServer server = mock(MinecraftDedicatedServer.class);
-		when(server.getGameRules()).thenReturn(GAME_RULES);
+		SaveProperties saveProperties = mock(SaveProperties.class);
+		when(server.getSaveProperties()).thenReturn(saveProperties);
+		when(saveProperties.getGameRules()).thenReturn(GAME_RULES);
 		GameRuleManagementHandler handler = new GameRuleManagementHandlerTestImpl(server, MANAGEMENT_LOGGER);
 
 		GameRuleRpcDispatcher.TypedRule result = handler.updateRule(new GameRuleRpcDispatcher.UntypedRule("doFireTick", "false"), CONNECTION_ID);
@@ -108,7 +115,9 @@ public class GameRuleManagementHandlerImplTest {
 	@Test
 	void testUpdateVanillaInt() {
 		MinecraftDedicatedServer server = mock(MinecraftDedicatedServer.class);
-		when(server.getGameRules()).thenReturn(GAME_RULES);
+		SaveProperties saveProperties = mock(SaveProperties.class);
+		when(server.getSaveProperties()).thenReturn(saveProperties);
+		when(saveProperties.getGameRules()).thenReturn(GAME_RULES);
 		GameRuleManagementHandler handler = new GameRuleManagementHandlerTestImpl(server, MANAGEMENT_LOGGER);
 
 		GameRuleRpcDispatcher.TypedRule result = handler.updateRule(new GameRuleRpcDispatcher.UntypedRule("randomTickSpeed", "123"), CONNECTION_ID);
