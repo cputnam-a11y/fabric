@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.function.BiPredicate;
 
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import net.minecraft.class_12197;
@@ -212,7 +211,7 @@ public interface BiomeModificationContext {
 		 * @see BiomeEffects#getGrassColorModifier()
 		 * @see BiomeEffects.Builder#grassColorModifier(BiomeEffects.GrassColorModifier)
 		 */
-		void setGrassColorModifier(@NotNull BiomeEffects.GrassColorModifier colorModifier);
+		void setGrassColorModifier(BiomeEffects.GrassColorModifier colorModifier);
 
 		/**
 		 * @deprecated Set the music volume using environment attributes instead
