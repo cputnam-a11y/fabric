@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import net.minecraft.block.Blocks;
-import net.minecraft.client.render.RenderLayer;
+import net.minecraft.class_12249;
 import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.entity.model.AllayEntityModel;
 import net.minecraft.client.render.entity.model.EntityModelLayers;
@@ -61,7 +61,7 @@ public class SpecialBlockRendererTest implements ClientModInitializer {
 						matrices.multiply(RotationAxis.POSITIVE_Y.rotation((float) (Util.getMeasuringTimeMs() * 0.001)));
 						matrices.translate(0, -1.46875f, 0);
 						orderedRenderCommandQueue.getBatchingQueue(0)
-								.submitCustom(matrices, RenderLayer.getSolid(), (matricesEntry, vertexConsumer) -> allayModel.render(matrices, vertexConsumer, light, overlay));
+								.submitCustom(matrices, class_12249.method_75965(), (matricesEntry, vertexConsumer) -> allayModel.render(matrices, vertexConsumer, light, overlay));
 						matrices.pop();
 					}
 

@@ -17,6 +17,7 @@
 package net.fabricmc.fabric.api.renderer.v1.render;
 
 import net.minecraft.block.BlockState;
+import net.minecraft.class_12249;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
@@ -33,10 +34,10 @@ public final class RenderLayerHelper {
 	 */
 	public static RenderLayer getMovingBlockLayer(BlockRenderLayer layer) {
 		return switch (layer) {
-		case SOLID -> RenderLayer.getSolid();
-		case CUTOUT -> RenderLayer.getCutout();
-		case TRANSLUCENT -> RenderLayer.getTranslucentMovingBlock();
-		case TRIPWIRE -> RenderLayer.getTripwire();
+		case SOLID -> class_12249.method_75965();
+		case CUTOUT -> class_12249.method_75972();
+		case TRANSLUCENT -> class_12249.method_75977();
+		case TRIPWIRE -> class_12249.method_76009();
 		};
 	}
 
