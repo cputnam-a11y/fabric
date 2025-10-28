@@ -17,7 +17,6 @@
 package net.fabricmc.fabric.api.renderer.v1.render;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.class_12249;
 import net.minecraft.client.render.BlockRenderLayer;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
@@ -29,20 +28,20 @@ public final class RenderLayerHelper {
 	}
 
 	/**
-	 * Same logic as {@link RenderLayers#getMovingBlockLayer}, but accepts a {@link BlockRenderLayer} instead of a
+	 * Same logic as {@link net.minecraft.client.render.BlockRenderLayers#getMovingBlockLayer}, but accepts a {@link BlockRenderLayer} instead of a
 	 * {@link BlockState}.
 	 */
 	public static RenderLayer getMovingBlockLayer(BlockRenderLayer layer) {
 		return switch (layer) {
-		case SOLID -> class_12249.method_75965();
-		case CUTOUT -> class_12249.method_75972();
-		case TRANSLUCENT -> class_12249.method_75977();
-		case TRIPWIRE -> class_12249.method_76009();
+		case SOLID -> RenderLayers.solid();
+		case CUTOUT -> RenderLayers.cutout();
+		case TRANSLUCENT -> RenderLayers.translucentMovingBlock();
+		case TRIPWIRE -> RenderLayers.tripwire();
 		};
 	}
 
 	/**
-	 * Same logic as {@link RenderLayers#getEntityBlockLayer}, but accepts a {@link BlockRenderLayer} instead of a
+	 * Same logic as {@link net.minecraft.client.render.BlockRenderLayers#getEntityBlockLayer}, but accepts a {@link BlockRenderLayer} instead of a
 	 * {@link BlockState}.
 	 */
 	public static RenderLayer getEntityBlockLayer(BlockRenderLayer layer) {
