@@ -18,15 +18,17 @@ package net.fabricmc.fabric.test.rendering.client;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.DrawStyle;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexRendering;
 import net.minecraft.client.render.state.OutlineRenderState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.debug.gizmo.GizmoDrawing;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -53,7 +55,7 @@ public class WorldRenderEventsTests implements ClientModInitializer, FabricClien
 		if (Boolean.TRUE.equals(outlineRenderState.getData(DIAMOND_BLOCK_OUTLINE))) {
 			MatrixStack matrixStack = new MatrixStack();
 			matrixStack.push();
-			Vec3d cameraPos = MinecraftClient.getInstance().gameRenderer.getCamera().getPos();
+			Vec3d cameraPos = MinecraftClient.getInstance().gameRenderer.getCamera().getCameraPos();
 			BlockPos pos = outlineRenderState.pos();
 			double x = pos.getX() - cameraPos.x;
 			double y = pos.getY() - cameraPos.y;
@@ -81,7 +83,8 @@ public class WorldRenderEventsTests implements ClientModInitializer, FabricClien
 		context.matrices().push();
 		context.matrices().translate(-camera.x, -camera.y, -camera.z);
 
-		VertexRendering.drawFilledBox(context.matrices(), context.consumers().getBuffer(RenderLayer.getDebugFilledBox()), 0, 100, 0, 1, 101, 1, 0, 1, 0, 0.5f);
+		Box box = Box.of(new Vec3d(0, 100, 0), 1, 1, 1);
+		GizmoDrawing.box(box, DrawStyle.filled(ColorHelper.fromFloats(0.5f, 0, 1, 0)));
 
 		context.matrices().pop();
 	}

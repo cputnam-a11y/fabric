@@ -16,7 +16,7 @@
 
 package net.fabricmc.fabric.impl.client.rendering.world;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.SectionRenderState;

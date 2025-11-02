@@ -16,9 +16,9 @@
 
 package net.fabricmc.fabric.impl.client.rendering.world;
 
-import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.Frustum;

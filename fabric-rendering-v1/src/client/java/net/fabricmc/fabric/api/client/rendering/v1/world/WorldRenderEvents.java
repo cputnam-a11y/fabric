@@ -16,7 +16,7 @@
 
 package net.fabricmc.fabric.api.client.rendering.v1.world;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.render.state.OutlineRenderState;
