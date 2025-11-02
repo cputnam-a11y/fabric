@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.client.gametest;
+package net.fabricmc.fabric.mixin.client.gametest.gui;
 
-import java.util.List;
-
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.injection.At;
 
-import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 
 @Mixin(Screen.class)
-public interface ScreenAccessor {
-	@Accessor
-	List<Drawable> getDrawables();
+public class ScreenMixin {
+	@ModifyReturnValue(method = "allowRotatingPanorama", at = @At("RETURN"))
+	private boolean disableRotatingPanoramaForClientGameTests(boolean original) {
+		return false;
+	}
 }
