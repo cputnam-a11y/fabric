@@ -160,9 +160,6 @@ public class FabricRegistryInit implements ModInitializer {
 		RegistryAttributeHolder.get(Registries.SENSOR_TYPE);
 
 		// Doesnt seem to be serialised or synced.
-		RegistryAttributeHolder.get(Registries.SCHEDULE);
-
-		// Doesnt seem to be serialised or synced.
 		RegistryAttributeHolder.get(Registries.ACTIVITY);
 
 		// Doesnt seem to be serialised or synced.

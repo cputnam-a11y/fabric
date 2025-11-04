@@ -24,7 +24,6 @@ import net.minecraft.client.render.model.ModelTextures;
 import net.minecraft.client.render.model.UnbakedModel;
 import net.minecraft.client.render.model.json.JsonUnbakedModel;
 import net.minecraft.client.render.model.json.ModelTransformation;
-import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 
@@ -74,7 +73,7 @@ public class BuiltInMeshUnbakedModelDeserializer implements UnbakedModelDeserial
 	private static ModelTextures.Textures texturesFromJson(JsonObject object) {
 		if (object.has("textures")) {
 			JsonObject jsonObject = JsonHelper.getObject(object, "textures");
-			return ModelTextures.fromJson(jsonObject, SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE);
+			return ModelTextures.fromJson(jsonObject);
 		} else {
 			return ModelTextures.Textures.EMPTY;
 		}

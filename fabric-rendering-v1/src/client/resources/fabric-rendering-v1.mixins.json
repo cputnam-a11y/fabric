@@ -13,7 +13,6 @@
     "ClientWorldMixin",
     "DebugOptionsScreenEntryMixin",
     "DebugOptionsScreenListWidgetMixin",
-    "DimensionEffectsAccessor",
     "DrawAccessor",
     "DrawContextMixin",
     "EntityModelLayersAccessor",

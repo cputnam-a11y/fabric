@@ -16,7 +16,7 @@
 
 package net.fabricmc.fabric.test.item;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import net.minecraft.component.ComponentType;
 import net.minecraft.component.DataComponentTypes;
@@ -37,7 +37,7 @@ public class ComponentTooltipAppenderTest implements ModInitializer {
 				Registries.DATA_COMPONENT_TYPE,
 				"fabric-item-api-v1-testmod:happy_component",
 				ComponentType.<TestComponent>builder()
-						.codec(Codec.unit(TestComponent.ONE))
+						.codec(MapCodec.unitCodec(TestComponent.ONE))
 						.build()
 		);
 
@@ -45,7 +45,7 @@ public class ComponentTooltipAppenderTest implements ModInitializer {
 				Registries.DATA_COMPONENT_TYPE,
 				"fabric-item-api-v1-testmod:sad_component",
 				ComponentType.<TestComponent>builder()
-						.codec(Codec.unit(TestComponent.TWO))
+						.codec(MapCodec.unitCodec(TestComponent.TWO))
 						.build()
 		);
 
@@ -53,7 +53,7 @@ public class ComponentTooltipAppenderTest implements ModInitializer {
 				Registries.DATA_COMPONENT_TYPE,
 				"fabric-item-api-v1-testmod:sadder_component",
 				ComponentType.<TestComponent>builder()
-						.codec(Codec.unit(TestComponent.THREE))
+						.codec(MapCodec.unitCodec(TestComponent.THREE))
 						.build()
 		);
 
@@ -61,7 +61,7 @@ public class ComponentTooltipAppenderTest implements ModInitializer {
 				Registries.DATA_COMPONENT_TYPE,
 				"fabric-item-api-v1-testmod:saddest_component",
 				ComponentType.<TestComponent>builder()
-						.codec(Codec.unit(TestComponent.FOUR))
+						.codec(MapCodec.unitCodec(TestComponent.FOUR))
 						.build()
 		);
 
