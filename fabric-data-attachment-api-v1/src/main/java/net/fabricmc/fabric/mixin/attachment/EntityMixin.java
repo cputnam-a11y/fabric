@@ -22,12 +22,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.registry.DynamicRegistryManager;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.world.World;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
@@ -44,21 +44,21 @@ abstract class EntityMixin implements AttachmentTargetImpl {
 	private int id;
 
 	@Shadow
-	public abstract World getEntityWorld();
+	public abstract Level level();
 
 	@Inject(
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomData(Lnet/minecraft/storage/ReadView;)V"),
-			method = "readData"
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;readAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueInput;)V"),
+			method = "load"
 	)
-	private void readEntityAttachments(ReadView data, CallbackInfo ci) {
+	private void readEntityAttachments(ValueInput data, CallbackInfo ci) {
 		this.fabric_readAttachmentsFromNbt(data);
 	}
 
 	@Inject(
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;writeCustomData(Lnet/minecraft/storage/WriteView;)V"),
-			method = "writeData"
+			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;addAdditionalSaveData(Lnet/minecraft/world/level/storage/ValueOutput;)V"),
+			method = "saveWithoutId"
 	)
-	private void writeEntityAttachments(WriteView view, CallbackInfo ci) {
+	private void writeEntityAttachments(ValueOutput view, CallbackInfo ci) {
 		this.fabric_writeAttachmentsToNbt(view);
 	}
 
@@ -69,10 +69,10 @@ abstract class EntityMixin implements AttachmentTargetImpl {
 
 	@Override
 	public void fabric_syncChange(AttachmentType<?> type, AttachmentChange change) {
-		if (!this.getEntityWorld().isClient()) {
+		if (!this.level().isClientSide()) {
 			AttachmentSyncPredicate predicate = ((AttachmentTypeImpl<?>) type).syncPredicate();
 
-			if ((Object) this instanceof ServerPlayerEntity self && predicate.test(this, self)) {
+			if ((Object) this instanceof ServerPlayer self && predicate.test(this, self)) {
 				// Players do not track themselves
 				AttachmentSync.trySync(change, self);
 			}
@@ -88,11 +88,11 @@ abstract class EntityMixin implements AttachmentTargetImpl {
 
 	@Override
 	public boolean fabric_shouldTryToSync() {
-		return !this.getEntityWorld().isClient();
+		return !this.level().isClientSide();
 	}
 
 	@Override
-	public DynamicRegistryManager fabric_getDynamicRegistryManager() {
-		return this.getEntityWorld().getRegistryManager();
+	public RegistryAccess fabric_getDynamicRegistryManager() {
+		return this.level().registryAccess();
 	}
 }

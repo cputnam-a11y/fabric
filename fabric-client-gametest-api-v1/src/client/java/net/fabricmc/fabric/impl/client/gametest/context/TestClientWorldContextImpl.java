@@ -18,17 +18,17 @@ package net.fabricmc.fabric.impl.client.gametest.context;
 
 import java.util.Objects;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.world.ClientChunkManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientChunkCache;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext;
 import net.fabricmc.fabric.impl.client.gametest.threading.ThreadingImpl;
-import net.fabricmc.fabric.mixin.client.gametest.ClientChunkManagerAccessor;
-import net.fabricmc.fabric.mixin.client.gametest.ClientChunkManagerClientChunkMapAccessor;
-import net.fabricmc.fabric.mixin.client.gametest.ClientWorldAccessor;
+import net.fabricmc.fabric.mixin.client.gametest.ClientChunkCacheAccessor;
+import net.fabricmc.fabric.mixin.client.gametest.ClientChunkCacheStorageAccessor;
+import net.fabricmc.fabric.mixin.client.gametest.ClientLevelAccessor;
 
 public class TestClientWorldContextImpl implements TestClientWorldContext {
 	private final ClientGameTestContext context;
@@ -51,11 +51,11 @@ public class TestClientWorldContextImpl implements TestClientWorldContext {
 		return context.waitFor(client -> (!waitForDownload || areChunksLoaded(client)) && areChunksRendered(client), timeout);
 	}
 
-	private static boolean areChunksLoaded(MinecraftClient client) {
-		int viewDistance = client.options.getClampedViewDistance();
-		ClientWorld world = Objects.requireNonNull(client.world);
-		ClientChunkManager.ClientChunkMap chunks = ((ClientChunkManagerAccessor) world.getChunkManager()).getChunks();
-		ClientChunkManagerClientChunkMapAccessor chunksAccessor = (ClientChunkManagerClientChunkMapAccessor) (Object) chunks;
+	private static boolean areChunksLoaded(Minecraft client) {
+		int viewDistance = client.options.getEffectiveRenderDistance();
+		ClientLevel world = Objects.requireNonNull(client.level);
+		ClientChunkCache.Storage chunks = ((ClientChunkCacheAccessor) world.getChunkSource()).getChunks();
+		ClientChunkCacheStorageAccessor chunksAccessor = (ClientChunkCacheStorageAccessor) (Object) chunks;
 		int centerChunkX = chunksAccessor.getCenterChunkX();
 		int centerChunkZ = chunksAccessor.getCenterChunkZ();
 
@@ -70,8 +70,8 @@ public class TestClientWorldContextImpl implements TestClientWorldContext {
 		return true;
 	}
 
-	private static boolean areChunksRendered(MinecraftClient client) {
-		ClientWorld world = Objects.requireNonNull(client.world);
-		return ((ClientWorldAccessor) world).getChunkUpdaters().isEmpty() && client.worldRenderer.isTerrainRenderComplete();
+	private static boolean areChunksRendered(Minecraft client) {
+		ClientLevel world = Objects.requireNonNull(client.level);
+		return ((ClientLevelAccessor) world).getChunkUpdaters().isEmpty() && client.levelRenderer.hasRenderedAllSections();
 	}
 }
