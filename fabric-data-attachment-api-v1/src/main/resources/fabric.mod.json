@@ -16,7 +16,7 @@
     "FabricMC"
   ],
   "depends": {
-    "fabricloader": ">=0.17.3",
+    "fabricloader": ">=0.18.0",
     "fabric-entity-events-v1": "*",
     "fabric-object-builder-api-v1": "*",
     "fabric-networking-api-v1": "*"
@@ -41,10 +41,10 @@
   "custom": {
     "fabric-api:module-lifecycle": "experimental",
     "loom:injected_interfaces": {
-      "net/minecraft/class_2586": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"],
-      "net/minecraft/class_2791": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"],
-      "net/minecraft/class_1297": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"],
-      "net/minecraft/class_1937": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"]
+      "net/minecraft/world/level/block/entity/BlockEntity": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"],
+      "net/minecraft/world/level/chunk/ChunkAccess": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"],
+      "net/minecraft/world/entity/Entity": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"],
+      "net/minecraft/world/level/Level": ["net/fabricmc/fabric/api/attachment/v1/AttachmentTarget"]
     }
   }
 }

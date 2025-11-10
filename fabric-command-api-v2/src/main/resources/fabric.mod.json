@@ -16,7 +16,7 @@
     "FabricMC"
   ],
   "depends": {
-    "fabricloader": ">=0.17.3",
+    "fabricloader": ">=0.18.0",
     "fabric-api-base": "*",
     "minecraft": ">1.19-alpha.22.11.a"
   },
@@ -32,7 +32,7 @@
   "custom": {
     "fabric-api:module-lifecycle": "stable",
     "loom:injected_interfaces": {
-      "net/minecraft/class_2303": ["net/fabricmc/fabric/api/command/v2/FabricEntitySelectorReader"]
+      "net/minecraft/commands/arguments/selector/EntitySelectorParser": ["net/fabricmc/fabric/api/command/v2/FabricEntitySelectorReader"]
     }
   }
 }

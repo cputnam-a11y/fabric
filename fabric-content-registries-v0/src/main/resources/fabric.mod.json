@@ -16,7 +16,7 @@
     "FabricMC"
   ],
   "depends": {
-    "fabricloader": ">=0.17.3",
+    "fabricloader": ">=0.18.0",
     "fabric-api-base": "*",
     "fabric-lifecycle-events-v1": "*",
     "fabric-resource-loader-v0": "*"
@@ -30,7 +30,7 @@
     "fabric-api:module-lifecycle": "stable",
     "loom:provided_javadoc": "fabric-content-registries-v0.mapping",
     "loom:injected_interfaces": {
-      "net/minecraft/class_1845\u0024class_9665": ["net/fabricmc/fabric/api/registry/FabricBrewingRecipeRegistryBuilder"]
+      "net/minecraft/world/item/alchemy/PotionBrewing\u0024Builder": ["net/fabricmc/fabric/api/registry/FabricBrewingRecipeRegistryBuilder"]
     }
   }
 }

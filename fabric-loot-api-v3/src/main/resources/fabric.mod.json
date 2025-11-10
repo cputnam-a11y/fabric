@@ -16,7 +16,7 @@
     "FabricMC"
   ],
   "depends": {
-    "fabricloader": ">=0.17.3",
+    "fabricloader": ">=0.18.0",
     "fabric-api-base": "*",
     "fabric-resource-loader-v0": "*"
   },
@@ -27,8 +27,8 @@
   "custom": {
     "fabric-api:module-lifecycle": "stable",
     "loom:injected_interfaces": {
-      "net/minecraft/class_52\u0024class_53": ["net/fabricmc/fabric/api/loot/v3/FabricLootTableBuilder"],
-      "net/minecraft/class_55\u0024class_56": ["net/fabricmc/fabric/api/loot/v3/FabricLootPoolBuilder"]
+      "net/minecraft/world/level/storage/loot/LootTable\u0024Builder": ["net/fabricmc/fabric/api/loot/v3/FabricLootTableBuilder"],
+      "net/minecraft/world/level/storage/loot/LootPool\u0024Builder": ["net/fabricmc/fabric/api/loot/v3/FabricLootPoolBuilder"]
     }
   }
 }

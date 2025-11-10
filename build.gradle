@@ -2,7 +2,7 @@ plugins {
 	id "java-library"
 	id "eclipse"
 	id "maven-publish"
-	id "fabric-loom" version "1.13.3" apply false
+	id "net.fabricmc.fabric-loom-no-remap" version "1.14.0-alpha.20" apply false
 	id "com.diffplug.spotless" version "7.2.1"
 	id "me.modmuss50.remotesign" version "0.5.0" apply false
 	id "me.modmuss50.mod-publish-plugin" version "1.1.0"
@@ -52,7 +52,7 @@ def getSubprojectVersion(Project project) {
 }
 
 def moduleDependencies(project, List<String> depNames) {
-	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
+	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it") }
 	def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
 
 	project.dependencies {
@@ -95,7 +95,7 @@ def moduleDependencies(project, List<String> depNames) {
 }
 
 def testDependencies(project, List<String> depNames) {
-	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it", configuration: 'namedElements') }
+	def deps = depNames.iterator().collect { project.dependencies.project(path: ":$it") }
 	def clientOutputs = depNames.iterator().collect { findProject(":$it").sourceSets.client.output }
 
 	project.dependencies {
@@ -142,7 +142,7 @@ allprojects {
 
 	apply plugin: "java-library"
 	apply plugin: "checkstyle"
-	apply plugin: "fabric-loom"
+	apply plugin: "net.fabricmc.fabric-loom-no-remap"
 	apply plugin: "com.diffplug.spotless"
 
 	tasks.withType(JavaCompile).configureEach {
@@ -221,8 +221,7 @@ allprojects {
 
 	dependencies {
 		minecraft "com.mojang:minecraft:$rootProject.minecraft_version"
-		mappings loom.officialMojangMappings()
-		modApi "net.fabricmc:fabric-loader:${project.loader_version}"
+		api "net.fabricmc:fabric-loader:${project.loader_version}"
 
 		testmodImplementation sourceSets.main.output
 		testmodClientImplementation sourceSets.main.output
@@ -277,7 +276,7 @@ allprojects {
 	}
 
 	remoteSign {
-		sign remapJar
+		sign jar
 	}
 
 	// Run this task after updating minecraft to regenerate any required resources
@@ -288,9 +287,10 @@ allprojects {
 	tasks.register('testmodJar', Jar) {
 		from sourceSets.testmod.output
 		from sourceSets.testmodClient.output
-		destinationDirectory = new File(project.buildDir, "devlibs")
 		archiveClassifier = "testmod"
 	}
+
+	build.dependsOn testmodJar
 
 	String archivesName = project.base.archivesName.get()
 	[jar, sourcesJar].each {
@@ -298,27 +298,6 @@ allprojects {
 			rename { "${it}-${archivesName}"}
 		}
 	}
-
-	if (file("src/client").exists() && !file("src/main").exists()) {
-		tasks.named("remapJar", net.fabricmc.loom.task.AbstractRemapJarTask) {
-			additionalClientOnlyEntries.add("LICENSE-${archivesName}".toString())
-		}
-
-		remapSourcesJar {
-			additionalClientOnlyEntries.add("LICENSE-${archivesName}".toString())
-		}
-	}
-
-	tasks.register('remapTestmodJar', net.fabricmc.loom.task.RemapJarTask) {
-		dependsOn testmodJar
-		input = testmodJar.archiveFile
-		archiveClassifier = "testmod"
-		addNestedDependencies = false
-		includesClientOnlyClasses = true
-		clientOnlySourceSetName = sourceSets.testmodClient.name
-		classpath.from(sourceSets.testmodClient.compileClasspath)
-	}
-	build.dependsOn remapTestmodJar
 
 	tasks.register('enigma', net.fabricmc.loom.task.tool.ModEnigmaTask) {
 		def clientOnly = file('src/client').exists() && !file('src/main').exists()
@@ -339,21 +318,17 @@ allprojects {
 	apply from: rootProject.file('gradle/validate-annotations.gradle')
 }
 
-remapTestmodJar {
-	def testModJarTasks = []
+def nestedTestModJars = project.files()
 
-	subprojects {
-		if (metaProjects.contains(it.name) || !(it.file("src/testmod").exists() || it.file("src/testmodClient").exists())) {
-			return
-		}
-
-		testModJarTasks += it.tasks.remapTestmodJar
+subprojects {
+	if (metaProjects.contains(it.name) || !(it.file("src/testmod").exists() || it.file("src/testmodClient").exists())) {
+		return
 	}
 
-	nestedJars.setFrom(testModJarTasks)
-	addNestedDependencies = true
-	clientOnlySourceSetName = sourceSets.testmodClient.name
+	nestedTestModJars.from(it.tasks.named("testmodJar"))
 }
+
+loom.nestJars(tasks.named("testmodJar"), nestedTestModJars)
 
 // Apply auxiliary buildscripts to submodules
 // This must be done after all plugins are applied to subprojects
@@ -426,6 +401,7 @@ loom {
 			vmArg "-Dfabric.client.gametest"
 			vmArg "-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail"
 			vmArg "-Dfabric-tag-conventions-v1.legacyTagWarning=fail"
+			vmArg "-Dfabric.client.gametest.disableNetworkSynchronizer=true"
 		}
 	}
 }
@@ -435,43 +411,6 @@ runGametest {
 }
 
 test.dependsOn runGametest
-
-configurations {
-	productionMods {
-		transitive = false
-	}
-}
-
-dependencies {
-	productionMods project(':fabric-client-gametest-api-v1')
-}
-
-def productionMods = project.files(configurations.productionMods, remapJar.archiveFile, remapTestmodJar.archiveFile)
-
-tasks.register('runProductionClientGametest', net.fabricmc.loom.task.prod.ClientProductionRunTask) {
-	mods.setFrom productionMods
-	jvmArgs.addAll([
-		"-Dfabric.client.gametest",
-		"-Dfabric-tag-conventions-v2.missingTagTranslationWarning=fail",
-		"-Dfabric-tag-conventions-v1.legacyTagWarning=fail",
-		"-Dfabric.client.gametest.disableNetworkSynchronizer=true"
-	])
-	jvmArgs.addAll(debugArgs)
-
-	if (providers.environmentVariable("ENABLE_TRACY").getOrNull() == "true") {
-		tracy {
-			tracyCapture = file("tracy-capture")
-			output = file("profile.tracy")
-		}
-	}
-}
-
-tasks.register('runProductionAutoTestServer', net.fabricmc.loom.task.prod.ServerProductionRunTask) {
-	mods.setFrom productionMods
-	jvmArgs.add("-Dfabric.autoTest")
-	jvmArgs.addAll(debugArgs)
-	programArgs.add("nogui")
-}
 
 // Format all the gradle files
 spotless {
@@ -529,15 +468,15 @@ subprojects {
 
 		// Make all modules depend on the gametest api (and thus res loader) to try and promote its usage.
 		if (project.name != "fabric-gametest-api-v1") {
-			testmodImplementation project(path: ':fabric-gametest-api-v1', configuration: 'namedElements')
+			testmodImplementation project(path: ':fabric-gametest-api-v1')
 			testmodClientImplementation project(":fabric-gametest-api-v1").sourceSets.client.output
-			testmodImplementation project(path: ':fabric-resource-loader-v0', configuration: 'namedElements')
+			testmodImplementation project(path: ':fabric-resource-loader-v0')
 			testmodClientImplementation project(":fabric-resource-loader-v0").sourceSets.client.output
 		}
 
 		// Make all testmods run with registry-sync-v0 as it is required to register new objects.
 		if (project.name != "fabric-registry-sync-v0") {
-			testmodRuntimeOnly project(path: ':fabric-registry-sync-v0', configuration: 'namedElements')
+			testmodRuntimeOnly project(path: ':fabric-registry-sync-v0')
 			testmodClientImplementation project(":fabric-registry-sync-v0").sourceSets.client.output
 		}
 	}
@@ -548,12 +487,12 @@ subprojects {
 				pom {
 					addPomMetadataInformation(project, pom)
 				}
-				artifact(signRemapJar.output) {
-					builtBy(signRemapJar)
+				artifact(tasks.jar.archiveFile) {
+					builtBy(tasks.jar)
 				}
 
-				artifact(remapSourcesJar) {
-					builtBy remapSourcesJar
+				artifact(tasks.sourcesJar) {
+					builtBy tasks.sourcesJar
 				}
 			}
 		}
@@ -601,16 +540,16 @@ subprojects {
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
-			artifact(signRemapJar.output) {
-				builtBy(signRemapJar)
+			artifact(signJar.output) {
+				builtBy(signJar)
 			}
 
 			artifact(sourcesJar) {
-				builtBy remapSourcesJar
+				builtBy sourcesJar
 			}
 
 			artifact javadocJar
-			artifact remapTestmodJar
+			artifact testmodJar
 
 			pom {
 				addPomMetadataInformation(rootProject, pom)
@@ -672,14 +611,6 @@ void setupRepositories(RepositoryHandler repositories) {
 	}
 }
 
-subprojects.each {
-	if (metaProjects.contains(it.name)) {
-		return
-	}
-
-	remapJar.dependsOn("${it.path}:remapJar")
-}
-
 // These modules are not included in the fat jar, maven will resolve them via the pom.
 def devOnlyModules = [
 	"fabric-client-gametest-api-v1",
@@ -687,18 +618,16 @@ def devOnlyModules = [
 ]
 
 dependencies {
-	afterEvaluate {
-		subprojects.each {
-			if (metaProjects.contains(it.name)) {
-				return
-			}
-
-			api project(path: "${it.path}", configuration: "namedElements")
-			clientImplementation project("${it.path}:").sourceSets.client.output
-
-			testmodImplementation project("${it.path}:").sourceSets.testmod.output
-			testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
+	subprojects.each {
+		if (metaProjects.contains(it.name)) {
+			return
 		}
+
+		api project(path: "${it.path}")
+		clientImplementation project("${it.path}:").sourceSets.client.output
+
+		testmodImplementation project("${it.path}:").sourceSets.testmod.output
+		testmodClientImplementation project("${it.path}:").sourceSets.testmodClient.output
 	}
 }
 
@@ -718,9 +647,7 @@ dependencies {
 	}
 }
 
-remapJar {
-	nestedJars.from configurations.nestedJars
-}
+loom.nestJars(tasks.named("jar"), configurations.nestedJars)
 
 // Attempt to create a single jar with all files from all nested jars, this will fail if there are duplicate files.
 tasks.register("checkNoDuplicateFiles", Zip) {
@@ -739,23 +666,25 @@ tasks.register("checkNoDuplicateFiles", Zip) {
 check.dependsOn "checkNoDuplicateFiles"
 
 publishMods {
-	file = signRemapJar.output
+	file = signJar.output
 	changelog = providers.environmentVariable("CHANGELOG").getOrElse("No changelog provided")
 	type = project.prerelease == "true" ? BETA : STABLE
 	displayName = "[${project.minecraft_version}] Fabric API $project.version"
 	modLoaders.add("fabric")
 	dryRun = providers.environmentVariable("CURSEFORGE_API_KEY").getOrNull() == null
 
-	curseforge {
-		accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
-		projectId = "306612"
-		minecraftVersions.add(project.curseforge_minecraft_version)
-	}
-	modrinth {
-		accessToken = providers.environmentVariable("MODRINTH_TOKEN")
-		projectId = "P7dR8mSH"
-		minecraftVersions.add(project.minecraft_version)
-	}
+	/*
+	 curseforge {
+	 accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+	 projectId = "306612"
+	 minecraftVersions.add(project.curseforge_minecraft_version)
+	 }
+	 modrinth {
+	 accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+	 projectId = "P7dR8mSH"
+	 minecraftVersions.add(project.minecraft_version)
+	 }
+	 */
 	github {
 		accessToken = providers.environmentVariable("GITHUB_TOKEN")
 		repository = providers.environmentVariable("GITHUB_REPOSITORY").getOrElse("FabricMC/dryrun")
@@ -763,9 +692,8 @@ publishMods {
 	}
 }
 
-assemble.dependsOn signRemapJar
+assemble.dependsOn signJar
 
-import java.util.stream.Collectors
 
 // A task to ensure that the version being released has not already been released.
 tasks.register('checkVersion') {

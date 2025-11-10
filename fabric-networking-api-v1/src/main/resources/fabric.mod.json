@@ -26,7 +26,7 @@
   },
   "accessWidener": "fabric-networking-api-v1.accesswidener",
   "depends": {
-    "fabricloader": ">=0.17.3",
+    "fabricloader": ">=0.18.0",
     "fabric-api-base": "*"
   },
   "description": "Low-level, vanilla protocol oriented networking hooks.",
@@ -40,7 +40,7 @@
   "custom": {
     "fabric-api:module-lifecycle": "stable",
     "loom:injected_interfaces": {
-      "net/minecraft/class_8610": [ "net/fabricmc/fabric/api/networking/v1/FabricServerConfigurationNetworkHandler" ]
+      "net/minecraft/server/network/ServerConfigurationPacketListenerImpl": [ "net/fabricmc/fabric/api/networking/v1/FabricServerConfigurationNetworkHandler" ]
     }
   }
 }
