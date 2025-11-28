@@ -13,15 +13,15 @@
   },
   "entrypoints": {
     "main": [
-      "net.fabricmc.fabric.test.resource.loader.v1.BuiltinPackTestMod",
-      "net.fabricmc.fabric.test.resource.loader.v1.ResourceReloaderTestMod",
-      "net.fabricmc.fabric.test.resource.loader.v1.VanillaBuiltinPackInjectionTestMod"
+      "net.fabricmc.fabric.test.resource.loader.BuiltinPackTestMod",
+      "net.fabricmc.fabric.test.resource.loader.ResourceReloaderTestMod",
+      "net.fabricmc.fabric.test.resource.loader.VanillaBuiltinPackInjectionTestMod"
     ],
     "server": [
-      "net.fabricmc.fabric.test.resource.loader.v1.LanguageTestMod"
+      "net.fabricmc.fabric.test.resource.loader.LanguageTestMod"
     ],
     "fabric-gametest": [
-      "net.fabricmc.fabric.test.resource.loader.v1.BuiltinPackSortingTest"
+      "net.fabricmc.fabric.test.resource.loader.BuiltinPackSortingTest"
     ]
   },
   "mixins": [

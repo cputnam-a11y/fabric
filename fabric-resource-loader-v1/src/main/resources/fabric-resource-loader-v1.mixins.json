@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "net.fabricmc.fabric.mixin.resource.v1",
+  "package": "net.fabricmc.fabric.mixin.resource",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "DataPackCommandMixin",

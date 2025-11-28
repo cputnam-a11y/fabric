@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "net.fabricmc.fabric.mixin.resource.v1.client",
+  "package": "net.fabricmc.fabric.mixin.resource.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BuiltInPackSourceMixin",

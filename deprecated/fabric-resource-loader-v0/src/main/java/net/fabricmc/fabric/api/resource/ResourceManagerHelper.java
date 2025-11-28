@@ -29,8 +29,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
+import net.fabricmc.fabric.impl.resource.ResourceLoaderImpl;
 import net.fabricmc.fabric.impl.resource.loader.ResourceManagerHelperImpl;
-import net.fabricmc.fabric.impl.resource.v1.ResourceLoaderImpl;
 import net.fabricmc.loader.api.ModContainer;
 
 /**
