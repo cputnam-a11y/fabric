@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.mixin.loot.v2;
+package net.fabricmc.fabric.mixin.gamerule.client;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
-import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.client.gui.screens.worldselection.EditGameRulesScreen;
 
-import net.fabricmc.fabric.api.loot.v2.FabricLootPoolBuilder;
-
-/**
- * The v3 module injects all the necessary methods into the target class.
- */
-@Mixin(LootPool.Builder.class)
-abstract class LootPoolBuilderMixin implements FabricLootPoolBuilder {
+@Mixin(EditGameRulesScreen.RuleList.class)
+public interface EditGameRulesScreenRuleListAccessor {
+	@Accessor("this$0")
+	EditGameRulesScreen getThis();
 }
