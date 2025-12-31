@@ -27,25 +27,25 @@ public final class OxidizableBlocksRegistryImpl {
 	private OxidizableBlocksRegistryImpl() {
 	}
 
-	public static void registerOxidizableBlockPair(Block less, Block more) {
-		Objects.requireNonNull(less, "Oxidizable block cannot be null!");
-		Objects.requireNonNull(more, "Oxidizable block cannot be null!");
-		WeatheringCopper.NEXT_BY_BLOCK.get().put(less, more);
+	public static void registerNextStage(Block from, Block to) {
+		Objects.requireNonNull(from, "Oxidizable block cannot be null!");
+		Objects.requireNonNull(to, "Oxidizable block cannot be null!");
+		WeatheringCopper.NEXT_BY_BLOCK.get().put(from, to);
 		// Fix #4371
-		refreshRandomTickCache(less);
-		refreshRandomTickCache(more);
+		refreshRandomTickCache(from);
+		refreshRandomTickCache(to);
 	}
 
-	public static void registerWaxableBlockPair(Block unwaxed, Block waxed) {
+	public static void registerWaxable(Block unwaxed, Block waxed) {
 		Objects.requireNonNull(unwaxed, "Unwaxed block cannot be null!");
 		Objects.requireNonNull(waxed, "Waxed block cannot be null!");
 		HoneycombItem.WAXABLES.get().put(unwaxed, waxed);
 	}
 
-	public static void registerCopperBlockSet(WeatheringCopperBlocks blockSet) {
-		Objects.requireNonNull(blockSet, "blockSet cannot be null!");
-		blockSet.weatheringMapping().forEach(OxidizableBlocksRegistryImpl::registerOxidizableBlockPair);
-		blockSet.waxedMapping().forEach(OxidizableBlocksRegistryImpl::registerWaxableBlockPair);
+	public static void registerWeatheringCopperBlocks(WeatheringCopperBlocks copperBlocks) {
+		Objects.requireNonNull(copperBlocks, "copperBlocks cannot be null!");
+		copperBlocks.weatheringMapping().forEach(OxidizableBlocksRegistryImpl::registerNextStage);
+		copperBlocks.waxedMapping().forEach(OxidizableBlocksRegistryImpl::registerWaxable);
 	}
 
 	private static void refreshRandomTickCache(Block block) {

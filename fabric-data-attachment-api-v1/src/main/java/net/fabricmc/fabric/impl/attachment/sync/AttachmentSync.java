@@ -29,7 +29,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ConfigurationTask;
 
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -39,28 +39,29 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.attachment.AttachmentEntrypoint;
 import net.fabricmc.fabric.impl.attachment.AttachmentRegistryImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
-import net.fabricmc.fabric.impl.attachment.sync.c2s.AcceptedAttachmentsPayloadC2S;
-import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
-import net.fabricmc.fabric.impl.attachment.sync.s2c.RequestAcceptedAttachmentsPayloadS2C;
+import net.fabricmc.fabric.impl.attachment.sync.clientbound.ClientboundAttachmentSyncPayload;
+import net.fabricmc.fabric.impl.attachment.sync.clientbound.ClientboundRequestAcceptedAttachmentsPayload;
+import net.fabricmc.fabric.impl.attachment.sync.serverbound.ServerboundAcceptedAttachmentsPayload;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerCommonPacketListenerImplAccessor;
 
 public class AttachmentSync implements ModInitializer {
 	public static final int MAX_IDENTIFIER_SIZE = 256;
 
-	public static AcceptedAttachmentsPayloadC2S createResponsePayload() {
-		return new AcceptedAttachmentsPayloadC2S(AttachmentRegistryImpl.getSyncableAttachments());
+	public static ServerboundAcceptedAttachmentsPayload createResponsePayload() {
+		return new ServerboundAcceptedAttachmentsPayload(AttachmentRegistryImpl.getSyncableAttachments());
 	}
 
 	public static void trySync(AttachmentChange change, ServerPlayer player) {
-		Set<Identifier> supported = ((SupportedAttachmentsClientConnection) ((ServerCommonPacketListenerImplAccessor) player.connection).getConnection())
+		Set<Identifier> supported = ((SupportedAttachmentsConnection) ((ServerCommonPacketListenerImplAccessor) player.connection).getConnection())
 				.fabric_getSupportedAttachments();
 
 		if (supported.contains(change.type().identifier())) {
-			ServerPlayNetworking.send(player, new AttachmentSyncPayloadS2C(List.of(change)));
+			ServerPlayNetworking.send(player, new ClientboundAttachmentSyncPayload(List.of(change)));
 		}
 	}
 
-	private static Set<Identifier> decodeResponsePayload(AcceptedAttachmentsPayloadC2S payload) {
+	private static Set<Identifier> decodeResponsePayload(
+			ServerboundAcceptedAttachmentsPayload payload) {
 		Set<Identifier> atts = payload.acceptedAttachments();
 		Set<Identifier> syncable = AttachmentRegistryImpl.getSyncableAttachments();
 		atts.retainAll(syncable);
@@ -79,13 +80,13 @@ public class AttachmentSync implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		// Config
-		PayloadTypeRegistry.configurationC2S()
-				.register(AcceptedAttachmentsPayloadC2S.ID, AcceptedAttachmentsPayloadC2S.CODEC);
-		PayloadTypeRegistry.configurationS2C()
-				.register(RequestAcceptedAttachmentsPayloadS2C.ID, RequestAcceptedAttachmentsPayloadS2C.CODEC);
+		PayloadTypeRegistry.serverboundConfiguration()
+				.register(ServerboundAcceptedAttachmentsPayload.ID, ServerboundAcceptedAttachmentsPayload.CODEC);
+		PayloadTypeRegistry.clientboundConfiguration()
+				.register(ClientboundRequestAcceptedAttachmentsPayload.ID, ClientboundRequestAcceptedAttachmentsPayload.CODEC);
 
 		ServerConfigurationConnectionEvents.CONFIGURE.register((handler, server) -> {
-			if (ServerConfigurationNetworking.canSend(handler, RequestAcceptedAttachmentsPayloadS2C.PACKET_ID)) {
+			if (ServerConfigurationNetworking.canSend(handler, ClientboundRequestAcceptedAttachmentsPayload.PACKET_ID)) {
 				handler.addTask(new AttachmentSyncTask());
 			} else {
 				AttachmentEntrypoint.LOGGER.debug(
@@ -94,20 +95,22 @@ public class AttachmentSync implements ModInitializer {
 			}
 		});
 
-		ServerConfigurationNetworking.registerGlobalReceiver(AcceptedAttachmentsPayloadC2S.ID, (payload, context) -> {
-			Set<Identifier> supportedAttachments = decodeResponsePayload(payload);
-			Connection connection = ((ServerCommonPacketListenerImplAccessor) context.networkHandler()).getConnection();
-			((SupportedAttachmentsClientConnection) connection).fabric_setSupportedAttachments(supportedAttachments);
+		ServerConfigurationNetworking.registerGlobalReceiver(
+				ServerboundAcceptedAttachmentsPayload.ID, (payload, context) -> {
+					Set<Identifier> supportedAttachments = decodeResponsePayload(payload);
+					Connection connection = ((ServerCommonPacketListenerImplAccessor) context.packetListener()).getConnection();
+					((SupportedAttachmentsConnection) connection).fabric_setSupportedAttachments(supportedAttachments);
 
-			context.networkHandler().completeTask(AttachmentSyncTask.KEY);
-		});
+					context.packetListener().completeTask(AttachmentSyncTask.KEY);
+				});
 
 		// Play
-		PayloadTypeRegistry.playS2C().register(AttachmentSyncPayloadS2C.ID, AttachmentSyncPayloadS2C.CODEC);
+		PayloadTypeRegistry.clientboundPlay().register(
+				ClientboundAttachmentSyncPayload.ID, ClientboundAttachmentSyncPayload.CODEC);
 
 		ServerPlayerEvents.JOIN.register((player) -> {
 			List<AttachmentChange> changes = new ArrayList<>();
-			// sync world attachments
+			// sync level attachments
 			((AttachmentTargetImpl) player.level()).fabric_computeInitialSyncChanges(player, changes::add);
 			// sync player's own persistent attachments that couldn't be synced earlier
 			((AttachmentTargetImpl) player).fabric_computeInitialSyncChanges(player, changes::add);
@@ -117,9 +120,9 @@ public class AttachmentSync implements ModInitializer {
 			}
 		});
 
-		ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((player, origin, destination) -> {
-			// sync new world's attachments
-			// no conflict with previous one because the client world is recreated every time
+		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, origin, destination) -> {
+			// sync new level's attachments
+			// no conflict with previous one because the client level is recreated every time
 			List<AttachmentChange> changes = new ArrayList<>();
 			((AttachmentTargetImpl) destination).fabric_computeInitialSyncChanges(player, changes::add);
 
@@ -139,11 +142,13 @@ public class AttachmentSync implements ModInitializer {
 	}
 
 	private record AttachmentSyncTask() implements ConfigurationTask {
-		public static final Type KEY = new Type(RequestAcceptedAttachmentsPayloadS2C.PACKET_ID.toString());
+		public static final Type KEY = new Type(
+				ClientboundRequestAcceptedAttachmentsPayload.PACKET_ID.toString());
 
 		@Override
 		public void start(Consumer<Packet<?>> sender) {
-			sender.accept(ServerConfigurationNetworking.createS2CPacket(RequestAcceptedAttachmentsPayloadS2C.INSTANCE));
+			sender.accept(ServerConfigurationNetworking.createClientboundPacket(
+					ClientboundRequestAcceptedAttachmentsPayload.INSTANCE));
 		}
 
 		@Override

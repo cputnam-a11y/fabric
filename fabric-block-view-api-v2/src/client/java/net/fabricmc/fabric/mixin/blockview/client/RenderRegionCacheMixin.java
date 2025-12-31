@@ -50,16 +50,16 @@ public abstract class RenderRegionCacheMixin {
 	private static final Logger LOGGER = LoggerFactory.getLogger(RenderRegionCacheMixin.class);
 
 	@Inject(method = "createRegion", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/RenderRegionCache;getSectionDataCopy(Lnet/minecraft/world/level/Level;III)Lnet/minecraft/client/renderer/chunk/SectionCopy;"))
-	private void copyDataForChunk(Level world, long packedChunkPos, CallbackInfoReturnable<RenderSectionRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef, @Local(ordinal = 11) int x, @Local(ordinal = 10) int y, @Local(ordinal = 9) int z) {
+	private void copyDataForChunk(Level level, long packedChunkPos, CallbackInfoReturnable<RenderSectionRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef, @Local(ordinal = 11) int x, @Local(ordinal = 10) int y, @Local(ordinal = 9) int z) {
 		// Hash maps in chunks should generally not be modified outside of client thread
 		// but does happen in practice, due to mods or inconsistent vanilla behaviors, causing
 		// CMEs when we iterate the map. (Vanilla does not iterate these maps when it builds
-		// the chunk cache and does not suffer from this problem.)
+		// the path navigation region and does not suffer from this problem.)
 		//
 		// We handle this simply by retrying until it works. Ugly but effective.
 		while (true) {
 			try {
-				mapRef.set(mapChunk(world.getChunk(x, z), SectionPos.of(packedChunkPos), mapRef.get()));
+				mapRef.set(mapChunk(level.getChunk(x, z), SectionPos.of(packedChunkPos), mapRef.get()));
 				break;
 			} catch (ConcurrentModificationException e) {
 				final int count = ERROR_COUNTER.incrementAndGet();
@@ -76,7 +76,7 @@ public abstract class RenderRegionCacheMixin {
 	}
 
 	@Inject(method = "createRegion", at = @At(value = "RETURN"))
-	private void createDataMap(Level world, long l, CallbackInfoReturnable<RenderSectionRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
+	private void createDataMap(Level level, long l, CallbackInfoReturnable<RenderSectionRegion> cir, @Share("dataMap") LocalRef<Long2ObjectOpenHashMap<Object>> mapRef) {
 		RenderSectionRegion rendererRegion = cir.getReturnValue();
 		Long2ObjectOpenHashMap<Object> map = mapRef.get();
 
@@ -86,18 +86,18 @@ public abstract class RenderRegionCacheMixin {
 	}
 
 	@Unique
-	private static Long2ObjectOpenHashMap<Object> mapChunk(LevelChunk chunk, SectionPos chunkSectionPos, Long2ObjectOpenHashMap<Object> map) {
+	private static Long2ObjectOpenHashMap<Object> mapChunk(LevelChunk chunk, SectionPos sectionPos, Long2ObjectOpenHashMap<Object> map) {
 		// Skip the math below if the chunk contains no block entities
 		if (chunk.getBlockEntities().isEmpty()) {
 			return map;
 		}
 
-		final int xMin = SectionPos.sectionToBlockCoord(chunkSectionPos.x() - 1);
-		final int yMin = SectionPos.sectionToBlockCoord(chunkSectionPos.y() - 1);
-		final int zMin = SectionPos.sectionToBlockCoord(chunkSectionPos.z() - 1);
-		final int xMax = SectionPos.sectionToBlockCoord(chunkSectionPos.x() + 1);
-		final int yMax = SectionPos.sectionToBlockCoord(chunkSectionPos.y() + 1);
-		final int zMax = SectionPos.sectionToBlockCoord(chunkSectionPos.z() + 1);
+		final int xMin = SectionPos.sectionToBlockCoord(sectionPos.x() - 1);
+		final int yMin = SectionPos.sectionToBlockCoord(sectionPos.y() - 1);
+		final int zMin = SectionPos.sectionToBlockCoord(sectionPos.z() - 1);
+		final int xMax = SectionPos.sectionToBlockCoord(sectionPos.x() + 1);
+		final int yMax = SectionPos.sectionToBlockCoord(sectionPos.y() + 1);
+		final int zMax = SectionPos.sectionToBlockCoord(sectionPos.z() + 1);
 
 		for (Map.Entry<BlockPos, BlockEntity> entry : chunk.getBlockEntities().entrySet()) {
 			final BlockPos pos = entry.getKey();

@@ -26,7 +26,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
-import net.fabricmc.fabric.api.client.rendering.v1.DrawItemStackOverlayCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.RenderItemDecorationsCallback;
 
 @Mixin(GuiGraphics.class)
 abstract class GuiGraphicsMixin {
@@ -34,10 +34,10 @@ abstract class GuiGraphicsMixin {
 			method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V",
 			at = @At("RETURN")
 	)
-	public void drawStackOverlay(Font textRenderer, ItemStack stack, int x, int y, @Nullable String stackCountText, CallbackInfo callback) {
+	public void drawStackOverlay(Font font, ItemStack stack, int x, int y, @Nullable String stackCountText, CallbackInfo callback) {
 		if (!stack.isEmpty()) {
-			DrawItemStackOverlayCallback.EVENT.invoker()
-					.onDrawItemStackOverlay((GuiGraphics) (Object) this, textRenderer, stack, x, y);
+			RenderItemDecorationsCallback.EVENT.invoker()
+					.onRenderItemDecorations((GuiGraphics) (Object) this, font, stack, x, y);
 		}
 	}
 }

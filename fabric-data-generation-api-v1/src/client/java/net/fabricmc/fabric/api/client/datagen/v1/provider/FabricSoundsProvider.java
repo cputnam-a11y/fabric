@@ -56,7 +56,7 @@ public abstract class FabricSoundsProvider implements DataProvider {
 	}
 
 	@Override
-	public CompletableFuture<?> run(CachedOutput writer) {
+	public CompletableFuture<?> run(CachedOutput output) {
 		return registriesFuture.thenCompose(lookup -> {
 			final Map<String, Map<String, SoundTypeBuilderImpl.SoundType>> data = new LinkedHashMap<>();
 			configure(lookup, (id, builder) -> {
@@ -66,8 +66,8 @@ public abstract class FabricSoundsProvider implements DataProvider {
 			});
 
 			return CompletableFuture.allOf(data.entrySet().stream().map(file -> {
-				Path outputPath = output.getOutputFolder(PackOutput.Target.RESOURCE_PACK).resolve(file.getKey() + "/sounds.json");
-				return DataProvider.saveStable(writer, lookup, CODEC, file.getValue(), outputPath);
+				Path outputPath = this.output.getOutputFolder(PackOutput.Target.RESOURCE_PACK).resolve(file.getKey() + "/sounds.json");
+				return DataProvider.saveStable(output, lookup, CODEC, file.getValue(), outputPath);
 			}).toArray(CompletableFuture[]::new));
 		});
 	}
@@ -75,7 +75,7 @@ public abstract class FabricSoundsProvider implements DataProvider {
 	/**
 	 * Implement this method and then use {@link BiConsumer#accept} to register sound events to be data-generated.
 	 *
-	 * <p>Registered sound types will be appended to their own sounds.json in a namespace corresponding to
+	 * <p>Registered sound types will be appended to their own {@code sounds.json} in a namespace corresponding to
 	 * the id of the sound event they are assigned to.
 	 */
 	protected abstract void configure(HolderLookup.Provider registryLookup, SoundExporter exporter);
@@ -99,10 +99,10 @@ public abstract class FabricSoundsProvider implements DataProvider {
 		/**
 		 * Adds a sound event.
 		 *
-		 * @param event   registry entry for sound event
+		 * @param event   holder for sound event
 		 * @param builder the sound event details
 		 *
-		 * @throws IllegalArgumentException if the registry entry provided has not been registered
+		 * @throws IllegalArgumentException if the holder provided has not been registered
 		 */
 		default void add(Holder<SoundEvent> event, SoundTypeBuilder builder) {
 			add(event.unwrapKey().orElseThrow(() -> new IllegalArgumentException("Direct (non-registered) sound event cannot be added")).identifier(), builder);

@@ -108,10 +108,10 @@ public class MinecraftMixin {
 	}
 
 	@Inject(method = "doWorldLoad", at = @At("HEAD"), cancellable = true)
-	private void deferStartIntegratedServer(LevelStorageSource.LevelStorageAccess session, PackRepository dataPackManager, WorldStem saveLoader, boolean newWorld, CallbackInfo ci) {
+	private void deferStartIntegratedServer(LevelStorageSource.LevelStorageAccess storageAccess, PackRepository dataPackManager, WorldStem worldStem, boolean newWorld, CallbackInfo ci) {
 		if (ThreadingImpl.taskToRun != null) {
 			// don't start the integrated server (which busywaits) inside a task
-			deferredTask = () -> Minecraft.getInstance().doWorldLoad(session, dataPackManager, saveLoader, newWorld);
+			deferredTask = () -> Minecraft.getInstance().doWorldLoad(storageAccess, dataPackManager, worldStem, newWorld);
 			ci.cancel();
 		}
 	}
@@ -192,7 +192,7 @@ public class MinecraftMixin {
 	private static void checkThreadOnGetInstance(CallbackInfoReturnable<Minecraft> cir) {
 		Preconditions.checkState(
 				Thread.currentThread() != ThreadingImpl.testThread,
-				"MinecraftClient.getInstance() cannot be called from the gametest thread. Try using ClientGameTestContext.runOnClient or ClientGameTestContext.computeOnClient"
+				"Minecraft.getInstance() cannot be called from the gametest thread. Try using ClientGameTestContext.runOnClient or ClientGameTestContext.computeOnClient"
 		);
 	}
 

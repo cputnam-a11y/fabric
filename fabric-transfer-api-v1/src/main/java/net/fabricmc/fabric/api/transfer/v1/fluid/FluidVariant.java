@@ -55,7 +55,7 @@ public interface FluidVariant extends TransferVariant<Fluid> {
 	/**
 	 * Retrieve a FluidVariant with a fluid, and a {@code null} tag.
 	 *
-	 * <p>The flowing and still variations of {@linkplain net.minecraft.world.level.material.FlowingFluid flowable fluids}
+	 * <p>The flowing and still variations of {@linkplain net.minecraft.world.level.material.FlowingFluid flowing fluids}
 	 * are normalized to always refer to the still variant. For example,
 	 * {@code FluidVariant.of(Fluids.FLOWING_WATER).getFluid() == Fluids.WATER}.
 	 */
@@ -66,9 +66,9 @@ public interface FluidVariant extends TransferVariant<Fluid> {
 	/**
 	 * Retrieve a FluidVariant with a fluid, and an optional tag.
 	 *
-	 * <p>The flowing and still variations of {@linkplain net.minecraft.world.level.material.FlowingFluid flowable fluids}
+	 * <p>The flowing and still variations of {@linkplain net.minecraft.world.level.material.FlowingFluid flowing fluids}
 	 * are normalized to always refer to the still fluid. For example,
-	 * {@code FluidVariant.of(Fluids.FLOWING_WATER, ComponentChanges.EMPTY).getFluid() == Fluids.WATER}.
+	 * {@code FluidVariant.of(Fluids.FLOWING_WATER, DataComponentPatch.EMPTY).getFluid() == Fluids.WATER}.
 	 */
 	static FluidVariant of(Fluid fluid, DataComponentPatch components) {
 		return FluidVariantImpl.of(fluid, components);
@@ -81,15 +81,16 @@ public interface FluidVariant extends TransferVariant<Fluid> {
 		return getObject();
 	}
 
-	default Holder<Fluid> getRegistryEntry() {
+	@Override
+	default Holder<Fluid> typeHolder() {
 		return getFluid().builtInRegistryHolder();
 	}
 
 	/**
-	 * Creates a copy of this FluidVariant with the provided component changes applied.
-	 * @param changes the changes to apply
-	 * @return the new variant with the changes applied
+	 * Creates a copy of this FluidVariant with the provided component patch applied.
+	 * @param patch the patch to apply
+	 * @return the new variant with the patch applied
 	 */
 	@Override
-	FluidVariant withComponentChanges(DataComponentPatch changes);
+	FluidVariant withComponents(DataComponentPatch patch);
 }

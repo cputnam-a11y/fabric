@@ -42,7 +42,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SidedStorageBlockEntity;
 import net.fabricmc.fabric.impl.transfer.item.BundleContentsStorage;
 import net.fabricmc.fabric.impl.transfer.item.ComposterWrapper;
-import net.fabricmc.fabric.impl.transfer.item.ContainerComponentStorage;
+import net.fabricmc.fabric.impl.transfer.item.ItemContainerContentsStorage;
 import net.fabricmc.fabric.mixin.transfer.CompoundContainerAccessor;
 
 /**
@@ -51,7 +51,7 @@ import net.fabricmc.fabric.mixin.transfer.CompoundContainerAccessor;
 public final class ItemStorage {
 	/**
 	 * Sided block access to item variant storages.
-	 * The {@code Direction} parameter may be null, meaning that the full inventory (ignoring side restrictions) should be queried.
+	 * The {@code Direction} parameter may be null, meaning that the full storage (ignoring side restrictions) should be queried.
 	 * Refer to {@link BlockApiLookup} for documentation on how to use this field.
 	 *
 	 * <p>When the operations supported by a storage change,
@@ -60,17 +60,17 @@ public final class ItemStorage {
 	 *
 	 * <p>Block entities directly implementing {@link Container} or {@link WorldlyContainer} are automatically handled by a fallback provider,
 	 * and don't need to do anything.
-	 * Blocks that implement {@link WorldlyContainerHolder} and whose returned inventory is constant (it's the same for two subsequent calls)
+	 * Blocks that implement {@link WorldlyContainerHolder} and whose returned container is constant (it's the same for two subsequent calls)
 	 * are also handled automatically and don't need to do anything.
 	 * The fallback provider assumes that the {@link Container} "owns" its contents. If that's not the case,
-	 * for example because it redirects all function calls to another inventory, then implementing {@link Container} should be avoided.
+	 * for example because it redirects all function calls to another container, then implementing {@link Container} should be avoided.
 	 *
 	 * <p>Hoppers and droppers will interact with storages exposed through this lookup, thus implementing one of the vanilla APIs is not necessary.
 	 *
 	 * <p>Depending on the use case, the following strategies can be used to offer a {@code Storage<ItemVariant>} implementation:
 	 * <ul>
-	 *     <li>Directly implementing {@code Inventory} or {@code SidedInventory} on a block entity - it will be wrapped automatically.</li>
-	 *     <li>Storing an inventory inside a block entity field, and converting it manually with {@link InventoryStorage#of}.
+	 *     <li>Directly implementing {@link Container} or {@link WorldlyContainer} on a block entity - it will be wrapped automatically.</li>
+	 *     <li>Storing a container inside a block entity field, and converting it manually with {@link ContainerStorage#of}.
 	 *     {@link SimpleContainer} can be used for easy implementation.</li>
 	 *     <li>{@link SingleStackStorage} can also be used for more flexibility. Multiple of them can be combined with {@link CombinedStorage}.</li>
 	 *     <li>Directly providing a custom implementation of {@code Storage<ItemVariant>} is also possible.</li>
@@ -79,8 +79,8 @@ public final class ItemStorage {
 	 * <p>A simple way to expose item variant storages for a block entity hierarchy is to extend {@link SidedStorageBlockEntity}.
 	 *
 	 * <p>This may be queried safely both on the logical server and on the logical client threads.
-	 * On the server thread (i.e. with a server world), all transfer functionality is always supported.
-	 * On the client thread (i.e. with a client world), contents of queried Storages are unreliable and should not be modified.
+	 * On the server thread (i.e. with a server level), all transfer functionality is always supported.
+	 * On the client thread (i.e. with a client level), contents of queried Storages are unreliable and should not be modified.
 	 */
 	public static final BlockApiLookup<Storage<ItemVariant>, @Nullable Direction> SIDED =
 			BlockApiLookup.get(Identifier.fromNamespaceAndPath("fabric", "sided_item_storage"), Storage.asClass(), Direction.class);
@@ -100,10 +100,10 @@ public final class ItemStorage {
 
 	static {
 		// Composter support.
-		ItemStorage.SIDED.registerForBlocks((world, pos, state, blockEntity, direction) -> ComposterWrapper.get(world, pos, direction), Blocks.COMPOSTER);
+		ItemStorage.SIDED.registerForBlocks((level, pos, state, blockEntity, direction) -> ComposterWrapper.get(level, pos, direction), Blocks.COMPOSTER);
 
 		// Support for SidedStorageBlockEntity.
-		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
+		ItemStorage.SIDED.registerFallback((level, pos, state, blockEntity, direction) -> {
 			if (blockEntity instanceof SidedStorageBlockEntity sidedStorageBlockEntity) {
 				return sidedStorageBlockEntity.getItemStorage(direction);
 			}
@@ -111,41 +111,41 @@ public final class ItemStorage {
 			return null;
 		});
 
-		// Register Inventory fallback.
-		ItemStorage.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
-			Container inventoryToWrap = null;
+		// Register container fallback.
+		ItemStorage.SIDED.registerFallback((level, pos, state, blockEntity, direction) -> {
+			Container containerToWrap = null;
 
 			if (state.getBlock() instanceof WorldlyContainerHolder provider) {
-				WorldlyContainer first = provider.getContainer(state, world, pos);
-				WorldlyContainer second = provider.getContainer(state, world, pos);
+				WorldlyContainer first = provider.getContainer(state, level, pos);
+				WorldlyContainer second = provider.getContainer(state, level, pos);
 
-				// Hopefully we can trust the sided inventory not to change.
+				// Hopefully we can trust the sided container not to change.
 				if (first == second && first != null) {
-					return InventoryStorage.of(first, direction);
+					return ContainerStorage.of(first, direction);
 				}
 			}
 
-			if (blockEntity instanceof Container inventory) {
+			if (blockEntity instanceof Container container) {
 				if (blockEntity instanceof ChestBlockEntity && state.getBlock() instanceof ChestBlock chestBlock) {
-					inventoryToWrap = ChestBlock.getContainer(chestBlock, state, world, pos, true);
+					containerToWrap = ChestBlock.getContainer(chestBlock, state, level, pos, true);
 
 					// For double chests, we need to retrieve a wrapper for each part separately.
-					if (inventoryToWrap instanceof CompoundContainerAccessor accessor) {
-						SlottedStorage<ItemVariant> first = InventoryStorage.of(accessor.fabric_getFirst(), direction);
-						SlottedStorage<ItemVariant> second = InventoryStorage.of(accessor.fabric_getSecond(), direction);
+					if (containerToWrap instanceof CompoundContainerAccessor accessor) {
+						SlottedStorage<ItemVariant> first = ContainerStorage.of(accessor.fabric_getContainer1(), direction);
+						SlottedStorage<ItemVariant> second = ContainerStorage.of(accessor.fabric_getContainer2(), direction);
 
 						return new CombinedSlottedStorage<>(List.of(first, second));
 					}
 				} else {
-					inventoryToWrap = inventory;
+					containerToWrap = container;
 				}
 			}
 
-			return inventoryToWrap != null ? InventoryStorage.of(inventoryToWrap, direction) : null;
+			return containerToWrap != null ? ContainerStorage.of(containerToWrap, direction) : null;
 		});
 
 		ItemStorage.ITEM.registerForItems(
-				(itemStack, context) -> new ContainerComponentStorage(context, 27),
+				(itemStack, context) -> new ItemContainerContentsStorage(context, 27),
 				Items.SHULKER_BOX,
 				Items.WHITE_SHULKER_BOX,
 				Items.ORANGE_SHULKER_BOX,

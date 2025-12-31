@@ -40,11 +40,11 @@ import net.minecraft.world.level.Level;
 
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.impl.attachment.AttachmentRegistryImpl;
 import net.fabricmc.fabric.impl.attachment.AttachmentTypeImpl;
-import net.fabricmc.fabric.impl.attachment.sync.s2c.AttachmentSyncPayloadS2C;
+import net.fabricmc.fabric.impl.attachment.sync.clientbound.ClientboundAttachmentSyncPayload;
 import net.fabricmc.fabric.mixin.attachment.ServerboundCustomPayloadPacketAccessor;
 import net.fabricmc.fabric.mixin.attachment.VarIntAccessor;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerCommonPacketListenerImplAccessor;
@@ -63,12 +63,12 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
 	private static final int MAX_DATA_SIZE_IN_BYTES = ServerboundCustomPayloadPacketAccessor.getMaxPayloadSize() - MAX_PADDING_SIZE_IN_BYTES;
 
 	@SuppressWarnings("unchecked")
-	public static AttachmentChange create(AttachmentTargetInfo<?> targetInfo, AttachmentType<?> type, @Nullable Object value, RegistryAccess dynamicRegistryManager) {
-		StreamCodec<? super RegistryFriendlyByteBuf, Object> codec = (StreamCodec<? super RegistryFriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).packetCodec();
-		Objects.requireNonNull(codec, "attachment packet codec cannot be null");
-		Objects.requireNonNull(dynamicRegistryManager, "dynamic registry manager cannot be null");
+	public static AttachmentChange create(AttachmentTargetInfo<?> targetInfo, AttachmentType<?> type, @Nullable Object value, RegistryAccess registryAccess) {
+		StreamCodec<? super RegistryFriendlyByteBuf, Object> codec = (StreamCodec<? super RegistryFriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).streamCodec();
+		Objects.requireNonNull(codec, "attachment stream codec cannot be null");
+		Objects.requireNonNull(registryAccess, "registry access cannot be null");
 
-		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(PacketByteBufs.create(), dynamicRegistryManager);
+		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(FriendlyByteBufs.create(), registryAccess);
 
 		if (value != null) {
 			buf.writeBoolean(true);
@@ -91,7 +91,7 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
 	}
 
 	public static void partitionAndSendPackets(List<AttachmentChange> changes, ServerPlayer player) {
-		Set<Identifier> supported = ((SupportedAttachmentsClientConnection) ((ServerCommonPacketListenerImplAccessor) player.connection).getConnection())
+		Set<Identifier> supported = ((SupportedAttachmentsConnection) ((ServerCommonPacketListenerImplAccessor) player.connection).getConnection())
 				.fabric_getSupportedAttachments();
 		// sort by size to better partition packets
 		changes.sort(Comparator.comparingInt(c -> c.data().length));
@@ -107,7 +107,7 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
 			int size = MAX_PADDING_SIZE_IN_BYTES + change.data.length;
 
 			if (byteSize + size > MAX_DATA_SIZE_IN_BYTES) {
-				ServerPlayNetworking.send(player, new AttachmentSyncPayloadS2C(packetChanges));
+				ServerPlayNetworking.send(player, new ClientboundAttachmentSyncPayload(packetChanges));
 				packetChanges.clear();
 				byteSize = maxVarIntSize;
 			}
@@ -117,18 +117,18 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
 		}
 
 		if (!packetChanges.isEmpty()) {
-			ServerPlayNetworking.send(player, new AttachmentSyncPayloadS2C(packetChanges));
+			ServerPlayNetworking.send(player, new ClientboundAttachmentSyncPayload(packetChanges));
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	@Nullable
-	public Object decodeValue(RegistryAccess dynamicRegistryManager) {
-		StreamCodec<? super RegistryFriendlyByteBuf, Object> codec = (StreamCodec<? super RegistryFriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).packetCodec();
+	public Object decodeValue(RegistryAccess registryAccess) {
+		StreamCodec<? super RegistryFriendlyByteBuf, Object> codec = (StreamCodec<? super RegistryFriendlyByteBuf, Object>) ((AttachmentTypeImpl<?>) type).streamCodec();
 		Objects.requireNonNull(codec, "codec was null");
-		Objects.requireNonNull(dynamicRegistryManager, "dynamic registry manager cannot be null");
+		Objects.requireNonNull(registryAccess, "registry access cannot be null");
 
-		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.copiedBuffer(data), dynamicRegistryManager);
+		RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.copiedBuffer(data), registryAccess);
 
 		if (!buf.readBoolean()) {
 			return null;
@@ -137,32 +137,32 @@ public record AttachmentChange(AttachmentTargetInfo<?> targetInfo, AttachmentTyp
 		return codec.decode(buf);
 	}
 
-	public void tryApply(Level world) throws AttachmentSyncException {
-		AttachmentTarget target = targetInfo.getTarget(world);
-		Object value = decodeValue(world.registryAccess());
+	public void tryApply(Level level) throws AttachmentSyncException {
+		AttachmentTarget target = targetInfo.getTarget(level);
+		Object value = decodeValue(level.registryAccess());
 
 		if (target == null) {
-			final MutableComponent errorMessageText = Component.empty();
-			errorMessageText
+			final MutableComponent errorMessageComponent = Component.empty();
+			errorMessageComponent
 					.append(Component.translatable("fabric-data-attachment-api-v1.unknown-target.title").withStyle(ChatFormatting.RED))
 					.append(CommonComponents.NEW_LINE);
-			errorMessageText.append(CommonComponents.NEW_LINE);
+			errorMessageComponent.append(CommonComponents.NEW_LINE);
 
-			errorMessageText
+			errorMessageComponent
 					.append(Component.translatable(
 							"fabric-data-attachment-api-v1.unknown-target.attachment-identifier",
 							Component.literal(String.valueOf(type.identifier())).withStyle(ChatFormatting.YELLOW))
 					)
 					.append(CommonComponents.NEW_LINE);
-			errorMessageText
+			errorMessageComponent
 					.append(Component.translatable(
-							"fabric-data-attachment-api-v1.unknown-target.world",
-							Component.literal(String.valueOf(world.dimension().identifier())).withStyle(ChatFormatting.YELLOW)
+							"fabric-data-attachment-api-v1.unknown-target.level",
+							Component.literal(String.valueOf(level.dimension().identifier())).withStyle(ChatFormatting.YELLOW)
 					))
 					.append(CommonComponents.NEW_LINE);
-			targetInfo.appendDebugInformation(errorMessageText);
+			targetInfo.appendDebugInformation(errorMessageComponent);
 
-			throw new AttachmentSyncException(errorMessageText);
+			throw new AttachmentSyncException(errorMessageComponent);
 		}
 
 		target.setAttached((AttachmentType<Object>) type, value);

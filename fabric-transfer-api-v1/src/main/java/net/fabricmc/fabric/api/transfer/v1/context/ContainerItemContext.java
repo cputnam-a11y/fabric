@@ -119,10 +119,10 @@ public interface ContainerItemContext {
 	}
 
 	/**
-	 * Return a context for the passed player's cursor slot. This is recommended for screen handler click interactions.
+	 * Return a context for the passed player's cursor slot. This is recommended for menu click interactions.
 	 */
-	static ContainerItemContext ofPlayerCursor(Player player, AbstractContainerMenu screenHandler) {
-		return ofPlayerSlot(player, PlayerInventoryStorage.getCursorStorage(screenHandler));
+	static ContainerItemContext ofPlayerCursor(Player player, AbstractContainerMenu menu) {
+		return ofPlayerSlot(player, PlayerInventoryStorage.getCursorStorage(menu));
 	}
 
 	/**

@@ -42,35 +42,35 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 
+import net.fabricmc.fabric.api.networking.v1.FriendlyByteBufs;
 import net.fabricmc.fabric.api.networking.v1.LoginPacketSender;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.fabricmc.fabric.impl.networking.AbstractNetworkAddon;
-import net.fabricmc.fabric.impl.networking.payload.PacketByteBufLoginQueryRequestPayload;
-import net.fabricmc.fabric.impl.networking.payload.PacketByteBufLoginQueryResponse;
+import net.fabricmc.fabric.impl.networking.payload.FriendlyByteBufLoginQueryRequestPayload;
+import net.fabricmc.fabric.impl.networking.payload.FriendlyByteBufLoginQueryResponse;
 import net.fabricmc.fabric.mixin.networking.accessor.ServerLoginPacketListenerImplAccessor;
 
 public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLoginNetworking.LoginQueryResponseHandler> implements LoginPacketSender {
 	private final Connection connection;
-	private final ServerLoginPacketListenerImpl handler;
+	private final ServerLoginPacketListenerImpl listener;
 	private final MinecraftServer server;
 	private final QueryIdFactory queryIdFactory;
 	private final Collection<Future<?>> waits = new ConcurrentLinkedQueue<>();
 	private final Map<Integer, Identifier> channels = new ConcurrentHashMap<>();
 	private boolean firstQueryTick = true;
 
-	public ServerLoginNetworkAddon(ServerLoginPacketListenerImpl handler) {
-		super(ServerNetworkingImpl.LOGIN, "ServerLoginNetworkAddon for " + handler.getUserName());
-		this.connection = ((ServerLoginPacketListenerImplAccessor) handler).getConnection();
-		this.handler = handler;
-		this.server = ((ServerLoginPacketListenerImplAccessor) handler).getServer();
+	public ServerLoginNetworkAddon(ServerLoginPacketListenerImpl listener) {
+		super(ServerNetworkingImpl.LOGIN, "ServerLoginNetworkAddon for " + listener.getUserName());
+		this.connection = ((ServerLoginPacketListenerImplAccessor) listener).getConnection();
+		this.listener = listener;
+		this.server = ((ServerLoginPacketListenerImplAccessor) listener).getServer();
 		this.queryIdFactory = QueryIdFactory.create();
 	}
 
 	@Override
 	protected void invokeInitEvent() {
-		ServerLoginConnectionEvents.INIT.invoker().onLoginInit(handler, this.server);
+		ServerLoginConnectionEvents.INIT.invoker().onLoginInit(listener, this.server);
 	}
 
 	// return true if no longer ticks query
@@ -79,7 +79,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 			// Send the compression packet now so clients receive compressed login queries
 			this.sendCompressionPacket();
 
-			ServerLoginConnectionEvents.QUERY_START.invoker().onLoginStart(this.handler, this.server, this, this.waits::add);
+			ServerLoginConnectionEvents.QUERY_START.invoker().onLoginStart(this.listener, this.server, this, this.waits::add);
 			this.firstQueryTick = false;
 		}
 
@@ -127,7 +127,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 	 * @return true if the packet was handled
 	 */
 	public boolean handle(ServerboundCustomQueryAnswerPacket packet) {
-		PacketByteBufLoginQueryResponse response = (PacketByteBufLoginQueryResponse) packet.payload();
+		FriendlyByteBufLoginQueryResponse response = (FriendlyByteBufLoginQueryResponse) packet.payload();
 		return handle(packet.transactionId(), response == null ? null : response.data());
 	}
 
@@ -147,10 +147,10 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 			return false;
 		}
 
-		FriendlyByteBuf buf = understood ? PacketByteBufs.slice(originalBuf) : PacketByteBufs.empty();
+		FriendlyByteBuf buf = understood ? FriendlyByteBufs.slice(originalBuf) : FriendlyByteBufs.empty();
 
 		try {
-			handler.receive(this.server, this.handler, understood, buf, this.waits::add, this);
+			handler.receive(this.server, this.listener, understood, buf, this.waits::add, this);
 		} catch (Throwable ex) {
 			this.logger.error("Encountered exception while handling in channel \"{}\"", channel, ex);
 			throw ex;
@@ -167,7 +167,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 	@Override
 	public Packet<?> createPacket(Identifier channelName, FriendlyByteBuf buf) {
 		int queryId = this.queryIdFactory.nextId();
-		return new ClientboundCustomQueryPacket(queryId, new PacketByteBufLoginQueryRequestPayload(channelName, buf));
+		return new ClientboundCustomQueryPacket(queryId, new FriendlyByteBufLoginQueryRequestPayload(channelName, buf));
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public final class ServerLoginNetworkAddon extends AbstractNetworkAddon<ServerLo
 
 	@Override
 	protected void invokeDisconnectEvent() {
-		ServerLoginConnectionEvents.DISCONNECT.invoker().onLoginDisconnect(this.handler, this.server);
+		ServerLoginConnectionEvents.DISCONNECT.invoker().onLoginDisconnect(this.listener, this.server);
 	}
 
 	@Override

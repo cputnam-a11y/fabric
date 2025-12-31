@@ -29,7 +29,7 @@
  * <p>The game remains paused unless you explicitly unpause it using various waiting functions such as
  * {@link net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext#waitTick() ClientGameTestContext.waitTick()}.
  * A side effect of this is that <strong>the results of your code may not be immediate if the game needs a tick to
- * process them</strong>. A big example of this is key bindings, although some key binding methods have built-in tick
+ * process them</strong>. A big example of this is key mappings, although some key mapping methods have built-in tick
  * waits to mitigate the issue. See the {@link net.fabricmc.fabric.api.client.gametest.v1.TestInput TestInput}
  * documentation for details. Another pseudo-example is effects on the server need a tick to propagate to the client and
  * vice versa, although this is related to packets more than the fact the game is suspended (see the network
@@ -70,7 +70,7 @@
  *         <td>Consistency of tests</td>
  *     </tr>
  *     <tr>
- *         <td>{@linkplain net.minecraft.client.Options#cloudStatus() Cloud render mode}</td>
+ *         <td>{@linkplain net.minecraft.client.Options#cloudStatus() Cloud status}</td>
  *         <td>{@link net.minecraft.client.CloudStatus#OFF OFF}</td>
  *         <td>{@link net.minecraft.client.CloudStatus#FANCY FANCY}</td>
  *         <td>Consistency of tests</td>
@@ -82,11 +82,11 @@
  *         <td>Would cause the game test runner to have to click through the onboard accessibility prompt</td>
  *     </tr>
  *     <tr>
- *         <td>{@linkplain net.minecraft.client.Options#renderDistance() View distance}</td>
+ *         <td>{@linkplain net.minecraft.client.Options#renderDistance() Render distance}</td>
  *         <td>{@code 5}</td>
  *         <td>{@code 10}</td>
  *         <td>Speeds up loading of chunks, especially for functions such as
- *         {@link net.fabricmc.fabric.api.client.gametest.v1.context.TestClientWorldContext#waitForChunksRender() TestClientWorldContext.waitForChunksRender()}</td>
+ *         {@link net.fabricmc.fabric.api.client.gametest.v1.context.TestClientLevelContext#waitForChunksRender() TestClientLevelContext.waitForChunksRender()}</td>
  *     </tr>
  *     <tr>
  *         <td>{@linkplain net.minecraft.client.Options#getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource) Music volume}</td>

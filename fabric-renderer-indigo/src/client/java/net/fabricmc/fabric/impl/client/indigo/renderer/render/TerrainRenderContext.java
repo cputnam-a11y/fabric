@@ -45,7 +45,7 @@ import net.fabricmc.fabric.impl.client.indigo.renderer.aocalc.AoLuminanceFix;
 public class TerrainRenderContext extends AbstractTerrainRenderContext {
 	public static final ThreadLocal<TerrainRenderContext> POOL = ThreadLocal.withInitial(TerrainRenderContext::new);
 
-	private PoseStack matrixStack;
+	private PoseStack poseStack;
 	private RandomSource random;
 	private Function<ChunkSectionLayer, BufferBuilder> bufferFunc;
 
@@ -63,45 +63,45 @@ public class TerrainRenderContext extends AbstractTerrainRenderContext {
 		return bufferFunc.apply(layer);
 	}
 
-	public void prepare(BlockAndTintGetter blockView, BlockPos sectionOrigin, PoseStack matrixStack, RandomSource random, Function<ChunkSectionLayer, BufferBuilder> bufferFunc) {
-		blockInfo.prepareForWorld(blockView, true);
+	public void prepare(BlockAndTintGetter level, BlockPos sectionOrigin, PoseStack poseStack, RandomSource random, Function<ChunkSectionLayer, BufferBuilder> bufferFunc) {
+		blockInfo.prepareForLevel(level, true);
 		((LightDataCache) lightDataProvider).prepare(sectionOrigin);
 
-		this.matrixStack = matrixStack;
+		this.poseStack = poseStack;
 		this.random = random;
 		this.bufferFunc = bufferFunc;
 	}
 
 	public void release() {
-		matrices = null;
-		matrixStack = null;
+		pose = null;
+		poseStack = null;
 		random = null;
 		bufferFunc = null;
 
 		blockInfo.release();
 	}
 
-	/** Called from section builder hook. */
+	/** Called from section compiler hook. */
 	public void bufferModel(BlockStateModel model, BlockState blockState, BlockPos blockPos) {
-		matrixStack.pushPose();
+		poseStack.pushPose();
 
 		try {
-			matrixStack.translate(SectionPos.sectionRelative(blockPos.getX()), SectionPos.sectionRelative(blockPos.getY()), SectionPos.sectionRelative(blockPos.getZ()));
+			poseStack.translate(SectionPos.sectionRelative(blockPos.getX()), SectionPos.sectionRelative(blockPos.getY()), SectionPos.sectionRelative(blockPos.getZ()));
 			Vec3 offset = blockState.getOffset(blockPos);
-			matrixStack.translate(offset.x, offset.y, offset.z);
-			matrices = matrixStack.last();
+			poseStack.translate(offset.x, offset.y, offset.z);
+			pose = poseStack.last();
 
 			random.setSeed(blockState.getSeed(blockPos));
 
 			prepare(blockPos, blockState);
-			model.emitQuads(getEmitter(), blockInfo.blockView, blockPos, blockState, random, blockInfo::shouldCullSide);
+			model.emitQuads(getEmitter(), blockInfo.level, blockPos, blockState, random, blockInfo::shouldCullSide);
 		} catch (Throwable throwable) {
 			CrashReport crashReport = CrashReport.forThrowable(throwable, "Tessellating block in world - Indigo Renderer");
-			CrashReportCategory crashReportSection = crashReport.addCategory("Block being tessellated");
-			CrashReportCategory.populateBlockDetails(crashReportSection, blockInfo.blockView, blockPos, blockState);
+			CrashReportCategory crashReportCategory = crashReport.addCategory("Block being tessellated");
+			CrashReportCategory.populateBlockDetails(crashReportCategory, blockInfo.level, blockPos, blockState);
 			throw new ReportedException(crashReport);
 		} finally {
-			matrixStack.popPose();
+			poseStack.popPose();
 		}
 	}
 
@@ -120,17 +120,17 @@ public class TerrainRenderContext extends AbstractTerrainRenderContext {
 			this.blockInfo = blockInfo;
 		}
 
-		private final LevelRenderer.BrightnessGetter lightGetter = (world, pos) -> {
+		private final LevelRenderer.BrightnessGetter brightnessGetter = (level, pos) -> {
 			int cacheIndex = cacheIndex(pos);
 
 			if (cacheIndex == -1) {
-				return LevelRenderer.BrightnessGetter.DEFAULT.packedBrightness(world, pos);
+				return LevelRenderer.BrightnessGetter.DEFAULT.packedBrightness(level, pos);
 			}
 
 			int result = lightCache[cacheIndex];
 
 			if (result == Integer.MAX_VALUE) {
-				result = LevelRenderer.BrightnessGetter.DEFAULT.packedBrightness(world, pos);
+				result = LevelRenderer.BrightnessGetter.DEFAULT.packedBrightness(level, pos);
 				lightCache[cacheIndex] = result;
 			}
 
@@ -146,7 +146,7 @@ public class TerrainRenderContext extends AbstractTerrainRenderContext {
 
 		@Override
 		public int light(BlockPos pos, BlockState state) {
-			return LevelRenderer.getLightCoords(lightGetter, blockInfo.blockView, state, pos);
+			return LevelRenderer.getLightCoords(brightnessGetter, blockInfo.level, state, pos);
 		}
 
 		@Override
@@ -154,13 +154,13 @@ public class TerrainRenderContext extends AbstractTerrainRenderContext {
 			int cacheIndex = cacheIndex(pos);
 
 			if (cacheIndex == -1) {
-				return AoLuminanceFix.INSTANCE.apply(blockInfo.blockView, pos, state);
+				return AoLuminanceFix.INSTANCE.apply(blockInfo.level, pos, state);
 			}
 
 			float result = aoCache[cacheIndex];
 
 			if (Float.isNaN(result)) {
-				result = AoLuminanceFix.INSTANCE.apply(blockInfo.blockView, pos, state);
+				result = AoLuminanceFix.INSTANCE.apply(blockInfo.level, pos, state);
 				aoCache[cacheIndex] = result;
 			}
 

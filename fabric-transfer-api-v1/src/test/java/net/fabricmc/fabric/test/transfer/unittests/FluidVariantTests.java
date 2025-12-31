@@ -46,23 +46,23 @@ class FluidVariantTests extends AbstractTransferApiTest {
 	}
 
 	@Test
-	public void testWithComponentChanges() {
+	public void testWithComponents() {
 		FluidVariant variant = FluidVariant.of(Fluids.WATER, DataComponentPatch.builder()
 				.set(DataComponents.TOOLTIP_DISPLAY, TooltipDisplay.DEFAULT)
 				.build());
 
-		FluidVariant newVariant = variant.withComponentChanges(DataComponentPatch.builder()
+		FluidVariant newVariant = variant.withComponents(DataComponentPatch.builder()
 				.remove(DataComponents.TOOLTIP_DISPLAY)
 				.set(DataComponents.GLIDER, Unit.INSTANCE)
 				.build());
 
 		Assertions.assertFalse(
-				newVariant.getComponentMap().has(DataComponents.TOOLTIP_DISPLAY),
+				newVariant.getComponents().has(DataComponents.TOOLTIP_DISPLAY),
 				"New variant's HIDE_TOOLTIP component was removed, but is still present"
 		);
 
 		Assertions.assertTrue(
-				newVariant.getComponentMap().has(DataComponents.GLIDER),
+				newVariant.getComponents().has(DataComponents.GLIDER),
 				"New variant's GLIDER component was added, but is not present"
 		);
 	}

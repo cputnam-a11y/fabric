@@ -31,14 +31,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.util.TriState;
 
 /**
- * Holds, manages, and provides access to the block/world related state
+ * Holds, manages, and provides access to the block/level related state
  * needed to buffer quads.
  */
 public class BlockRenderInfo {
 	private final BlockColors blockColorMap = Minecraft.getInstance().getBlockColors();
 	private final BlockPos.MutableBlockPos searchPos = new BlockPos.MutableBlockPos();
 
-	public BlockAndTintGetter blockView;
+	public BlockAndTintGetter level;
 	public BlockPos blockPos;
 	public BlockState blockState;
 
@@ -50,8 +50,8 @@ public class BlockRenderInfo {
 	private int cullCompletionFlags;
 	private int cullResultFlags;
 
-	public void prepareForWorld(BlockAndTintGetter blockView, boolean enableCulling) {
-		this.blockView = blockView;
+	public void prepareForLevel(BlockAndTintGetter level, boolean enableCulling) {
+		this.level = level;
 		this.enableCulling = enableCulling;
 	}
 
@@ -69,21 +69,22 @@ public class BlockRenderInfo {
 	}
 
 	public void release() {
-		blockView = null;
+		level = null;
 		blockPos = null;
 		blockState = null;
 	}
 
 	public int blockColor(int tintIndex) {
-		return 0xFF000000 | blockColorMap.getColor(blockState, blockView, blockPos, tintIndex);
+		return 0xFF000000 | blockColorMap.getColor(blockState,
+				level, blockPos, tintIndex);
 	}
 
 	public boolean effectiveAo(TriState aoMode) {
 		return useAo && aoMode.orElse(defaultAo);
 	}
 
-	public ChunkSectionLayer effectiveRenderLayer(@Nullable ChunkSectionLayer quadRenderLayer) {
-		return quadRenderLayer == null ? defaultLayer : quadRenderLayer;
+	public ChunkSectionLayer effectiveChunkLayer(@Nullable ChunkSectionLayer quadLayer) {
+		return quadLayer == null ? defaultLayer : quadLayer;
 	}
 
 	public boolean shouldDrawSide(@Nullable Direction side) {
@@ -96,7 +97,7 @@ public class BlockRenderInfo {
 		if ((cullCompletionFlags & mask) == 0) {
 			cullCompletionFlags |= mask;
 
-			if (Block.shouldRenderFace(blockState, blockView.getBlockState(searchPos.setWithOffset(blockPos, side)), side)) {
+			if (Block.shouldRenderFace(blockState, level.getBlockState(searchPos.setWithOffset(blockPos, side)), side)) {
 				cullResultFlags |= mask;
 				return true;
 			} else {

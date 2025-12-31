@@ -67,8 +67,8 @@ public class ClientGameTestTest implements FabricClientGameTest {
 			spWorldSave = singleplayer.getWorldSave();
 
 			{
-				setDebugHud(context, true);
-				singleplayer.getClientWorld().waitForChunksRender();
+				setDebugOverlay(context, true);
+				singleplayer.getClientLevel().waitForChunksRender();
 				context.takeScreenshot("in_game_overworld");
 			}
 
@@ -84,9 +84,9 @@ public class ClientGameTestTest implements FabricClientGameTest {
 
 			{
 				// See if the player render events are working.
-				setPerspective(context, CameraType.THIRD_PERSON_BACK);
+				setCameraType(context, CameraType.THIRD_PERSON_BACK);
 				context.takeScreenshot("in_game_overworld_third_person");
-				setPerspective(context, CameraType.FIRST_PERSON);
+				setCameraType(context, CameraType.FIRST_PERSON);
 			}
 
 			{
@@ -98,13 +98,13 @@ public class ClientGameTestTest implements FabricClientGameTest {
 		}
 
 		try (TestSingleplayerContext singleplayer = spWorldSave.open()) {
-			singleplayer.getClientWorld().waitForChunksRender();
+			singleplayer.getClientLevel().waitForChunksRender();
 			context.takeScreenshot("in_game_overworld_2");
 		}
 
 		try (TestDedicatedServerContext server = context.worldBuilder().createServer()) {
 			try (TestServerConnection connection = server.connect()) {
-				connection.getClientWorld().waitForChunksRender();
+				connection.getClientLevel().waitForChunksRender();
 				context.takeScreenshot("server_in_game");
 
 				{ // Test that we can enter and exit configuration
@@ -119,21 +119,21 @@ public class ClientGameTestTest implements FabricClientGameTest {
 			}
 		}
 
-		setDebugHud(context, false);
+		setDebugOverlay(context, false);
 	}
 
 	private static void waitForTitleScreenFade(ClientGameTestContext context) {
 		context.waitFor(client -> {
-			return !(client.screen instanceof TitleScreenAccessor titleScreen) || !titleScreen.getDoBackgroundFade();
+			return !(client.screen instanceof TitleScreenAccessor titleScreen) || !titleScreen.isFading();
 		});
 	}
 
-	private static void setDebugHud(ClientGameTestContext context, boolean f3Enabled) {
+	private static void setDebugOverlay(ClientGameTestContext context, boolean f3Enabled) {
 		context.runOnClient(client -> client.debugEntries.setOverlayVisible(f3Enabled));
 	}
 
-	private static void setPerspective(ClientGameTestContext context, CameraType perspective) {
-		context.runOnClient(client -> client.options.setCameraType(perspective));
+	private static void setCameraType(ClientGameTestContext context, CameraType cameraType) {
+		context.runOnClient(client -> client.options.setCameraType(cameraType));
 	}
 
 	private static void testScreenSize(ClientGameTestContext context, int expectedWidth, int expectedHeight) {

@@ -24,9 +24,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 
 @Mixin(Minecraft.class)
 public abstract class MinecraftMixin {
@@ -45,17 +45,17 @@ public abstract class MinecraftMixin {
 		ClientLifecycleEvents.CLIENT_STOPPING.invoker().onClientStopping((Minecraft) (Object) this);
 	}
 
-	// We inject after the thread field is set so `ThreadExecutor#getThread` will work
+	// We inject after the thread field is set so `BlockableEventLoop#getRunningThread` will work
 	@Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;gameThread:Ljava/lang/Thread;", shift = At.Shift.AFTER, ordinal = 0), method = "run")
 	private void onStart(CallbackInfo ci) {
 		ClientLifecycleEvents.CLIENT_STARTED.invoker().onClientStarted((Minecraft) (Object) this);
 	}
 
 	@Inject(method = "updateLevelInEngines", at = @At("TAIL"))
-	private void afterClientWorldChange(ClientLevel world, CallbackInfo ci) {
-		if (world != null) {
+	private void afterClientLevelChange(ClientLevel level, CallbackInfo ci) {
+		if (level != null) {
 			Minecraft client = (Minecraft) (Object) this;
-			ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.invoker().afterWorldChange(client, world);
+			ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.invoker().afterLevelChange(client, level);
 		}
 	}
 }

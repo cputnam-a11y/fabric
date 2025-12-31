@@ -31,14 +31,14 @@ public interface FabricItemStack {
 	/**
 	 * Return a leftover item for use in recipes.
 	 *
-	 * <p>See {@link FabricItem#getRecipeRemainder(ItemStack)} for a more in depth description.
+	 * <p>See {@link FabricItem#getCraftingRemainder(ItemStack)} for a more in depth description.
 	 *
 	 * <p>Stack-aware version of {@link Item#getCraftingRemainder()}.
 	 *
 	 * @return the leftover item
 	 */
-	default ItemStack getRecipeRemainder() {
-		return ((ItemStack) this).getItem().getRecipeRemainder((ItemStack) this);
+	default ItemStack getCraftingRemainder() {
+		return ((ItemStack) this).getItem().getCraftingRemainder((ItemStack) this);
 	}
 
 	/**
@@ -72,7 +72,7 @@ public interface FabricItemStack {
 	 * <p>Should be used instead of querying the item ID namespace to determine what mod an item is from when displaying
 	 * to the player.</p>
 	 *
-	 * <p>Defaults to the namespace of the item's own registry entry, except in the cases of potions or enchanted books,
+	 * <p>Defaults to the namespace of the item's own holder, except in the cases of potions or enchanted books,
 	 * in which it uses the namespace of the potion contents or single enchantment applied.</p>
 	 *
 	 * <p>Note that while it is recommended that this reflect a namespace and/or mod ID, it can technically be any

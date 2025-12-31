@@ -35,19 +35,19 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.impl.datagen.client.FabricItemAssetDefinitions;
 import net.fabricmc.fabric.impl.datagen.client.FabricModelProviderDefinitions;
 
 @Mixin(ModelProvider.class)
 public class ModelProviderMixin {
 	@Unique
-	private FabricDataOutput fabricDataOutput;
+	private FabricPackOutput fabricPackOutput;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	public void init(PackOutput output, CallbackInfo ci) {
-		if (output instanceof FabricDataOutput fabricDataOutput) {
-			this.fabricDataOutput = fabricDataOutput;
+		if (output instanceof FabricPackOutput fabricPackOutput) {
+			this.fabricPackOutput = fabricPackOutput;
 		}
 	}
 
@@ -72,11 +72,11 @@ public class ModelProviderMixin {
 	}
 
 	@Inject(method = "run", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/data/models/BlockModelGenerators;run()V"))
-	private void setFabricDataOutput(CachedOutput writer, CallbackInfoReturnable<CompletableFuture<?>> cir,
-									@Local ModelProvider.BlockStateGeneratorCollector blockStateSuppliers,
-									@Local ModelProvider.ItemInfoCollector itemAssets) {
-		((FabricModelProviderDefinitions) blockStateSuppliers).setFabricDataOutput(fabricDataOutput);
-		((FabricModelProviderDefinitions) itemAssets).setFabricDataOutput(fabricDataOutput);
-		((FabricItemAssetDefinitions) itemAssets).fabric_setProcessedBlocks(blockStateSuppliers.generators.keySet());
+	private void setFabricPackOutput(CachedOutput output, CallbackInfoReturnable<CompletableFuture<?>> cir,
+									@Local ModelProvider.BlockStateGeneratorCollector blockStateGeneratorCollector,
+									@Local ModelProvider.ItemInfoCollector itemInfoCollectors) {
+		((FabricModelProviderDefinitions) blockStateGeneratorCollector).setFabricPackOutput(fabricPackOutput);
+		((FabricModelProviderDefinitions) itemInfoCollectors).setFabricPackOutput(fabricPackOutput);
+		((FabricItemAssetDefinitions) itemInfoCollectors).fabric_setProcessedBlocks(blockStateGeneratorCollector.generators.keySet());
 	}
 }

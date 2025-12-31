@@ -24,13 +24,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.ClientTooltipComponentCallback;
 import net.fabricmc.fabric.test.rendering.TooltipComponentTestInit;
 
 public class TooltipComponentTests implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
-		TooltipComponentCallback.EVENT.register(data -> {
+		ClientTooltipComponentCallback.EVENT.register(data -> {
 			if (data instanceof TooltipComponentTestInit.Data d) {
 				return ClientTooltipComponent.create(Component.literal(d.string()).setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)).getVisualOrderText());
 			}
@@ -38,7 +38,7 @@ public class TooltipComponentTests implements ClientModInitializer {
 			return null;
 		});
 
-		// Test that TooltipComponent.of works with custom TooltipData
+		// Test that ClientTooltipComponent.create works with custom TooltipComponent
 		Objects.requireNonNull(ClientTooltipComponent.create(new TooltipComponentTestInit.Data("Hello world!")));
 	}
 }

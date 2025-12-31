@@ -50,7 +50,7 @@ public class HudElementRegistryImpl {
 			VanillaHudElements.EXPERIENCE_LEVEL,
 			VanillaHudElements.HELD_ITEM_TOOLTIP,
 			VanillaHudElements.SPECTATOR_TOOLTIP,
-			VanillaHudElements.STATUS_EFFECTS,
+			VanillaHudElements.MOB_EFFECTS,
 			VanillaHudElements.BOSS_BAR,
 			VanillaHudElements.SLEEP,
 			VanillaHudElements.DEMO_TIMER,
@@ -210,10 +210,10 @@ public class HudElementRegistryImpl {
 			layers().add(HudLayer.ofVanilla(id));
 		}
 
-		public void render(GuiGraphics context, DeltaTracker tickCounter, HudElement vanillaElement) {
+		public void render(GuiGraphics graphics, DeltaTracker deltaTracker, HudElement vanillaElement) {
 			for (HudLayer layer : layers) {
 				if (!layer.isRemoved()) {
-					layer.element(vanillaElement).render(context, tickCounter);
+					layer.element(vanillaElement).render(graphics, deltaTracker);
 				}
 			}
 		}

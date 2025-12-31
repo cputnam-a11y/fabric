@@ -26,8 +26,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -38,9 +38,9 @@ public final class NetworkingPlayPacketClientTest implements ClientModInitialize
 	@Override
 	public void onInitializeClient() {
 		// Register the payload only on the client.
-		PayloadTypeRegistry.playC2S().register(UnknownPayload.ID, UnknownPayload.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(UnknownPayload.TYPE, UnknownPayload.CODEC);
 
-		ClientPlayConnectionEvents.INIT.register((handler, client) -> ClientPlayNetworking.registerReceiver(NetworkingPlayPacketTest.OverlayPacket.ID, (payload, context) -> {
+		ClientPlayConnectionEvents.INIT.register((listener, client) -> ClientPlayNetworking.registerReceiver(NetworkingPlayPacketTest.OverlayPacket.TYPE, (payload, context) -> {
 			Objects.requireNonNull(context);
 			Objects.requireNonNull(context.client());
 			Objects.requireNonNull(context.player());
@@ -49,8 +49,8 @@ public final class NetworkingPlayPacketClientTest implements ClientModInitialize
 		}));
 
 		ClientCommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> dispatcher.register(
-				ClientCommandManager.literal("clientnetworktestcommand")
-						.then(ClientCommandManager.literal("unknown").executes(context -> {
+				ClientCommands.literal("clientnetworktestcommand")
+						.then(ClientCommands.literal("unknown").executes(context -> {
 							ClientPlayNetworking.send(new UnknownPayload("Hello"));
 							return Command.SINGLE_SUCCESS;
 						}
@@ -58,12 +58,12 @@ public final class NetworkingPlayPacketClientTest implements ClientModInitialize
 	}
 
 	private record UnknownPayload(String data) implements CustomPacketPayload {
-		private static final CustomPacketPayload.Type<UnknownPayload> ID = new Type<>(NetworkingTestmods.id("unknown_test_channel_c2s"));
+		private static final CustomPacketPayload.Type<UnknownPayload> TYPE = new Type<>(NetworkingTestmods.id("unknown_test_channel_c2s"));
 		private static final StreamCodec<FriendlyByteBuf, UnknownPayload> CODEC = ByteBufCodecs.STRING_UTF8.map(UnknownPayload::new, UnknownPayload::data).cast();
 
 		@Override
 		public Type<? extends CustomPacketPayload> type() {
-			return ID;
+			return TYPE;
 		}
 	}
 }

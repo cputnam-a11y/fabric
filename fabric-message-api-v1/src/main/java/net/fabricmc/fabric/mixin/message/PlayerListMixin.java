@@ -42,13 +42,13 @@ public abstract class PlayerListMixin {
 	private MinecraftServer server;
 
 	@Inject(method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/server/level/ServerPlayer;Lnet/minecraft/network/chat/ChatType$Bound;)V", at = @At("HEAD"), cancellable = true)
-	private void onSendChatMessage(PlayerChatMessage message, ServerPlayer sender, ChatType.Bound params, CallbackInfo ci) {
-		if (!ServerMessageEvents.ALLOW_CHAT_MESSAGE.invoker().allowChatMessage(message, sender, params)) {
+	private void onSendChatMessage(PlayerChatMessage message, ServerPlayer sender, ChatType.Bound boundChatType, CallbackInfo ci) {
+		if (!ServerMessageEvents.ALLOW_CHAT_MESSAGE.invoker().allowChatMessage(message, sender, boundChatType)) {
 			ci.cancel();
 			return;
 		}
 
-		ServerMessageEvents.CHAT_MESSAGE.invoker().onChatMessage(message, sender, params);
+		ServerMessageEvents.CHAT_MESSAGE.invoker().onChatMessage(message, sender, boundChatType);
 	}
 
 	@Inject(method = "broadcastSystemMessage(Lnet/minecraft/network/chat/Component;Ljava/util/function/Function;Z)V", at = @At("HEAD"), cancellable = true)
@@ -62,12 +62,12 @@ public abstract class PlayerListMixin {
 	}
 
 	@Inject(method = "broadcastChatMessage(Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/network/chat/ChatType$Bound;)V", at = @At("HEAD"), cancellable = true)
-	private void onSendCommandMessage(PlayerChatMessage message, CommandSourceStack source, ChatType.Bound params, CallbackInfo ci) {
-		if (!ServerMessageEvents.ALLOW_COMMAND_MESSAGE.invoker().allowCommandMessage(message, source, params)) {
+	private void onSendCommandMessage(PlayerChatMessage message, CommandSourceStack source, ChatType.Bound boundChatType, CallbackInfo ci) {
+		if (!ServerMessageEvents.ALLOW_COMMAND_MESSAGE.invoker().allowCommandMessage(message, source, boundChatType)) {
 			ci.cancel();
 			return;
 		}
 
-		ServerMessageEvents.COMMAND_MESSAGE.invoker().onCommandMessage(message, source, params);
+		ServerMessageEvents.COMMAND_MESSAGE.invoker().onCommandMessage(message, source, boundChatType);
 	}
 }

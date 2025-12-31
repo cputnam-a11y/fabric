@@ -34,16 +34,16 @@ import net.fabricmc.fabric.impl.client.rendering.EntityRendererRegistryImpl;
 @Deprecated
 public final class EntityRendererRegistry {
 	/**
-	 * Register an {@link EntityRenderer} for an {@link EntityType}. Can be called clientside before the world is rendered.
+	 * Register an {@link EntityRenderer} for an {@link EntityType}. Can be called clientside before the level is rendered.
 	 *
 	 * @param entityType            the {@link EntityType} to register a renderer for
-	 * @param entityRendererFactory a {@link EntityRendererProvider} that creates a {@link EntityRenderer}, called
+	 * @param entityRendererProvider a {@link EntityRendererProvider} that creates a {@link EntityRenderer}, called
 	 *                              when {@link EntityRenderDispatcher} is initialized or immediately if the dispatcher
 	 *                              class is already loaded
 	 * @param <E>                   the {@link Entity}
 	 */
-	public static <E extends Entity> void register(EntityType<? extends E> entityType, EntityRendererProvider<E> entityRendererFactory) {
-		EntityRendererRegistryImpl.register(entityType, entityRendererFactory);
+	public static <E extends Entity> void register(EntityType<? extends E> entityType, EntityRendererProvider<E> entityRendererProvider) {
+		EntityRendererRegistryImpl.register(entityType, entityRendererProvider);
 	}
 
 	private EntityRendererRegistry() {

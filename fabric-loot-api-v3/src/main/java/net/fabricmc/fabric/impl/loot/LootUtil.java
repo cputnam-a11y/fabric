@@ -30,7 +30,7 @@ import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
-import net.fabricmc.fabric.impl.resource.pack.BuiltinModResourcePackSource;
+import net.fabricmc.fabric.impl.resource.pack.BuiltinModPackSource;
 import net.fabricmc.fabric.impl.resource.pack.ModResourcePackCreator;
 
 public final class LootUtil {
@@ -42,7 +42,7 @@ public final class LootUtil {
 
 			if (packSource == PackSource.BUILT_IN) {
 				return LootTableSource.VANILLA;
-			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModResourcePackSource) {
+			} else if (packSource == ModResourcePackCreator.RESOURCE_PACK_SOURCE || packSource instanceof BuiltinModPackSource) {
 				return LootTableSource.MOD;
 			}
 		}
@@ -53,17 +53,17 @@ public final class LootUtil {
 		return LootTableSource.DATA_PACK;
 	}
 
-	public static Holder<LootTable> getEntryOrDirect(ServerLevel world, LootTable table) {
-		HolderLookup.Provider wrapperLookup = world
+	public static Holder<LootTable> getEntryOrDirect(ServerLevel level, LootTable table) {
+		HolderLookup.Provider provider = level
 				.getServer()
 				.reloadableRegistries()
 				.lookup();
 
-		HolderLookup<LootTable> lootTableRegistryWrapper = wrapperLookup
+		HolderLookup<LootTable> lootTableHolderLookup = provider
 				.lookup(Registries.LOOT_TABLE)
-				.orElseThrow(() -> new IllegalStateException("Failed to fetch LootTable wrapper from WrapperLookup"));
+				.orElseThrow(() -> new IllegalStateException("Failed to fetch LootTable provider from HolderLookup.Provider"));
 
-		return lootTableRegistryWrapper
+		return lootTableHolderLookup
 				.listElements()
 				.filter(it -> it.value().equals(table))
 				.findFirst()

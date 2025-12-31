@@ -31,7 +31,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.dimension.LevelStem;
 
-import net.fabricmc.fabric.impl.biome.modification.BuiltInRegistryKeys;
+import net.fabricmc.fabric.impl.biome.modification.BuiltInResourceKeys;
 
 /**
  * Provides several convenient biome selectors that can be used with {@link BiomeModifications}.
@@ -54,7 +54,7 @@ public final class BiomeSelectors {
 		return context -> {
 			// In addition to the namespace, we also check that it exists in the vanilla registries
 			return context.getBiomeKey().identifier().getNamespace().equals("minecraft")
-					&& BuiltInRegistryKeys.isBuiltinBiome(context.getBiomeKey());
+					&& BuiltInResourceKeys.isBuiltinBiome(context.getBiomeKey());
 		};
 	}
 
@@ -132,7 +132,7 @@ public final class BiomeSelectors {
 	/**
 	 * Returns a biome selector that will match biomes in which one of the given entity types can spawn.
 	 *
-	 * <p>Matches spawns in all {@link MobCategory spawn groups}.
+	 * <p>Matches spawns in all {@link MobCategory categories}.
 	 */
 	public static Predicate<BiomeSelectionContext> spawnsOneOf(EntityType<?>... entityTypes) {
 		return spawnsOneOf(ImmutableSet.copyOf(entityTypes));
@@ -141,14 +141,14 @@ public final class BiomeSelectors {
 	/**
 	 * Returns a biome selector that will match biomes in which one of the given entity types can spawn.
 	 *
-	 * <p>Matches spawns in all {@link MobCategory spawn groups}.
+	 * <p>Matches spawns in all {@link MobCategory categories}.
 	 */
 	public static Predicate<BiomeSelectionContext> spawnsOneOf(Set<EntityType<?>> entityTypes) {
 		return context -> {
 			MobSpawnSettings spawnSettings = context.getBiome().getMobSettings();
 
-			for (MobCategory spawnGroup : MobCategory.values()) {
-				for (Weighted<MobSpawnSettings.SpawnerData> spawnEntry : spawnSettings.getMobs(spawnGroup).unwrap()) {
+			for (MobCategory mobCategory : MobCategory.values()) {
+				for (Weighted<MobSpawnSettings.SpawnerData> spawnEntry : spawnSettings.getMobs(mobCategory).unwrap()) {
 					if (entityTypes.contains(spawnEntry.value().type())) {
 						return true;
 					}

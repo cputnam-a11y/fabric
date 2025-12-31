@@ -52,25 +52,25 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 
 /**
  * Extend this class and implement {@link FabricLanguageProvider#generateTranslations}.
- * Make sure to use {@link FabricLanguageProvider#FabricLanguageProvider(FabricDataOutput, String, CompletableFuture) FabricLanguageProvider} to declare what language code is being generated if it isn't {@code en_us}.
+ * Make sure to use {@link FabricLanguageProvider#FabricLanguageProvider(FabricPackOutput, String, CompletableFuture) FabricLanguageProvider} to declare what language code is being generated if it isn't {@code en_us}.
  *
  * <p>Register an instance of the class with {@link FabricDataGenerator.Pack#addProvider} in a {@link net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint}.
  */
 public abstract class FabricLanguageProvider implements DataProvider {
-	protected final FabricDataOutput dataOutput;
+	protected final FabricPackOutput packOutput;
 	private final String languageCode;
 	private final CompletableFuture<HolderLookup.Provider> registryLookup;
 
-	protected FabricLanguageProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
-		this(dataOutput, "en_us", registryLookup);
+	protected FabricLanguageProvider(FabricPackOutput packOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
+		this(packOutput, "en_us", registryLookup);
 	}
 
-	protected FabricLanguageProvider(FabricDataOutput dataOutput, String languageCode, CompletableFuture<HolderLookup.Provider> registryLookup) {
-		this.dataOutput = dataOutput;
+	protected FabricLanguageProvider(FabricPackOutput packOutput, String languageCode, CompletableFuture<HolderLookup.Provider> registryLookup) {
+		this.packOutput = packOutput;
 		this.languageCode = languageCode;
 		this.registryLookup = registryLookup;
 	}
@@ -83,7 +83,7 @@ public abstract class FabricLanguageProvider implements DataProvider {
 	public abstract void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder);
 
 	@Override
-	public CompletableFuture<?> run(CachedOutput writer) {
+	public CompletableFuture<?> run(CachedOutput output) {
 		TreeMap<String, String> translationEntries = new TreeMap<>();
 
 		return this.registryLookup.thenCompose(lookup -> {
@@ -104,7 +104,7 @@ public abstract class FabricLanguageProvider implements DataProvider {
 				langEntryJson.addProperty(entry.getKey(), entry.getValue());
 			}
 
-			return DataProvider.saveStable(writer, langEntryJson, getLangFilePath(this.languageCode));
+			return DataProvider.saveStable(output, langEntryJson, getLangFilePath(this.languageCode));
 		});
 	}
 
@@ -114,9 +114,9 @@ public abstract class FabricLanguageProvider implements DataProvider {
 	 * @param code The language code (like "en_us") of the translations.
 	 */
 	protected Path getLangFilePath(String code) {
-		return dataOutput
+		return packOutput
 				.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang")
-				.json(Identifier.fromNamespaceAndPath(dataOutput.getModId(), code));
+				.json(Identifier.fromNamespaceAndPath(packOutput.getModId(), code));
 	}
 
 	@Override
@@ -161,19 +161,19 @@ public abstract class FabricLanguageProvider implements DataProvider {
 		/**
 		 * Adds a translation for an {@link CreativeModeTab}.
 		 *
-		 * @param registryKey The {@link ResourceKey} to get the translation key from.
+		 * @param resourceKey The {@link ResourceKey} to get the translation key from.
 		 * @param value The value of the entry.
 		 */
-		default void add(ResourceKey<CreativeModeTab> registryKey, String value) {
-			final CreativeModeTab group = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(registryKey);
+		default void add(ResourceKey<CreativeModeTab> resourceKey, String value) {
+			final CreativeModeTab group = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(resourceKey);
 			final ComponentContents content = group.getDisplayName().getContents();
 
-			if (content instanceof TranslatableContents translatableTextContent) {
-				add(translatableTextContent.getKey(), value);
+			if (content instanceof TranslatableContents translatableContent) {
+				add(translatableContent.getKey(), value);
 				return;
 			}
 
-			throw new UnsupportedOperationException("Cannot add language entry for ItemGroup (%s) as the display name is not translatable.".formatted(group.getDisplayName().getString()));
+			throw new UnsupportedOperationException("Cannot add language entry for CreativeModeTab (%s) as the display name is not translatable.".formatted(group.getDisplayName().getString()));
 		}
 
 		/**
@@ -199,11 +199,11 @@ public abstract class FabricLanguageProvider implements DataProvider {
 		/**
 		 * Adds a translation for an {@link Attribute}.
 		 *
-		 * @param entityAttribute The {@link Attribute} to get the translation key from.
-		 * @param value           The value of the entry.
+		 * @param attribute The {@link Attribute} to get the translation key from.
+		 * @param value     The value of the entry.
 		 */
-		default void add(Holder<Attribute> entityAttribute, String value) {
-			add(entityAttribute.value().getDescriptionId(), value);
+		default void add(Holder<Attribute> attribute, String value) {
+			add(attribute.value().getDescriptionId(), value);
 		}
 
 		/**
@@ -219,11 +219,11 @@ public abstract class FabricLanguageProvider implements DataProvider {
 		/**
 		 * Adds a translation for a {@link MobEffect}.
 		 *
-		 * @param statusEffect The {@link MobEffect} to get the translation key from.
-		 * @param value        The value of the entry.
+		 * @param mobEffect The {@link MobEffect} to get the translation key from.
+		 * @param value     The value of the entry.
 		 */
-		default void add(MobEffect statusEffect, String value) {
-			add(statusEffect.getDescriptionId(), value);
+		default void add(MobEffect mobEffect, String value) {
+			add(mobEffect.getDescriptionId(), value);
 		}
 
 		/**

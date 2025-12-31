@@ -38,7 +38,7 @@ import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider;
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricSoundsProvider;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
 import net.fabricmc.fabric.api.datagen.v1.JsonKeySortOrderCallback;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricCodecDataProvider;
 import net.fabricmc.fabric.test.datagen.DataGeneratorTestContent;
@@ -58,13 +58,13 @@ public class DataGeneratorClientTestEntrypoint implements DataGeneratorEntrypoin
 	}
 
 	private static class TestAtlasSourceProvider extends FabricCodecDataProvider<List<SpriteSource>> {
-		private TestAtlasSourceProvider(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registriesFuture) {
-			super(dataOutput, registriesFuture, PackOutput.Target.RESOURCE_PACK, "atlases", SpriteSources.FILE_CODEC);
+		private TestAtlasSourceProvider(FabricPackOutput packOutput, CompletableFuture<HolderLookup.Provider> holderFuture) {
+			super(packOutput, holderFuture, PackOutput.Target.RESOURCE_PACK, "atlases", SpriteSources.FILE_CODEC);
 		}
 
 		@Override
-		protected void configure(BiConsumer<Identifier, List<SpriteSource>> provider, HolderLookup.Provider lookup) {
-			provider.accept(Identifier.fromNamespaceAndPath(MOD_ID, "atlas_source_test"), List.of(new DirectoryLister("example", "example/")));
+		protected void configure(BiConsumer<Identifier, List<SpriteSource>> spriteProvider, HolderLookup.Provider registryLookup) {
+			spriteProvider.accept(Identifier.fromNamespaceAndPath(MOD_ID, "atlas_source_test"), List.of(new DirectoryLister("example", "example/")));
 		}
 
 		@Override
@@ -74,21 +74,21 @@ public class DataGeneratorClientTestEntrypoint implements DataGeneratorEntrypoin
 	}
 
 	private static class TestModelProvider extends FabricModelProvider {
-		private TestModelProvider(FabricDataOutput output) {
+		private TestModelProvider(FabricPackOutput output) {
 			super(output);
 		}
 
 		@Override
-		public void generateBlockStateModels(BlockModelGenerators blockStateModelGenerator) {
-			blockStateModelGenerator.createTrivialCube(DataGeneratorTestContent.SIMPLE_BLOCK);
-			blockStateModelGenerator.createTrivialCube(DataGeneratorTestContent.BLOCK_WITHOUT_ITEM);
-			blockStateModelGenerator.createTrivialCube(DataGeneratorTestContent.BLOCK_WITHOUT_LOOT_TABLE);
-			blockStateModelGenerator.createTrivialCube(DataGeneratorTestContent.BLOCK_WITH_VANILLA_LOOT_TABLE);
-			blockStateModelGenerator.createTrivialCube(DataGeneratorTestContent.BLOCK_THAT_DROPS_NOTHING);
+		public void generateBlockStateModels(BlockModelGenerators blockModelGenerators) {
+			blockModelGenerators.createTrivialCube(DataGeneratorTestContent.SIMPLE_BLOCK);
+			blockModelGenerators.createTrivialCube(DataGeneratorTestContent.BLOCK_WITHOUT_ITEM);
+			blockModelGenerators.createTrivialCube(DataGeneratorTestContent.BLOCK_WITHOUT_LOOT_TABLE);
+			blockModelGenerators.createTrivialCube(DataGeneratorTestContent.BLOCK_WITH_VANILLA_LOOT_TABLE);
+			blockModelGenerators.createTrivialCube(DataGeneratorTestContent.BLOCK_THAT_DROPS_NOTHING);
 		}
 
 		@Override
-		public void generateItemModels(ItemModelGenerators itemModelGenerator) {
+		public void generateItemModels(ItemModelGenerators itemModelGenerators) {
 			//itemModelGenerator.register(item, Models.SLAB);
 		}
 	}
@@ -106,12 +106,12 @@ public class DataGeneratorClientTestEntrypoint implements DataGeneratorEntrypoin
 		@Override
 		protected void configure(HolderLookup.Provider registryLookup, SoundExporter exporter) {
 			exporter.add(DataGeneratorTestContent.TEST_SOUND, SoundTypeBuilder.of(DataGeneratorTestContent.TEST_SOUND)
-					.sound(SoundTypeBuilder.EntryBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
+					.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
 						.volume(0.7F), 1)
-					.sound(SoundTypeBuilder.EntryBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle2")))
-					.sound(SoundTypeBuilder.EntryBuilder.ofEvent(SoundEvents.ANVIL_HIT))
-					.sound(SoundTypeBuilder.EntryBuilder.ofEvent(SoundEvents.ARMOR_EQUIP_GENERIC))
-					.sound(SoundTypeBuilder.EntryBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
+					.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle2")))
+					.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ANVIL_HIT))
+					.sound(SoundTypeBuilder.RegistrationBuilder.ofEvent(SoundEvents.ARMOR_EQUIP_GENERIC))
+					.sound(SoundTypeBuilder.RegistrationBuilder.ofFile(Identifier.withDefaultNamespace("mob/parrot/idle"))
 						.volume(0.3F).pitch(0.5F).stream(true).preload(true).attenuationDistance(8)
 					).replace(true)
 			);

@@ -85,17 +85,17 @@ public final class FluidVariantRendering {
 	 * Return a mutable list: the tooltip for the passed fluid variant, including the name and additional lines if available
 	 * and the id of the fluid if advanced tooltips are enabled.
 	 */
-	public static List<Component> getTooltip(FluidVariant fluidVariant, TooltipFlag type) {
+	public static List<Component> getTooltip(FluidVariant fluidVariant, TooltipFlag flag) {
 		List<Component> tooltip = new ArrayList<>();
 
 		// Name first
 		tooltip.add(FluidVariantAttributes.getName(fluidVariant));
 
 		// Additional tooltip information
-		getHandlerOrDefault(fluidVariant.getFluid()).appendTooltip(fluidVariant, tooltip, type);
+		getHandlerOrDefault(fluidVariant.getFluid()).appendTooltip(fluidVariant, tooltip, flag);
 
 		// If advanced tooltips are enabled, render the fluid id
-		if (type.isAdvanced()) {
+		if (flag.isAdvanced()) {
 			tooltip.add(Component.literal(BuiltInRegistries.FLUID.getKey(fluidVariant.getFluid()).toString()).withStyle(ChatFormatting.DARK_GRAY));
 		}
 
@@ -135,9 +135,9 @@ public final class FluidVariantRendering {
 	/**
 	 * Return the color that should be used when rendering {@linkplain #getSprite the sprite} of the passed fluid variant.
 	 *
-	 * <p>If the world and the position parameters are null, a position-independent color is returned.
-	 * If the world and position parameters are not null, the color may depend on the position.
-	 * For example, if world and position are passed, water will use them to return a biome-dependent color.
+	 * <p>If the level and the position parameters are null, a position-independent color is returned.
+	 * If the level and position parameters are not null, the color may depend on the position.
+	 * For example, if level and position are passed, water will use them to return a biome-dependent color.
 	 */
 	public static int getColor(FluidVariant fluidVariant, @Nullable BlockAndTintGetter view, @Nullable BlockPos pos) {
 		return getHandlerOrDefault(fluidVariant.getFluid()).getColor(fluidVariant, view, pos);

@@ -37,33 +37,33 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricLootTableProvider;
-import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootSubProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricLootTableSubProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.SimpleFabricLootTableSubProvider;
 import net.fabricmc.fabric.api.resource.conditions.v1.ResourceCondition;
 import net.fabricmc.fabric.impl.datagen.FabricDataGenHelper;
 
 public final class FabricLootTableProviderImpl {
 	/**
-	 * Shared run logic for {@link FabricBlockLootTableProvider} and {@link SimpleFabricLootTableProvider}.
+	 * Shared run logic for {@link FabricBlockLootSubProvider} and {@link SimpleFabricLootTableSubProvider}.
 	 */
 	public static CompletableFuture<?> run(
-			CachedOutput writer,
-			FabricLootTableProvider provider,
-			ContextKeySet contextType,
-			FabricDataOutput fabricDataOutput,
-			CompletableFuture<HolderLookup.Provider> registryLookup) {
+			CachedOutput cache,
+			FabricLootTableSubProvider provider,
+			ContextKeySet contextParamSet,
+			FabricPackOutput packOutput,
+			CompletableFuture<HolderLookup.Provider> registryLookupFuture) {
 		HashMap<Identifier, LootTable> builders = Maps.newHashMap();
 		HashMap<Identifier, ResourceCondition[]> conditionMap = new HashMap<>();
 
-		return registryLookup.thenCompose(lookup -> {
-			provider.generate((registryKey, builder) -> {
+		return registryLookupFuture.thenCompose(lookup -> {
+			provider.generate((resourceKey, builder) -> {
 				ResourceCondition[] conditions = FabricDataGenHelper.consumeConditions(builder);
-				conditionMap.put(registryKey.identifier(), conditions);
+				conditionMap.put(resourceKey.identifier(), conditions);
 
-				if (builders.put(registryKey.identifier(), builder.setParamSet(contextType).build()) != null) {
-					throw new IllegalStateException("Duplicate loot table " + registryKey.identifier());
+				if (builders.put(resourceKey.identifier(), builder.setParamSet(contextParamSet).build()) != null) {
+					throw new IllegalStateException("Duplicate loot table " + resourceKey.identifier());
 				}
 			});
 
@@ -73,15 +73,15 @@ public final class FabricLootTableProviderImpl {
 			for (Map.Entry<Identifier, LootTable> entry : builders.entrySet()) {
 				JsonObject tableJson = (JsonObject) LootTable.DIRECT_CODEC.encodeStart(ops, entry.getValue()).getOrThrow(IllegalStateException::new);
 				FabricDataGenHelper.addConditions(tableJson, conditionMap.remove(entry.getKey()));
-				futures.add(DataProvider.saveStable(writer, tableJson, getOutputPath(fabricDataOutput, entry.getKey())));
+				futures.add(DataProvider.saveStable(cache, tableJson, getOutputPath(packOutput, entry.getKey())));
 			}
 
 			return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
 		});
 	}
 
-	private static Path getOutputPath(FabricDataOutput dataOutput, Identifier lootTableId) {
-		return dataOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE).json(lootTableId);
+	private static Path getOutputPath(FabricPackOutput packOutput, Identifier lootTableId) {
+		return packOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE).json(lootTableId);
 	}
 
 	private FabricLootTableProviderImpl() {

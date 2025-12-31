@@ -55,20 +55,20 @@ public class FluidChuteBlock extends Block implements EntityBlock {
 	}
 
 	@Override
-	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+	public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
 		return (w, p, s, be) -> ((FluidChuteBlockEntity) be).tick();
 	}
 
 	@Override
-	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+	public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
 		return SHAPE;
 	}
 
 	@Override
-	public InteractionResult useItemOn(ItemStack stack, BlockState blockState, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
-		if (world.getBlockEntity(pos) instanceof FluidChuteBlockEntity chute) {
+	public InteractionResult useItemOn(ItemStack stack, BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult blockHitResult) {
+		if (level.getBlockEntity(pos) instanceof FluidChuteBlockEntity chute) {
 			if (!FluidStorageUtil.interactWithFluidStorage(chute.storage, player, hand)) {
-				if (!world.isClientSide()) {
+				if (!level.isClientSide()) {
 					player.displayClientMessage(
 							Component.literal("Fluid: ")
 									.append(FluidVariantAttributes.getName(chute.storage.variant))

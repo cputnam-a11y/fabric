@@ -107,11 +107,11 @@ public final class FluidVariantAttributes {
 	 * Return an integer in [0, 15]: the light level emitted by this fluid variant, or 0 if it doesn't naturally emit light.
 	 */
 	public static int getLuminance(FluidVariant variant) {
-		int luminance = getHandlerOrDefault(variant.getFluid()).getLuminance(variant);
+		int luminance = getHandlerOrDefault(variant.getFluid()).getLightEmission(variant);
 
 		if (luminance < 0 || luminance > 15) {
 			TransferApiImpl.LOGGER.warn("Broken FluidVariantAttributeHandler. Invalid luminance %d for fluid variant %s".formatted(luminance, variant));
-			return DEFAULT_HANDLER.getLuminance(variant);
+			return DEFAULT_HANDLER.getLightEmission(variant);
 		}
 
 		return luminance;
@@ -136,19 +136,19 @@ public final class FluidVariantAttributes {
 	 * Return a positive integer, representing the viscosity of this fluid variant.
 	 * Fluids with lower viscosity generally flow faster than fluids with higher viscosity.
 	 *
-	 * <p>More precisely, viscosity should be {@value FluidConstants#VISCOSITY_RATIO} * {@link FlowingFluid#getTickDelay} for flowable fluids.
+	 * <p>More precisely, viscosity should be {@value FluidConstants#VISCOSITY_RATIO} * {@link FlowingFluid#getTickDelay} for flowing fluids.
 	 * The reference values are {@value FluidConstants#WATER_VISCOSITY} for water,
 	 * {@value FluidConstants#LAVA_VISCOSITY_NETHER} for lava in ultrawarm dimensions (such as the nether),
 	 * and {@value FluidConstants#LAVA_VISCOSITY} for lava in other dimensions.
 	 *
-	 * @param world World if available, otherwise null.
+	 * @param level Level if available, otherwise null.
 	 */
-	public static int getViscosity(FluidVariant variant, @Nullable Level world) {
-		int viscosity = getHandlerOrDefault(variant.getFluid()).getViscosity(variant, world);
+	public static int getViscosity(FluidVariant variant, @Nullable Level level) {
+		int viscosity = getHandlerOrDefault(variant.getFluid()).getViscosity(variant, level);
 
 		if (viscosity <= 0) {
 			TransferApiImpl.LOGGER.warn("Broken FluidVariantAttributeHandler. Invalid viscosity %d for fluid variant %s".formatted(viscosity, variant));
-			return DEFAULT_HANDLER.getViscosity(variant, world);
+			return DEFAULT_HANDLER.getViscosity(variant, level);
 		}
 
 		return viscosity;
@@ -204,8 +204,8 @@ public final class FluidVariantAttributes {
 			}
 
 			@Override
-			public int getViscosity(FluidVariant variant, @Nullable Level world) {
-				if (world != null && world.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA)) {
+			public int getViscosity(FluidVariant variant, @Nullable Level level) {
+				if (level != null && level.environmentAttributes().getDimensionValue(EnvironmentAttributes.FAST_LAVA)) {
 					return FluidConstants.LAVA_VISCOSITY_NETHER;
 				} else {
 					return FluidConstants.LAVA_VISCOSITY;

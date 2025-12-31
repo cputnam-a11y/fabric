@@ -30,7 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.Hopper;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 
-import net.fabricmc.fabric.api.transfer.v1.item.InventoryStorage;
+import net.fabricmc.fabric.api.transfer.v1.item.ContainerStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemStorage;
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
@@ -52,18 +52,18 @@ public class HopperBlockEntityMixin {
 			method = "ejectItems",
 			cancellable = true
 	)
-	private static void hookInsert(Level world, BlockPos pos, HopperBlockEntity blockEntity, CallbackInfoReturnable<Boolean> cir, @Local Container targetInventory) {
+	private static void hookInsert(Level level, BlockPos pos, HopperBlockEntity blockEntity, CallbackInfoReturnable<Boolean> cir, @Local Container targetInventory) {
 		// Let vanilla handle the transfer if it found an inventory.
 		if (targetInventory != null) return;
 
 		// Otherwise inject our transfer logic.
 		Direction direction = ((HopperBlockEntityMixin) (Object) blockEntity).facing;
 		BlockPos targetPos = pos.relative(direction);
-		Storage<ItemVariant> target = ItemStorage.SIDED.find(world, targetPos, direction.getOpposite());
+		Storage<ItemVariant> target = ItemStorage.SIDED.find(level, targetPos, direction.getOpposite());
 
 		if (target != null) {
 			long moved = StorageUtil.move(
-					InventoryStorage.of(blockEntity, direction),
+					ContainerStorage.of(blockEntity, direction),
 					target,
 					iv -> true,
 					1,
@@ -81,18 +81,18 @@ public class HopperBlockEntityMixin {
 			method = "suckInItems(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/Hopper;)Z",
 			cancellable = true
 	)
-	private static void hookExtract(Level world, Hopper hopper, CallbackInfoReturnable<Boolean> cir, @Local Container inputInventory) {
+	private static void hookExtract(Level level, Hopper hopper, CallbackInfoReturnable<Boolean> cir, @Local Container inputInventory) {
 		// Let vanilla handle the transfer if it found an inventory.
 		if (inputInventory != null) return;
 
 		// Otherwise inject our transfer logic.
 		BlockPos sourcePos = BlockPos.containing(hopper.getLevelX(), hopper.getLevelY() + 1.0D, hopper.getLevelZ());
-		Storage<ItemVariant> source = ItemStorage.SIDED.find(world, sourcePos, Direction.DOWN);
+		Storage<ItemVariant> source = ItemStorage.SIDED.find(level, sourcePos, Direction.DOWN);
 
 		if (source != null) {
 			long moved = StorageUtil.move(
 					source,
-					InventoryStorage.of(hopper, Direction.UP),
+					ContainerStorage.of(hopper, Direction.UP),
 					iv -> true,
 					1,
 					null

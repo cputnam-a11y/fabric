@@ -74,15 +74,15 @@ public interface FabricItem {
 
 	/**
 	 * Returns a leftover item stack after {@code stack} is consumed in a recipe.
-	 * (This is also known as "recipe remainder".)
+	 * (This is also known as a "crafting remainder".)
 	 * For example, using a lava bucket in a furnace as fuel will leave an empty bucket.
 	 *
-	 * <p>Here is an example for a recipe remainder that increments the item's damage.
+	 * <p>Here is an example for a crafting remainder that increments the item's damage.
 	 *
 	 * <pre>{@code
-	 *  if (stack.getDamage() < stack.getMaxDamage() - 1) {
+	 *  if (stack.getDamageValue() < stack.getMaxDamage() - 1) {
 	 *  	ItemStack moreDamaged = stack.copy();
-	 *  	moreDamaged.setDamage(stack.getDamage() + 1);
+	 *  	moreDamaged.setDamageValue(stack.getDamageValue() + 1);
 	 *  	return moreDamaged;
 	 *  }
 	 *
@@ -95,12 +95,12 @@ public interface FabricItem {
 	 * <p>Note that simple item remainders can also be set via {@link Item.Properties#craftRemainder(Item)}.
 	 *
 	 * <p>If you want to get a remainder for a stack,
-	 * is recommended to use the stack version of this method: {@link FabricItemStack#getRecipeRemainder()}.
+	 * is recommended to use the stack version of this method: {@link FabricItemStack#getCraftingRemainder()}.
 	 *
 	 * @param stack the consumed {@link ItemStack}
 	 * @return the leftover item stack
 	 */
-	default ItemStack getRecipeRemainder(ItemStack stack) {
+	default ItemStack getCraftingRemainder(ItemStack stack) {
 		return ((Item) this).getCraftingRemainder();
 	}
 
@@ -136,7 +136,7 @@ public interface FabricItem {
 	 * <p>Should be used instead of querying the item ID namespace to determine what mod an item is from when displaying
 	 * to the player.</p>
 	 *
-	 * <p>Defaults to the namespace of the item's own registry entry, except in the cases of potions or enchanted books,
+	 * <p>Defaults to the namespace of the item's own holder, except in the cases of potions or enchanted books,
 	 * in which it uses the namespace of the potion contents or single enchantment applied.</p>
 	 *
 	 * <p>Note that while it is recommended that this reflect a namespace and/or mod ID, it can technically be any
@@ -146,24 +146,24 @@ public interface FabricItem {
 	 * @return the namespace of the mod that created the item
 	 */
 	default String getCreatorNamespace(ItemStack stack) {
-		Holder<?> entry = stack.typeHolder();
+		Holder<?> holder = stack.typeHolder();
 
 		if ((this instanceof PotionItem || this instanceof TippedArrowItem) && stack.has(DataComponents.POTION_CONTENTS)) {
 			Optional<Holder<Potion>> potion = stack.get(DataComponents.POTION_CONTENTS).potion();
-			if (potion.isPresent()) entry = potion.get();
+			if (potion.isPresent()) holder = potion.get();
 		} else if (stack.is(Items.ENCHANTED_BOOK) && stack.has(DataComponents.STORED_ENCHANTMENTS)) {
 			Set<Holder<Enchantment>> enchantments = stack.get(DataComponents.STORED_ENCHANTMENTS).keySet();
-			if (enchantments.size() == 1) entry = enchantments.iterator().next();
+			if (enchantments.size() == 1) holder = enchantments.iterator().next();
 		}
 
-		return entry.unwrapKey().orElseThrow().identifier().getNamespace();
+		return holder.unwrapKey().orElseThrow().identifier().getNamespace();
 	}
 
 	/**
 	 * Fabric-provided extensions for {@link Item.Properties}.
-	 * This interface is automatically implemented on all item settings via Mixin and interface injection.
+	 * This interface is automatically implemented on all item properties via Mixin and interface injection.
 	 */
-	interface Settings {
+	interface Properties {
 		/**
 		 * Sets the equipment slot provider of the item.
 		 *

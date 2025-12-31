@@ -35,16 +35,16 @@ import net.fabricmc.fabric.impl.client.rendering.BlockEntityRendererRegistryImpl
 @Deprecated
 public final class BlockEntityRendererRegistry {
 	/**
-	 * Register a BlockEntityRenderer for a BlockEntityType. Can be called clientside before the world is rendered.
+	 * Register a BlockEntityRenderer for a BlockEntityType. Can be called clientside before the level is rendered.
 	 *
 	 * @param blockEntityType the {@link BlockEntityType} to register a renderer for
-	 * @param blockEntityRendererFactory a {@link BlockEntityRendererProvider} that creates a {@link BlockEntityRenderer}, called
+	 * @param blockEntityRendererProvider a {@link BlockEntityRendererProvider} that creates a {@link BlockEntityRenderer}, called
 	 *                            when {@link BlockEntityRenderDispatcher} is initialized or immediately if the dispatcher
 	 *                            class is already loaded
 	 * @param <E> the {@link BlockEntity}
 	 */
-	public static <E extends BlockEntity, S extends BlockEntityRenderState> void register(BlockEntityType<E> blockEntityType, BlockEntityRendererProvider<? super E, ? super S> blockEntityRendererFactory) {
-		BlockEntityRendererRegistryImpl.register(blockEntityType, blockEntityRendererFactory);
+	public static <E extends BlockEntity, S extends BlockEntityRenderState> void register(BlockEntityType<E> blockEntityType, BlockEntityRendererProvider<? super E, ? super S> blockEntityRendererProvider) {
+		BlockEntityRendererRegistryImpl.register(blockEntityType, blockEntityRendererProvider);
 	}
 
 	private BlockEntityRendererRegistry() {

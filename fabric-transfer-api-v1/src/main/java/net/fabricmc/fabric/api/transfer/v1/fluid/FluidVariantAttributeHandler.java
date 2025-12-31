@@ -71,7 +71,7 @@ public interface FluidVariantAttributeHandler {
 	/**
 	 * Return an integer in [0, 15]: the light level emitted by this fluid, or 0 if it doesn't naturally emit light.
 	 */
-	default int getLuminance(FluidVariant variant) {
+	default int getLightEmission(FluidVariant variant) {
 		return variant.getFluid().defaultFluidState().createLegacyBlock().getLightEmission();
 	}
 
@@ -87,14 +87,14 @@ public interface FluidVariantAttributeHandler {
 	 * Return a positive integer, representing the viscosity of this fluid.
 	 * Fluids with lower viscosity generally flow faster than fluids with higher viscosity.
 	 *
-	 * <p>More precisely, viscosity should be {@value FluidConstants#VISCOSITY_RATIO} * {@link FlowingFluid#getTickDelay} for flowable fluids.
+	 * <p>More precisely, viscosity should be {@value FluidConstants#VISCOSITY_RATIO} * {@link FlowingFluid#getTickDelay} for flowing fluids.
 	 * The reference values are {@value FluidConstants#WATER_VISCOSITY} for water,
 	 * {@value FluidConstants#LAVA_VISCOSITY_NETHER} for lava in ultrawarm dimensions (such as the nether),
 	 * and {@value FluidConstants#LAVA_VISCOSITY} for lava in other dimensions.
 	 *
-	 * @param world World if available, otherwise null.
+	 * @param level Level if available, otherwise null.
 	 */
-	default int getViscosity(FluidVariant variant, @Nullable Level world) {
+	default int getViscosity(FluidVariant variant, @Nullable Level level) {
 		return FluidConstants.WATER_VISCOSITY;
 	}
 

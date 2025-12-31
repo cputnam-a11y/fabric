@@ -241,8 +241,8 @@ public class QuadViewImpl implements QuadView {
 
 	@Override
 	@Nullable
-	public ChunkSectionLayer renderLayer() {
-		return EncodingFormat.renderLayer(data[baseIndex + HEADER_BITS]);
+	public ChunkSectionLayer chunkLayer() {
+		return EncodingFormat.chunkLayer(data[baseIndex + HEADER_BITS]);
 	}
 
 	@Override
@@ -261,8 +261,8 @@ public class QuadViewImpl implements QuadView {
 	}
 
 	@Override
-	public ItemStackRenderState.@Nullable FoilType glint() {
-		return EncodingFormat.glint(data[baseIndex + HEADER_BITS]);
+	public ItemStackRenderState.@Nullable FoilType foilType() {
+		return EncodingFormat.foilType(data[baseIndex + HEADER_BITS]);
 	}
 
 	@Override

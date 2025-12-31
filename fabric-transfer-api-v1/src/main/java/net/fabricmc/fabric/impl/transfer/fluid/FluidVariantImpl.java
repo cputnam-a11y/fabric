@@ -42,10 +42,10 @@ public class FluidVariantImpl implements FluidVariant {
 			// Note: the empty fluid is not still, that's why we check for it specifically.
 
 			if (fluid instanceof FlowingFluid flowable) {
-				// Normalize FlowableFluids to their still variants.
+				// Normalize FlowingFluids to their still variants.
 				fluid = flowable.getSource();
 			} else {
-				// If not a FlowableFluid, we don't know how to convert -> crash.
+				// If not a FlowingFluid, we don't know how to convert -> crash.
 				Identifier id = BuiltInRegistries.FLUID.getKey(fluid);
 				throw new IllegalArgumentException("Cannot convert flowing fluid %s (%s) into a still fluid.".formatted(id, fluid));
 			}
@@ -87,18 +87,18 @@ public class FluidVariantImpl implements FluidVariant {
 	}
 
 	@Override
-	public @Nullable DataComponentPatch getComponents() {
+	public @Nullable DataComponentPatch getComponentsPatch() {
 		return components;
 	}
 
 	@Override
-	public DataComponentMap getComponentMap() {
+	public DataComponentMap getComponents() {
 		return componentMap;
 	}
 
 	@Override
-	public FluidVariant withComponentChanges(DataComponentPatch changes) {
-		return of(fluid, TransferApiImpl.mergeChanges(getComponents(), changes));
+	public FluidVariant withComponents(DataComponentPatch patch) {
+		return of(fluid, TransferApiImpl.mergePatches(getComponentsPatch(), patch));
 	}
 
 	@Override

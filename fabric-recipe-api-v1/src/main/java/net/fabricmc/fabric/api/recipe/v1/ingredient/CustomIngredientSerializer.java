@@ -66,9 +66,9 @@ public interface CustomIngredientSerializer<T extends CustomIngredient> {
 	MapCodec<T> getCodec();
 
 	/**
-	 * {@return the packet codec for serializing this ingredient}.
+	 * {@return the stream codec for serializing this ingredient}.
 	 *
 	 * @see Ingredient#CONTENTS_STREAM_CODEC
 	 */
-	StreamCodec<RegistryFriendlyByteBuf, T> getPacketCodec();
+	StreamCodec<RegistryFriendlyByteBuf, T> getStreamCodec();
 }

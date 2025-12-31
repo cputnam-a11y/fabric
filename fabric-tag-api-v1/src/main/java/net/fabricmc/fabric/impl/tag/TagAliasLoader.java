@@ -47,36 +47,36 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.StrictJsonParser;
 
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
-import net.fabricmc.fabric.api.resource.v1.reloader.SimpleResourceReloader;
+import net.fabricmc.fabric.api.resource.v1.reloader.SimpleReloadListener;
 
-public final class TagAliasLoader extends SimpleResourceReloader<Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>>> {
+public final class TagAliasLoader extends SimpleReloadListener<Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>>> {
 	public static final Identifier ID = Identifier.fromNamespaceAndPath("fabric-tag-api-v1", "tag_alias_groups");
 
 	private static final Logger LOGGER = LoggerFactory.getLogger("fabric-tag-api-v1");
 
 	@SuppressWarnings("unchecked")
 	@Override
-	protected Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepare(SharedState store) {
+	protected Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepare(SharedState state) {
 		Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> dataByRegistry = new HashMap<>();
-		HolderLookup.Provider registries = store.get(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY);
+		HolderLookup.Provider registries = state.get(ResourceLoader.REGISTRY_LOOKUP_KEY);
 		Iterator<ResourceKey<? extends Registry<?>>> registryIterator = registries.listRegistryKeys().iterator();
 
 		while (registryIterator.hasNext()) {
-			ResourceKey<? extends Registry<?>> registryKey = registryIterator.next();
-			FileToIdConverter resourceFinder = FileToIdConverter.json(getDirectory(registryKey));
+			ResourceKey<? extends Registry<?>> resourceKey = registryIterator.next();
+			FileToIdConverter fileToIdConverter = FileToIdConverter.json(getDirectory(resourceKey));
 
-			for (Map.Entry<Identifier, Resource> entry : resourceFinder.listMatchingResources(store.resourceManager()).entrySet()) {
+			for (Map.Entry<Identifier, Resource> entry : fileToIdConverter.listMatchingResources(state.resourceManager()).entrySet()) {
 				Identifier resourcePath = entry.getKey();
-				Identifier groupId = resourceFinder.fileToId(resourcePath);
+				Identifier groupId = fileToIdConverter.fileToId(resourcePath);
 
 				try (Reader reader = entry.getValue().openAsReader()) {
 					JsonElement json = StrictJsonParser.parse(reader);
-					Codec<TagAliasGroup<Object>> codec = TagAliasGroup.codec((ResourceKey<? extends Registry<Object>>) registryKey);
+					Codec<TagAliasGroup<Object>> codec = TagAliasGroup.codec((ResourceKey<? extends Registry<Object>>) resourceKey);
 
 					switch (codec.parse(JsonOps.INSTANCE, json)) {
 					case DataResult.Success(TagAliasGroup<Object> group, Lifecycle unused) -> {
 						var data = new Data(groupId, group);
-						dataByRegistry.computeIfAbsent(registryKey, key -> new ArrayList<>()).add(data);
+						dataByRegistry.computeIfAbsent(resourceKey, key -> new ArrayList<>()).add(data);
 					}
 					case DataResult.Error<?> error -> {
 						LOGGER.error("[Fabric] Couldn't parse tag alias group file '{}' from '{}': {}", groupId, resourcePath, error.message());
@@ -91,9 +91,9 @@ public final class TagAliasLoader extends SimpleResourceReloader<Map<ResourceKey
 		return dataByRegistry;
 	}
 
-	private static String getDirectory(ResourceKey<? extends Registry<?>> registryKey) {
+	private static String getDirectory(ResourceKey<? extends Registry<?>> resourceKey) {
 		String directory = "fabric/tag_alias/";
-		Identifier registryId = registryKey.identifier();
+		Identifier registryId = resourceKey.identifier();
 
 		if (!Identifier.DEFAULT_NAMESPACE.equals(registryId.getNamespace())) {
 			directory += registryId.getNamespace() + '/';
@@ -103,7 +103,7 @@ public final class TagAliasLoader extends SimpleResourceReloader<Map<ResourceKey
 	}
 
 	@Override
-	protected void apply(Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepared, SharedState store) {
+	protected void apply(Map<ResourceKey<? extends Registry<?>>, List<TagAliasLoader.Data>> prepared, SharedState state) {
 		for (Map.Entry<ResourceKey<? extends Registry<?>>, List<Data>> entry : prepared.entrySet()) {
 			Map<TagKey<?>, Set<TagKey<?>>> groupsByTag = new HashMap<>();
 
@@ -131,13 +131,13 @@ public final class TagAliasLoader extends SimpleResourceReloader<Map<ResourceKey
 			// Remove any groups of one tag, we don't need to apply them.
 			groupsByTag.values().removeIf(tags -> tags.size() == 1);
 
-			HolderLookup.RegistryLookup<?> wrapper = store.get(ResourceLoader.RELOADER_REGISTRY_LOOKUP_KEY).lookupOrThrow(entry.getKey());
+			HolderLookup.RegistryLookup<?> lookup = state.get(ResourceLoader.REGISTRY_LOOKUP_KEY).lookupOrThrow(entry.getKey());
 
-			if (wrapper instanceof TagAliasEnabledRegistryWrapper aliasWrapper) {
-				aliasWrapper.fabric_loadTagAliases(groupsByTag);
+			if (lookup instanceof TagAliasEnabledRegistryLookup aliasLookup) {
+				aliasLookup.fabric_loadTagAliases(groupsByTag);
 			} else {
-				throw new ClassCastException("[Fabric] Couldn't apply tag aliases to registry wrapper %s (%s) since it doesn't implement TagAliasEnabledRegistryWrapper"
-						.formatted(wrapper, entry.getKey().identifier()));
+				throw new ClassCastException("[Fabric] Couldn't apply tag aliases to registry lookup %s (%s) since it doesn't implement TagAliasEnabledRegistryLookup"
+						.formatted(lookup, entry.getKey().identifier()));
 			}
 		}
 	}
@@ -148,14 +148,14 @@ public final class TagAliasLoader extends SimpleResourceReloader<Map<ResourceKey
 		while (registryEntries.hasNext()) {
 			Registry<?> registry = registryEntries.next().value();
 
-			if (registry instanceof SimpleRegistryExtension extension) {
+			if (registry instanceof MappedRegistryExtension extension) {
 				extension.fabric_applyPendingTagAliases();
 				// This is not needed in the static registry code path as the tag aliases are applied
 				// before the tags are refreshed. Dynamic registry loading (including tags) takes place earlier
 				// than the rest of a data reload, so we need to refresh the tags manually.
 				extension.fabric_refreshTags();
 			} else {
-				throw new ClassCastException("[Fabric] Couldn't apply pending tag aliases to registry %s (%s) since it doesn't implement SimpleRegistryExtension"
+				throw new ClassCastException("[Fabric] Couldn't apply pending tag aliases to registry %s (%s) since it doesn't implement MappedRegistryExtension"
 						.formatted(registry, registry.getClass().getName()));
 			}
 		}

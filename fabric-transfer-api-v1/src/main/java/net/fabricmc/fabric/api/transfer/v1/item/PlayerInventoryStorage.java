@@ -31,7 +31,7 @@ import net.fabricmc.fabric.impl.transfer.item.CursorSlotWrapper;
 
 /**
  * A {@code Storage<ItemVariant>} implementation for a {@link Inventory}.
- * This is a specialized version of {@link InventoryStorage},
+ * This is a specialized version of {@link ContainerStorage},
  * with an additional transactional wrapper for {@link Inventory#placeItemBackInInventory}.
  *
  * <p>Note that this is a wrapper around all the slots of the player inventory.
@@ -40,9 +40,9 @@ import net.fabricmc.fabric.impl.transfer.item.CursorSlotWrapper;
  * {@link #getSlots} can also be used and combined with {@link CombinedStorage} to retrieve a wrapper around a specific range of slots.
  */
 @ApiStatus.NonExtendable
-// TODO: Consider explicitly syncing stacks by sending a ScreenHandlerSlotUpdateS2CPacket if that proves to be necessary.
+// TODO: Consider explicitly syncing stacks by sending a ClientboundContainerSetSlotPacket if that proves to be necessary.
 // TODO: Vanilla doesn't seem to be doing it reliably, so we ignore it for now.
-public interface PlayerInventoryStorage extends InventoryStorage {
+public interface PlayerInventoryStorage extends ContainerStorage {
 	/**
 	 * Return an instance for the passed player's inventory.
 	 */
@@ -54,15 +54,15 @@ public interface PlayerInventoryStorage extends InventoryStorage {
 	 * Return an instance for the passed player inventory.
 	 */
 	static PlayerInventoryStorage of(Inventory playerInventory) {
-		return (PlayerInventoryStorage) InventoryStorage.of(playerInventory, null);
+		return (PlayerInventoryStorage) ContainerStorage.of(playerInventory, null);
 	}
 
 	/**
-	 * Return a wrapper around the cursor slot of a screen handler,
+	 * Return a wrapper around the cursor slot of a menu,
 	 * i.e. the stack that can be manipulated with {@link AbstractContainerMenu#getCarried()} and {@link AbstractContainerMenu#setCarried}.
 	 */
-	static SingleSlotStorage<ItemVariant> getCursorStorage(AbstractContainerMenu screenHandler) {
-		return CursorSlotWrapper.get(screenHandler);
+	static SingleSlotStorage<ItemVariant> getCursorStorage(AbstractContainerMenu menu) {
+		return CursorSlotWrapper.get(menu);
 	}
 
 	/**

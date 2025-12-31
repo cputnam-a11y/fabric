@@ -37,7 +37,7 @@ import net.minecraft.world.item.Items;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.ArmorRenderer;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 
 public class ArmorRenderingTests implements ClientModInitializer {
 	private static final Identifier TEXTURE = Identifier.withDefaultNamespace("textures/block/dirt.png");
@@ -49,23 +49,29 @@ public class ArmorRenderingTests implements ClientModInitializer {
 	public void onInitializeClient() {
 		ArmorModelSet<ModelLayerLocation> armorModelData = new ArmorModelSet<>("helmet", "chestplate", "leggings", "boots")
 				.map(name -> new ModelLayerLocation(Identifier.fromNamespaceAndPath(MOD_ID, "test_armor"), name));
-		EntityModelLayerRegistry.registerEquipmentModelLayers(armorModelData, () -> HumanoidModel.createArmorMeshSet(new CubeDeformation(0.5f), new CubeDeformation(1f)).map(modelData -> LayerDefinition.create(modelData, 64, 32)));
+		ModelLayerRegistry.registerArmorModelLayers(armorModelData, () -> HumanoidModel.createArmorMeshSet(new CubeDeformation(0.5f), new CubeDeformation(1f)).map(modelData -> LayerDefinition.create(modelData, 64, 32)));
 		ArmorRenderer.register(context -> new ArmorRendererTestImpl(context, armorModelData.head()), Items.DIAMOND_HELMET, Items.DIAMOND_SWORD);
 		ArmorRenderer.register(context -> new ArmorRendererTestImpl(context, armorModelData.chest()), Items.DIAMOND_CHESTPLATE);
 	}
 
 	record ArmorRendererTestImpl(HumanoidModel<HumanoidRenderState> model) implements ArmorRenderer {
-		ArmorRendererTestImpl(EntityRendererProvider.Context context, ModelLayerLocation entityModelLayer) {
-			this(new HumanoidModel<>(context.bakeLayer(entityModelLayer)));
+		ArmorRendererTestImpl(EntityRendererProvider.Context context, ModelLayerLocation modelLayerLocation) {
+			this(new HumanoidModel<>(context.bakeLayer(modelLayerLocation)));
 		}
 
 		@Override
-		public void render(PoseStack matrices, SubmitNodeCollector orderedRenderCommandQueue, ItemStack stack, HumanoidRenderState bipedEntityRenderState, EquipmentSlot slot, int light, HumanoidModel<HumanoidRenderState> contextModel) {
-			OrderedSubmitNodeCollector renderCommandQueue = orderedRenderCommandQueue.order(0);
-			ArmorRenderer.submitTransformCopyingModel(contextModel, bipedEntityRenderState, model, bipedEntityRenderState, false, renderCommandQueue, matrices, RenderTypes.armorCutoutNoCull(TEXTURE), light, OverlayTexture.NO_OVERLAY, 0, null);
+		public void render(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, ItemStack stack, HumanoidRenderState humanoidRenderState, EquipmentSlot slot, int light, HumanoidModel<HumanoidRenderState> contextModel) {
+			OrderedSubmitNodeCollector orderedCollector = submitNodeCollector.order(0);
+			ArmorRenderer.submitTransformCopyingModel(contextModel,
+					humanoidRenderState, model,
+					humanoidRenderState, false, orderedCollector,
+					poseStack, RenderTypes.armorCutoutNoCull(TEXTURE), light, OverlayTexture.NO_OVERLAY, 0, null);
 
 			if (stack.hasFoil()) {
-				ArmorRenderer.submitTransformCopyingModel(contextModel, bipedEntityRenderState, model, bipedEntityRenderState, false, renderCommandQueue, matrices, RenderTypes.armorEntityGlint(), light, OverlayTexture.NO_OVERLAY, 0, null);
+				ArmorRenderer.submitTransformCopyingModel(contextModel,
+						humanoidRenderState, model,
+						humanoidRenderState, false, orderedCollector,
+						poseStack, RenderTypes.armorEntityGlint(), light, OverlayTexture.NO_OVERLAY, 0, null);
 			}
 		}
 

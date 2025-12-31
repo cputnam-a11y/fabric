@@ -98,7 +98,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 	}
 
 	@Override
-	public SpawnSettingsContext getSpawnSettings() {
+	public MobSpawnSettingsContext getMobSpawnSettings() {
 		return spawnSettings;
 	}
 
@@ -183,17 +183,17 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		}
 
 		@Override
-		public void setFoliageColor(Optional<Integer> color) {
+		public void setFoliageColorOverride(Optional<Integer> color) {
 			effects.foliageColorOverride = Objects.requireNonNull(color);
 		}
 
 		@Override
-		public void setDryFoliageColor(Optional<Integer> color) {
+		public void setDryFoliageColorOverride(Optional<Integer> color) {
 			effects.dryFoliageColorOverride = Objects.requireNonNull(color);
 		}
 
 		@Override
-		public void setGrassColor(Optional<Integer> color) {
+		public void setGrassColorOverride(Optional<Integer> color) {
 			effects.grassColorOverride = Objects.requireNonNull(color);
 		}
 
@@ -259,7 +259,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 
 		@Override
 		public boolean removeFeature(GenerationStep.Decoration step, ResourceKey<PlacedFeature> placedFeatureKey) {
-			PlacedFeature placedFeature = getEntry(features, placedFeatureKey).value();
+			PlacedFeature placedFeature = getHolder(features, placedFeatureKey).value();
 
 			int stepIndex = step.ordinal();
 			List<HolderSet<PlacedFeature>> featureSteps = generationSettings.features;
@@ -291,7 +291,7 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 				featureSteps.add(HolderSet.direct(Collections.emptyList()));
 			}
 
-			Holder.Reference<PlacedFeature> feature = getEntry(features, entry);
+			Holder.Reference<PlacedFeature> feature = getHolder(features, entry);
 
 			// Don't add the feature if it's already present
 			if (featureSteps.get(index).contains(feature)) {
@@ -307,12 +307,12 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		@Override
 		public void addCarver(ResourceKey<ConfiguredWorldCarver<?>> entry) {
 			// We do not need to delay evaluation of this since the registries are already fully built
-			generationSettings.carvers = plus(generationSettings.carvers, getEntry(carvers, entry));
+			generationSettings.carvers = plus(generationSettings.carvers, getHolder(carvers, entry));
 		}
 
 		@Override
-		public boolean removeCarver(ResourceKey<ConfiguredWorldCarver<?>> configuredCarverKey) {
-			ConfiguredWorldCarver<?> carver = getEntry(carvers, configuredCarverKey).value();
+		public boolean removeCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
+			ConfiguredWorldCarver<?> carver = getHolder(carvers, carverKey).value();
 			List<Holder<ConfiguredWorldCarver<?>>> genCarvers = new ArrayList<>(generationSettings.carvers.stream().toList());
 
 			if (genCarvers.removeIf(entry -> entry.value() == carver)) {
@@ -323,11 +323,11 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 			return false;
 		}
 
-		private <T> HolderSet<T> plus(@Nullable HolderSet<T> values, Holder<T> entry) {
-			if (values == null) return HolderSet.direct(entry);
+		private <T> HolderSet<T> plus(@Nullable HolderSet<T> values, Holder<T> holder) {
+			if (values == null) return HolderSet.direct(holder);
 
 			List<Holder<T>> list = new ArrayList<>(values.stream().toList());
-			list.add(entry);
+			list.add(holder);
 			return HolderSet.direct(list);
 		}
 	}
@@ -337,18 +337,18 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 	 * Gives more helpful error messages if an entry is missing by checking if the modder
 	 * forgot to data-gen the JSONs corresponding to their built-in objects.
 	 */
-	private static <T> Holder.Reference<T> getEntry(Registry<T> registry, ResourceKey<T> key) {
-		Holder.Reference<T> entry = registry.get(key).orElse(null);
+	private static <T> Holder.Reference<T> getHolder(Registry<T> registry, ResourceKey<T> key) {
+		Holder.Reference<T> holder = registry.get(key).orElse(null);
 
-		if (entry == null) {
+		if (holder == null) {
 			// The key doesn't exist in the data packs
-			throw new IllegalArgumentException("Couldn't find registry entry for " + key);
+			throw new IllegalArgumentException("Couldn't find holder for " + key);
 		}
 
-		return entry;
+		return holder;
 	}
 
-	private class SpawnSettingsContextImpl implements SpawnSettingsContext {
+	private class SpawnSettingsContextImpl implements MobSpawnSettingsContext {
 		private final MobSpawnSettings spawnSettings = biome.getMobSettings();
 		private final EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>> fabricSpawners = new EnumMap<>(MobCategory.class);
 
@@ -360,13 +360,13 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		private void unfreezeSpawners() {
 			fabricSpawners.clear();
 
-			for (MobCategory spawnGroup : MobCategory.values()) {
-				WeightedList<MobSpawnSettings.SpawnerData> entries = spawnSettings.spawners.get(spawnGroup);
+			for (MobCategory mobCategory : MobCategory.values()) {
+				WeightedList<MobSpawnSettings.SpawnerData> entries = spawnSettings.spawners.get(mobCategory);
 
 				if (entries != null) {
-					fabricSpawners.put(spawnGroup, new ArrayList<>(entries.unwrap()));
+					fabricSpawners.put(mobCategory, new ArrayList<>(entries.unwrap()));
 				} else {
-					fabricSpawners.put(spawnGroup, new ArrayList<>());
+					fabricSpawners.put(mobCategory, new ArrayList<>());
 				}
 			}
 		}
@@ -399,23 +399,23 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		}
 
 		@Override
-		public void setCreatureSpawnProbability(float probability) {
+		public void setCreatureGenerationProbability(float probability) {
 			spawnSettings.creatureGenerationProbability = probability;
 		}
 
 		@Override
-		public @UnmodifiableView List<Weighted<MobSpawnSettings.SpawnerData>> getSpawnEntries(MobCategory spawnGroup) {
-			Objects.requireNonNull(spawnGroup);
+		public @UnmodifiableView List<Weighted<MobSpawnSettings.SpawnerData>> getMobs(MobCategory category) {
+			Objects.requireNonNull(category);
 
-			return Collections.unmodifiableList(fabricSpawners.get(spawnGroup));
+			return Collections.unmodifiableList(fabricSpawners.get(category));
 		}
 
 		@Override
-		public void addSpawn(MobCategory spawnGroup, MobSpawnSettings.SpawnerData spawnEntry, int weight) {
-			Objects.requireNonNull(spawnGroup);
-			Objects.requireNonNull(spawnEntry);
+		public void addSpawn(MobCategory category, MobSpawnSettings.SpawnerData data, int weight) {
+			Objects.requireNonNull(category);
+			Objects.requireNonNull(data);
 
-			fabricSpawners.get(spawnGroup).add(new Weighted<>(spawnEntry, weight));
+			fabricSpawners.get(category).add(new Weighted<>(data, weight));
 		}
 
 		@Override
@@ -432,13 +432,13 @@ public class BiomeModificationContextImpl implements BiomeModificationContext {
 		}
 
 		@Override
-		public void setSpawnCost(EntityType<?> entityType, double mass, double gravityLimit) {
+		public void addMobCharge(EntityType<?> entityType, double charge, double energyBudget) {
 			Objects.requireNonNull(entityType);
-			spawnSettings.mobSpawnCosts.put(entityType, new MobSpawnSettings.MobSpawnCost(gravityLimit, mass));
+			spawnSettings.mobSpawnCosts.put(entityType, new MobSpawnSettings.MobSpawnCost(energyBudget, charge));
 		}
 
 		@Override
-		public void clearSpawnCost(EntityType<?> entityType) {
+		public void clearMobCharge(EntityType<?> entityType) {
 			spawnSettings.mobSpawnCosts.remove(entityType);
 		}
 	}

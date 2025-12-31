@@ -42,7 +42,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.model.loading.v1.SimpleUnbakedExtraModel;
 import net.fabricmc.fabric.api.client.model.loading.v1.wrapper.WrapperBlockStateModel;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityRenderLayerRegistrationCallback;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.reloader.ResourceReloaderKeys;
@@ -119,12 +119,12 @@ public class ModelTestModClient implements ClientModInitializer {
 		});
 
 		ResourceLoader resourceLoader = ResourceLoader.get(PackType.CLIENT_RESOURCES);
-		resourceLoader.registerReloader(SpecificModelReloadListener.ID, SpecificModelReloadListener.INSTANCE);
-		resourceLoader.addReloaderOrdering(ResourceReloaderKeys.Client.MODELS, SpecificModelReloadListener.ID);
+		resourceLoader.registerReloadListener(SpecificModelReloadListener.ID, SpecificModelReloadListener.INSTANCE);
+		resourceLoader.addListenerOrdering(ResourceReloaderKeys.Client.MODELS, SpecificModelReloadListener.ID);
 
-		LivingEntityFeatureRendererRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
+		LivingEntityRenderLayerRegistrationCallback.EVENT.register((entityType, entityRenderer, registrationHelper, context) -> {
 			if (entityRenderer instanceof AvatarRenderer playerRenderer) {
-				registrationHelper.register(new BakedModelFeatureRenderer<>(playerRenderer, SpecificModelReloadListener.INSTANCE::getSpecificModel));
+				registrationHelper.register(new BakedModelRenderLayer<>(playerRenderer, SpecificModelReloadListener.INSTANCE::getSpecificModel));
 			}
 		});
 	}
@@ -143,10 +143,10 @@ public class ModelTestModClient implements ClientModInitializer {
 		}
 
 		@Override
-		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter blockView, BlockPos pos, BlockState state, RandomSource random, Predicate<@Nullable Direction> cullTest) {
+		public void emitQuads(QuadEmitter emitter, BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, Predicate<@Nullable Direction> cullTest) {
 			emitter.pushTransform(q -> q.cullFace() != Direction.DOWN);
 			// Modify the cullTest as an example of how to achieve maximum performance
-			super.emitQuads(emitter, blockView, pos, state, random, cullFace -> {
+			super.emitQuads(emitter, level, pos, state, random, cullFace -> {
 				if (cullFace == Direction.DOWN) {
 					return true;
 				}
@@ -158,8 +158,8 @@ public class ModelTestModClient implements ClientModInitializer {
 
 		@Override
 		@Nullable
-		public Object createGeometryKey(BlockAndTintGetter blockView, BlockPos pos, BlockState state, RandomSource random) {
-			Object subkey = wrapped.createGeometryKey(blockView, pos, state, random);
+		public Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
+			Object subkey = wrapped.createGeometryKey(level, pos, state, random);
 
 			if (subkey == null) {
 				return subkey;
