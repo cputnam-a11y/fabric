@@ -3,11 +3,14 @@
   "package": "net.fabricmc.fabric.mixin.event.interaction",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
+    "BlockBehaviourBlockStateBaseMixin",
+    "ItemStackMixin",
     "PlayerAdvancementsMixin",
-    "ServerPlayerMixin",
+    "ServerGamePacketListenerImplMixin",
     "ServerPlayerGameModeMixin",
     "ServerGamePacketListenerInteractEntityHandlerMixin",
-    "ServerGamePacketListenerImplMixin"
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
