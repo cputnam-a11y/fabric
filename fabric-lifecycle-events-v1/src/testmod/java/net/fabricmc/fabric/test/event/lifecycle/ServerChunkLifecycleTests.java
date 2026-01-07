@@ -105,13 +105,13 @@ public final class ServerChunkLifecycleTests implements ModInitializer {
 				throw new AssertionError("FULL_CHUNK_STATUS_CHANGE for " + dimensionId + " " + chunkPos + " NOT SEQUENTIAL: " + oldChunkStatus + "->" + newChunkStatus);
 			}
 
-			FullChunkStatusEvent prevEvent = eventsPerChunk.computeIfAbsent(dimensionId, obj -> new Long2ObjectOpenHashMap<>()).computeIfAbsent(chunkPos.toLong(), l -> new FullChunkStatusEvent(FullChunkStatus.INACCESSIBLE, FullChunkStatus.INACCESSIBLE));
+			FullChunkStatusEvent prevEvent = eventsPerChunk.computeIfAbsent(dimensionId, obj -> new Long2ObjectOpenHashMap<>()).computeIfAbsent(chunkPos.pack(), l -> new FullChunkStatusEvent(FullChunkStatus.INACCESSIBLE, FullChunkStatus.INACCESSIBLE));
 
 			if (prevEvent.newChunkStatus() != oldChunkStatus) { // check if newChunkStatus from the previous event == oldChunkStatus for this current event. Catches any out-of-sync firing issues.
 				throw new AssertionError("FULL_CHUNK_STATUS_CHANGE for " + dimensionId + " " + chunkPos + " PREVIOUS_EVENT: " + prevEvent.oldChunkStatus() + "->" + prevEvent.newChunkStatus() + " / CURRENT_EVENT: " + oldChunkStatus + "->" + newChunkStatus);
 			}
 
-			eventsPerChunk.get(dimensionId).put(chunkPos.toLong(), new FullChunkStatusEvent(oldChunkStatus, newChunkStatus));
+			eventsPerChunk.get(dimensionId).put(chunkPos.pack(), new FullChunkStatusEvent(oldChunkStatus, newChunkStatus));
 			numOfEventsPerLevel.computeIfAbsent(dimensionId, obj -> new Object2IntOpenHashMap<>()).mergeInt(newChunkStatus, 1, Integer::sum);
 		});
 
