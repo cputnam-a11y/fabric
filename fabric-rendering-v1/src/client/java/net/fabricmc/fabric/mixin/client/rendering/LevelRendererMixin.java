@@ -142,7 +142,7 @@ public abstract class LevelRendererMixin {
 		LevelRenderEvents.BEFORE_DEBUG_RENDER.invoker().beforeDebugRender(renderContext);
 	}
 
-	@Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent"))
+	@Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucentTerrain"))
 	private void beforeTranslucentRender(CallbackInfo ci) {
 		LevelRenderEvents.BEFORE_TRANSLUCENT.invoker().beforeTranslucent(renderContext);
 	}

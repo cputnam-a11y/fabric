@@ -52,8 +52,8 @@ abstract class BlockFeatureRendererMixin {
 	private PoseStack poseStack;
 
 	// Support multi-chunk layer models (MovingBlockSubmit).
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z", ordinal = 0))
-	private void beforeRenderMovingBlocks(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, OutlineBufferSource outlineBufferSource, CallbackInfo ci, @Local Iterator<SubmitNodeStorage.MovingBlockSubmit> iterator) {
+	@Inject(method = "renderMovingBlockSubmits", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;hasNext()Z", ordinal = 0))
+	private void beforeRenderMovingBlocks(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, boolean translucent, CallbackInfo ci, @Local Iterator<SubmitNodeStorage.MovingBlockSubmit> iterator) {
 		while (iterator.hasNext()) {
 			SubmitNodeStorage.MovingBlockSubmit command = iterator.next();
 			MovingBlockRenderState renderState = command.movingBlockRenderState();
@@ -69,8 +69,8 @@ abstract class BlockFeatureRendererMixin {
 	}
 
 	// Support ExtendedBlockSubmit and ExtendedBlockModelSubmit.
-	@Inject(method = "render", at = @At("RETURN"))
-	private void onReturnRender(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, OutlineBufferSource outlineBufferSource, CallbackInfo ci) {
+	@Inject(method = "renderBlockSubmits", at = @At("RETURN"))
+	private void onReturnRender(SubmitNodeCollection nodeCollection, MultiBufferSource.BufferSource bufferSource, BlockRenderDispatcher blockRenderDispatcher, OutlineBufferSource outlineBufferSource, boolean translucent, CallbackInfo ci) {
 		DelegatingBlockMultiBufferSourceImpl blockMultiBufferSource = new DelegatingBlockMultiBufferSourceImpl();
 
 		for (ExtendedBlockSubmit submit : ((SubmitNodeCollectionExtension) nodeCollection).fabric_getExtendedBlockSubmits()) {
