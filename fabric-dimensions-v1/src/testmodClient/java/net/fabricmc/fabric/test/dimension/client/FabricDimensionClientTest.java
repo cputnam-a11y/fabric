@@ -16,9 +16,14 @@
 
 package net.fabricmc.fabric.test.dimension.client;
 
+import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.world.clock.ClockTimeMarkers;
+import net.minecraft.world.clock.WorldClock;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 
@@ -41,7 +46,8 @@ public class FabricDimensionClientTest implements FabricClientGameTest {
 		try (TestSingleplayerContext spContext = context.worldBuilder().create()) {
 			spContext.getServer().runOnServer(server -> {
 				ServerLevel overworld = server.getLevel(Level.OVERWORLD);
-				overworld.setDayTime(6000);
+				Optional<Holder<WorldClock>> defaultClock = overworld.dimensionType().defaultClock();
+				overworld.getServer().clockManager().skipToTimeMarker(defaultClock.get(), ClockTimeMarkers.NOON);
 				int overworldCloudColor = overworld.environmentAttributes().getValue(EnvironmentAttributes.CLOUD_COLOR, BlockPos.ZERO);
 
 				if (overworldCloudColor != PURPLE) {
