@@ -84,13 +84,11 @@ public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistr
 		return transparencyForOverlay.getOrDefault(block, block instanceof HalfTransparentBlock || block instanceof LeavesBlock);
 	}
 
-	public Map<Fluid, ChunkSectionLayer> onFluidRendererReload(SpriteGetter spriteGetter, LiquidBlockRenderer renderer, TextureAtlasSprite[] waterSprites, TextureAtlasSprite[] lavaSprites, TextureAtlasSprite waterOverlay) {
+	public void onFluidRendererReload(SpriteGetter spriteGetter, LiquidBlockRenderer renderer, Map<Fluid, ChunkSectionLayer> fluidChunkSectionLayers, TextureAtlasSprite[] waterSprites, TextureAtlasSprite[] lavaSprites, TextureAtlasSprite waterOverlay) {
 		FluidRenderingImpl.setVanillaRenderer(renderer);
 
 		WaterRenderHandler.INSTANCE.updateSprites(waterSprites, waterOverlay);
 		LavaRenderHandler.INSTANCE.updateSprites(lavaSprites);
-
-		Map<Fluid, ChunkSectionLayer> fluidChunkSectionLayers = new IdentityHashMap<>();
 
 		// Multiple fluids may share the same handler, so we need to avoid reloading the same handler multiple times.
 		Map<FluidRenderHandler, ChunkSectionLayer> loadedHandlers = new IdentityHashMap<>();
@@ -103,10 +101,13 @@ public class FluidRenderHandlerRegistryImpl implements FluidRenderHandlerRegistr
 				loadedHandlers.put(entry.getValue(), chunkSectionLayer);
 			}
 
+			// Skip if the chunk section layer for this fluid has already been set, this happens for vanilla fluids.
+			if (fluidChunkSectionLayers.containsKey(entry.getKey())) {
+				continue;
+			}
+
 			fluidChunkSectionLayers.put(entry.getKey(), chunkSectionLayer);
 		}
-
-		return fluidChunkSectionLayers;
 	}
 
 	private static class WaterRenderHandler implements FluidRenderHandler {

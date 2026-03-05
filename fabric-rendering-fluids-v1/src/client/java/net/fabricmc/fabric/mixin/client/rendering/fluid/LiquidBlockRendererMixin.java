@@ -85,11 +85,10 @@ public class LiquidBlockRendererMixin {
 	@Inject(method = "<init>", at = @At("RETURN"))
 	public void onResourceReloadReturn(SpriteGetter sprites, CallbackInfo info) {
 		LiquidBlockRenderer self = (LiquidBlockRenderer) (Object) this;
-		Map<Fluid, ChunkSectionLayer> moddedLayers = ((FluidRenderHandlerRegistryImpl) FluidRenderHandlerRegistry.INSTANCE).onFluidRendererReload(sprites, self, new TextureAtlasSprite[]{waterStill, waterFlowing, waterOverlay}, new TextureAtlasSprite[]{lavaStill, lavaFlowing}, waterOverlay);
 
-		Map<Fluid, ChunkSectionLayer> layers = new IdentityHashMap<>(this.layerByFluid);
-		layers.putAll(moddedLayers);
-		this.layerByFluid = Map.copyOf(layers);
+		this.layerByFluid = new IdentityHashMap<>(this.layerByFluid);
+		((FluidRenderHandlerRegistryImpl) FluidRenderHandlerRegistry.INSTANCE).onFluidRendererReload(sprites, self, this.layerByFluid, new TextureAtlasSprite[]{waterStill, waterFlowing, waterOverlay}, new TextureAtlasSprite[]{lavaStill, lavaFlowing}, waterOverlay);
+		this.layerByFluid = Map.copyOf(this.layerByFluid);
 	}
 
 	@Inject(method = "tesselate", at = @At("HEAD"), cancellable = true)
