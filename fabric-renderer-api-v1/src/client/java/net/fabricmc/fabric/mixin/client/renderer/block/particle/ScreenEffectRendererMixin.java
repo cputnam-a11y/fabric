@@ -16,6 +16,8 @@
 
 package net.fabricmc.fabric.mixin.client.renderer.block.particle;
 
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -40,7 +42,7 @@ abstract class ScreenEffectRendererMixin {
 	@Nullable
 	private static BlockPos pos;
 
-	@WrapOperation(method = "renderScreenEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockStateModelSet;getParticleMaterial(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/sprite/Material$Baked;"))
+	@WrapOperation(method = "submit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/block/BlockStateModelSet;getParticleMaterial(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/client/resources/model/sprite/Material$Baked;"))
 	private static Material.Baked getParticleMaterialProxy(BlockStateModelSet models, BlockState state, Operation<Material.Baked> original, @Local(name = "player") Player player) {
 		if (pos != null && player.level() instanceof BlockAndTintGetter level) {
 			Material.Baked material = models.getParticleMaterial(state, level, pos);
@@ -51,12 +53,10 @@ abstract class ScreenEffectRendererMixin {
 		return original.call(models, state);
 	}
 
-	@Inject(method = "getViewBlockingState", at = @At("RETURN"))
+	@Definition(id = "blockState", local = @Local(type = BlockState.class, name = "blockState"))
+	@Expression("return blockState")
+	@Inject(method = "getViewBlockingState", at = @At(value = "MIXINEXTRAS:EXPRESSION"))
 	private static void onReturnGetInWallBlockState(CallbackInfoReturnable<@Nullable BlockState> cir, @Local(name = "testPos") BlockPos.MutableBlockPos testPos) {
-		if (cir.getReturnValue() != null) {
-			pos = testPos.immutable();
-		} else {
-			pos = null;
-		}
+		pos = testPos.immutable();
 	}
 }
