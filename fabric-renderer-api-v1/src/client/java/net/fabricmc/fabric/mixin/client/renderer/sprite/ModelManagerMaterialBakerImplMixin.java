@@ -23,6 +23,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 
 import net.minecraft.client.renderer.texture.SpriteLoader;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
@@ -31,17 +32,17 @@ import net.fabricmc.fabric.api.client.renderer.v1.sprite.FabricMaterialBaker;
 import net.fabricmc.fabric.api.client.renderer.v1.sprite.SpriteFinder;
 import net.fabricmc.fabric.impl.client.renderer.MissingSpriteFinderImpl;
 
-@Mixin(targets = "net.minecraft.client.resources.model.ModelManager$1")
-abstract class ModelManager1Mixin implements FabricMaterialBaker {
+@Mixin(ModelManager.MaterialBakerImpl.class)
+abstract class ModelManagerMaterialBakerImplMixin implements FabricMaterialBaker {
 	@Shadow
 	@Final
 	private Material.Baked blockMissing;
 	@Shadow
 	@Final
-	SpriteLoader.Preparations val$blockAtlas;
+	private SpriteLoader.Preparations blockAtlas;
 	@Shadow
 	@Final
-	SpriteLoader.Preparations val$itemAtlas;
+	private SpriteLoader.Preparations itemAtlas;
 
 	@Unique
 	@Nullable
@@ -50,9 +51,9 @@ abstract class ModelManager1Mixin implements FabricMaterialBaker {
 	@Override
 	public SpriteFinder spriteFinder(Identifier atlasId) {
 		if (atlasId.equals(AtlasIds.BLOCKS)) {
-			return val$blockAtlas.spriteFinder();
+			return blockAtlas.spriteFinder();
 		} else if (atlasId.equals(AtlasIds.ITEMS)) {
-			return val$itemAtlas.spriteFinder();
+			return itemAtlas.spriteFinder();
 		}
 
 		MissingSpriteFinderImpl result = missingSpriteFinder;

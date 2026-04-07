@@ -23,7 +23,7 @@
     "item.ItemStackRenderStateLayerRenderStateMixin",
     "item.ItemStackRenderStateMixin",
     "sprite.MaterialBakerMixin",
-    "sprite.ModelManager1Mixin",
+    "sprite.ModelManagerMaterialBakerImplMixin",
     "sprite.SpriteLoaderPreparationsMixin",
     "sprite.TextureAtlasMixin",
     "submit.OrderedSubmitNodeCollectorMixin",
