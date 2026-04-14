@@ -56,7 +56,7 @@ accessible	field	net/minecraft/client/data/models/ModelProvider$BlockStateGenera
 transitive-inject-interface	net/minecraft/data/loot/BlockLootSubProvider	net/fabricmc/fabric/api/datagen/v1/loot/FabricBlockLootSubProvider
 transitive-inject-interface	net/minecraft/data/loot/EntityLootSubProvider	net/fabricmc/fabric/api/datagen/v1/loot/FabricEntityLootSubProvider
 transitive-inject-interface	net/minecraft/data/recipes/RecipeOutput	net/fabricmc/fabric/api/datagen/v1/recipe/FabricRecipeOutput
-transitive-inject-interface	net/minecraft/data/tags/TagAppender	net/fabricmc/fabric/api/datagen/v1/provider/FabricTagAppender<TE;TT;>
+transitive-inject-interface	net/minecraft/data/tags/TagAppender	net/fabricmc/fabric/api/datagen/v1/provider/FabricTagAppender<TT;>
 
 ### Generated access wideners below
 
@@ -137,13 +137,13 @@ transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateR
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateCraftingRecipe	(Lnet/minecraft/data/BlockFamily;Lnet/minecraft/data/BlockFamily$Variant;Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/ItemLike;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateStonecutterRecipe	(Lnet/minecraft/data/BlockFamily;Lnet/minecraft/data/BlockFamily$Variant;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	getBaseBlockForCrafting	(Lnet/minecraft/data/BlockFamily;Lnet/minecraft/data/BlockFamily$Variant;)Lnet/minecraft/world/level/block/Block;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	insideOf	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/advancements/Criterion;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	bredAnimal	()Lnet/minecraft/advancements/Criterion;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	has	(Lnet/minecraft/advancements/criterion/MinMaxBounds$Ints;Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/advancements/Criterion;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	has	(Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/advancements/Criterion;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	has	(Lnet/minecraft/tags/TagKey;)Lnet/minecraft/advancements/Criterion;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	inventoryTrigger	([Lnet/minecraft/advancements/criterion/ItemPredicate$Builder;)Lnet/minecraft/advancements/Criterion;
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	inventoryTrigger	([Lnet/minecraft/advancements/criterion/ItemPredicate;)Lnet/minecraft/advancements/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	insideOf	(Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/advancements/triggers/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	bredAnimal	()Lnet/minecraft/advancements/triggers/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	has	(Lnet/minecraft/advancements/predicates/MinMaxBounds$Ints;Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/advancements/triggers/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	has	(Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/advancements/triggers/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	has	(Lnet/minecraft/tags/TagKey;)Lnet/minecraft/advancements/triggers/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	inventoryTrigger	([Lnet/minecraft/advancements/predicates/ItemPredicate$Builder;)Lnet/minecraft/advancements/triggers/Criterion;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	inventoryTrigger	([Lnet/minecraft/advancements/predicates/ItemPredicate;)Lnet/minecraft/advancements/triggers/Criterion;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	getHasName	(Lnet/minecraft/world/level/ItemLike;)Ljava/lang/String;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	getItemName	(Lnet/minecraft/world/level/ItemLike;)Ljava/lang/String;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	getSimpleRecipeName	(Lnet/minecraft/world/level/ItemLike;)Ljava/lang/String;
@@ -194,6 +194,7 @@ transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerato
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createStairs	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;)Lnet/minecraft/client/data/models/blockstates/BlockModelDefinitionGenerator;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createOrientableTrapdoor	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;)Lnet/minecraft/client/data/models/blockstates/BlockModelDefinitionGenerator;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createTrapdoor	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;)Lnet/minecraft/client/data/models/blockstates/BlockModelDefinitionGenerator;
+transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createBed	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;)Lnet/minecraft/client/data/models/blockstates/BlockModelDefinitionGenerator;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createSimpleBlock	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;)Lnet/minecraft/client/data/models/blockstates/MultiVariantGenerator;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createRotatedPillar	()Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createPillarBlockUVLocked	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/model/TextureMapping;Ljava/util/function/BiConsumer;)Lnet/minecraft/client/data/models/blockstates/BlockModelDefinitionGenerator;
@@ -265,7 +266,8 @@ transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerato
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createCopperBulb	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;Lnet/minecraft/client/data/models/MultiVariant;)Lnet/minecraft/client/data/models/blockstates/BlockModelDefinitionGenerator;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	copyCopperBulbModel	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createAmethystCluster	(Lnet/minecraft/world/level/block/Block;)V
-transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createPointedDripstoneVariant	(Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/properties/SpeleothemThickness;)Lnet/minecraft/client/data/models/MultiVariant;
+transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createSpeleothem	(Lnet/minecraft/world/level/block/Block;)V
+transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createSpeleothemVariant	(Lnet/minecraft/core/Direction;Lnet/minecraft/world/level/block/state/properties/SpeleothemThickness;Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/client/data/models/MultiVariant;
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createNyliumBlock	(Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createRotatableColumn	(Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/client/data/models/BlockModelGenerators	createLightningRod	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V

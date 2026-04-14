@@ -32,6 +32,7 @@ import java.util.function.Supplier;
 
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import org.apache.commons.lang3.function.FailableConsumer;
 import org.apache.commons.lang3.function.FailableFunction;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -388,7 +389,7 @@ public final class ClientGameTestContextImpl implements ClientGameTestContext {
 			if (options.size != null) {
 				client.getWindow().setWidth(options.size.x);
 				client.getWindow().setHeight(options.size.y);
-				client.getMainRenderTarget().resize(options.size.x, options.size.y);
+				client.gameRenderer.mainRenderTarget().resize(options.size.x, options.size.y);
 			}
 
 			return new Vector2i(prevWidth, prevHeight);
@@ -399,9 +400,10 @@ public final class ClientGameTestContextImpl implements ClientGameTestContext {
 				DeltaTracker.DefaultValue deltaTracker = DeltaTrackerDefaultValueAccessor.create(options.deltaTicks);
 				client.gameRenderer.extract(deltaTracker, true);
 				client.gameRenderer.render(deltaTracker, true);
+				RenderSystem.getDevice().createCommandEncoder().submit();
 				CompletableFuture<T> resultFuture = new CompletableFuture<>();
 
-				Screenshot.takeScreenshot(client.getMainRenderTarget(), screenshot -> {
+				Screenshot.takeScreenshot(client.gameRenderer.mainRenderTarget(), screenshot -> {
 					try {
 						resultFuture.complete(screenshotConsumer.apply(screenshot));
 					} catch (Throwable e) {
@@ -425,7 +427,7 @@ public final class ClientGameTestContextImpl implements ClientGameTestContext {
 				computeOnClient(client -> {
 					client.getWindow().setWidth(prevSize.x);
 					client.getWindow().setHeight(prevSize.y);
-					client.getMainRenderTarget().resize(prevSize.x, prevSize.y);
+					client.gameRenderer.mainRenderTarget().resize(prevSize.x, prevSize.y);
 					return null;
 				});
 			}

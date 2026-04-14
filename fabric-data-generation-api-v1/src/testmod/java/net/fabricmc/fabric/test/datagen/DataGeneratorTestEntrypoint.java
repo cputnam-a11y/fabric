@@ -21,6 +21,7 @@ import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.BLOCK_WI
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.ENTITY_TYPE_WITHOUT_LOOT_TABLE;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.MOD_ID;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_BLOCK;
+import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_BLOCK_KEY;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_ENTITY_TYPE;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.SIMPLE_ITEM_GROUP;
 import static net.fabricmc.fabric.test.datagen.DataGeneratorTestContent.TEST_DATAGEN_DYNAMIC_REGISTRY_KEY;
@@ -42,7 +43,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementType;
-import net.minecraft.advancements.criterion.KilledTrigger;
+import net.minecraft.advancements.triggers.KilledTrigger;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
@@ -61,10 +62,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -264,7 +266,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 		public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder translationBuilder) {
 			translationBuilder.add(SIMPLE_BLOCK, "Simple Block");
 			translationBuilder.add(Identifier.fromNamespaceAndPath(MOD_ID, "identifier_test"), "Identifier Test");
-			translationBuilder.add(EntityType.ALLAY, "Allay");
+			translationBuilder.add(EntityTypes.ALLAY, "Allay");
 			translationBuilder.add(Attributes.ARMOR, "Generic Armor");
 			translationBuilder.add(TEST_SOUND, "Test Sound");
 
@@ -281,7 +283,7 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 			}
 
 			try {
-				translationBuilder.add(EntityType.ALLAY, "Allay Duplicate Test");
+				translationBuilder.add(EntityTypes.ALLAY, "Allay Duplicate Test");
 			} catch (RuntimeException e) {
 				LOGGER.info("Duplicate test passed.");
 			}
@@ -308,9 +310,9 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 
 		@Override
 		protected void addTags(HolderLookup.Provider registries) {
-			valueLookupBuilder(BlockTags.FIRE).setReplace(true).add(SIMPLE_BLOCK);
-			valueLookupBuilder(BlockTags.DIRT).add(SIMPLE_BLOCK);
-			valueLookupBuilder(BlockTags.ACACIA_LOGS).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
+			builder(BlockTags.FIRE).add(SIMPLE_BLOCK_KEY.block()).setReplace(true);
+			builder(BlockTags.DIRT).add(SIMPLE_BLOCK_KEY.block());
+			builder(BlockItemTags.ACACIA_LOGS.block()).forceAddTag(BlockTags.ANIMALS_SPAWNABLE_ON);
 
 			aliasGroup("flowers")
 					.add(BlockTags.FLOWERS, BlockTags.FLOWER_POTS);

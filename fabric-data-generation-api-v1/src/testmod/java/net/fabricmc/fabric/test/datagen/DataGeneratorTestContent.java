@@ -23,6 +23,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.references.BlockItemId;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
@@ -52,10 +53,19 @@ public class DataGeneratorTestContent implements ModInitializer {
 	public static Block BLOCK_WITH_VANILLA_LOOT_TABLE;
 	public static Block BLOCK_THAT_DROPS_NOTHING;
 
+	public static BlockItemId SIMPLE_BLOCK_KEY = createBlockItemId("simple_block");
+	public static ResourceKey<Block> BLOCK_WITHOUT_ITEM_KEY = createBlockResourceKey("block_without_item");
+	public static ResourceKey<Block> BLOCK_WITHOUT_LOOT_TABLE_KEY = createBlockResourceKey("block_without_loot_table");
+	public static ResourceKey<Block> BLOCK_WITH_VANILLA_LOOT_TABLE_KEY = createBlockResourceKey("block_with_vanilla_loot_table");
+	public static ResourceKey<Block> BLOCK_THAT_DROPS_NOTHING_KEY = createBlockResourceKey("block_that_drops_nothing");
+
 	public static SoundEvent TEST_SOUND;
 
 	public static EntityType<?> SIMPLE_ENTITY_TYPE;
 	public static EntityType<?> ENTITY_TYPE_WITHOUT_LOOT_TABLE;
+
+	public static ResourceKey<EntityType<?>> SIMPLE_ENTITY_TYPE_KEY = createEntityTypeResourceKey("simple_entity");
+	public static ResourceKey<EntityType<?>> ENTITY_TYPE_WITHOUT_LOOT_TABLE_KEY = createEntityTypeResourceKey("entity_without_loot_table");
 
 	public static final ResourceKey<CreativeModeTab> SIMPLE_ITEM_GROUP = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MOD_ID, "simple"));
 
@@ -75,14 +85,14 @@ public class DataGeneratorTestContent implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		SIMPLE_BLOCK = createBlock("simple_block", true, BlockBehaviour.Properties.of());
-		BLOCK_WITHOUT_ITEM = createBlock("block_without_item", false, BlockBehaviour.Properties.of());
-		BLOCK_WITHOUT_LOOT_TABLE = createBlock("block_without_loot_table", false, BlockBehaviour.Properties.of());
-		BLOCK_WITH_VANILLA_LOOT_TABLE = createBlock("block_with_vanilla_loot_table", false, BlockBehaviour.Properties.of().overrideLootTable(Blocks.STONE.getLootTable()));
-		BLOCK_THAT_DROPS_NOTHING = createBlock("block_that_drops_nothing", false, BlockBehaviour.Properties.of().noLootTable());
+		SIMPLE_BLOCK = createBlockItem(SIMPLE_BLOCK_KEY, BlockBehaviour.Properties.of());
+		BLOCK_WITHOUT_ITEM = createBlock(BLOCK_WITHOUT_ITEM_KEY, BlockBehaviour.Properties.of());
+		BLOCK_WITHOUT_LOOT_TABLE = createBlock(BLOCK_WITHOUT_LOOT_TABLE_KEY, BlockBehaviour.Properties.of());
+		BLOCK_WITH_VANILLA_LOOT_TABLE = createBlock(BLOCK_WITH_VANILLA_LOOT_TABLE_KEY, BlockBehaviour.Properties.of().overrideLootTable(Blocks.STONE.getLootTable()));
+		BLOCK_THAT_DROPS_NOTHING = createBlock(BLOCK_THAT_DROPS_NOTHING_KEY, BlockBehaviour.Properties.of().noLootTable());
 
-		SIMPLE_ENTITY_TYPE = createEntityType("simple_entity", EntityType.Builder.createNothing(MobCategory.MISC));
-		ENTITY_TYPE_WITHOUT_LOOT_TABLE = createEntityType("entity_without_loot_table", EntityType.Builder.createNothing(MobCategory.MISC));
+		SIMPLE_ENTITY_TYPE = createEntityType(SIMPLE_ENTITY_TYPE_KEY, EntityType.Builder.createNothing(MobCategory.MISC));
+		ENTITY_TYPE_WITHOUT_LOOT_TABLE = createEntityType(ENTITY_TYPE_WITHOUT_LOOT_TABLE_KEY, EntityType.Builder.createNothing(MobCategory.MISC));
 
 		CreativeModeTabEvents.modifyOutputEvent(SIMPLE_ITEM_GROUP).register(entries -> entries.accept(SIMPLE_BLOCK));
 
@@ -97,20 +107,30 @@ public class DataGeneratorTestContent implements ModInitializer {
 		DynamicRegistries.register(TEST_DATAGEN_DYNAMIC_EMPTY_REGISTRY_KEY, TestDatagenObject.CODEC);
 	}
 
-	private static Block createBlock(String name, boolean hasItem, BlockBehaviour.Properties settings) {
+	private static BlockItemId createBlockItemId(String name) {
 		Identifier identifier = Identifier.fromNamespaceAndPath(MOD_ID, name);
-		Block block = Registry.register(BuiltInRegistries.BLOCK, identifier, new Block(settings.setId(ResourceKey.create(Registries.BLOCK, identifier))));
+		return BlockItemId.create(identifier, identifier);
+	}
 
-		if (hasItem) {
-			Registry.register(BuiltInRegistries.ITEM, identifier, new BlockItem(block, new Item.Properties().setId(ResourceKey.create(Registries.ITEM, identifier))));
-		}
+	private static ResourceKey<Block> createBlockResourceKey(String name) {
+		return ResourceKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(MOD_ID, name));
+	}
 
+	private static Block createBlock(ResourceKey<Block> key, BlockBehaviour.Properties settings) {
+		return Registry.register(BuiltInRegistries.BLOCK, key, new Block(settings.setId(key)));
+	}
+
+	private static Block createBlockItem(BlockItemId id, BlockBehaviour.Properties settings) {
+		Block block = createBlock(id.block(), settings);
+		Registry.register(BuiltInRegistries.ITEM, id.item(), new BlockItem(block, new Item.Properties().setId(id.item())));
 		return block;
 	}
 
-	private static <E extends Entity> EntityType<E> createEntityType(String name, EntityType.Builder<E> builder) {
-		ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name));
+	private static ResourceKey<EntityType<?>> createEntityTypeResourceKey(String name) {
+		return ResourceKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath(MOD_ID, name));
+	}
 
+	private static <E extends Entity> EntityType<E> createEntityType(ResourceKey<EntityType<?>> key, EntityType.Builder<E> builder) {
 		return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, builder.build(key));
 	}
 
