@@ -298,6 +298,13 @@ public final class BlockTagsGenerator extends FabricTagsProvider.BlockTagsProvid
 				.add(BlockItemIds.PALE_OAK_FENCE_GATE);
 		builder(ConventionalBlockTags.FENCE_GATES)
 				.addOptionalTag(ConventionalBlockTags.WOODEN_FENCE_GATES);
+		builder(ConventionalBlockTags.IRON_BARS)
+				.add(BlockItemIds.IRON_BARS);
+		builder(ConventionalBlockTags.COPPER_BARS)
+				.addAll(BlockItemIds.COPPER_BARS.asList().stream().map(BlockItemId::block));
+		builder(ConventionalBlockTags.BARS)
+				.addTag(ConventionalBlockTags.IRON_BARS)
+				.addTag(ConventionalBlockTags.COPPER_BARS);
 		builder(ConventionalBlockTags.PUMPKINS)
 				.addTag(ConventionalBlockTags.NORMAL_PUMPKINS)
 				.addTag(ConventionalBlockTags.CARVED_PUMPKINS)
@@ -679,6 +686,8 @@ public final class BlockTagsGenerator extends FabricTagsProvider.BlockTagsProvid
 		aliasGroup("fences").add(BlockTags.FENCES, ConventionalBlockTags.FENCES);
 		aliasGroup("fences/wooden").add(BlockTags.WOODEN_FENCES, ConventionalBlockTags.WOODEN_FENCES);
 		aliasGroup("fence_gates").add(BlockTags.FENCE_GATES, ConventionalBlockTags.FENCE_GATES);
+
+		aliasGroup("bars").add(BlockTags.BARS, ConventionalBlockTags.BARS);
 
 		aliasGroup("flowers").add(BlockTags.FLOWERS, ConventionalBlockTags.FLOWERS);
 	}
