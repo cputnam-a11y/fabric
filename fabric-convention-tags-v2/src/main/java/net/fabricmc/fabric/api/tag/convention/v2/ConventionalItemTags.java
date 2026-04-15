@@ -426,7 +426,7 @@ public final class ConventionalItemTags {
 
 	// Bars
 	/**
-	 * Aliased with {@link ItemTags#BARS}.
+	 * Aliased with {@link BlockItemTags#BARS}.
 	 */
 	public static final TagKey<Item> BARS = register("bars");
 	public static final TagKey<Item> IRON_BARS = register("bars/iron");
