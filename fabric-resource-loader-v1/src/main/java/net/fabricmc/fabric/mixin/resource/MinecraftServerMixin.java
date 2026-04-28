@@ -33,11 +33,11 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Services;
 import net.minecraft.server.WorldStem;
 import net.minecraft.server.level.progress.LevelLoadListener;
+import net.minecraft.server.notifications.NotificationManager;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.repository.KnownPack;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.LevelStorageSource;
 
 import net.fabricmc.fabric.api.resource.v1.DataResourceStore;
@@ -63,7 +63,7 @@ public class MinecraftServerMixin implements DataResourceStore, FabricOriginalKn
 	}
 
 	@Inject(method = "<init>", at = @At("TAIL"))
-	private void init(Thread serverThread, LevelStorageSource.LevelStorageAccess storageAccess, PackRepository dataPackManager, WorldStem worldStem, Optional<GameRules> gameRules, Proxy proxy, DataFixer dataFixer, Services apiServices, LevelLoadListener chunkLoadProgress, boolean propagatesCrashes, CallbackInfo ci) {
+	private void init(Thread serverThread, LevelStorageSource.LevelStorageAccess storageSource, PackRepository packRepository, WorldStem worldStem, Optional gameRules, Proxy proxy, DataFixer fixerUpper, Services services, LevelLoadListener levelLoadListener, boolean propagatesCrashes, NotificationManager notificationManager, CallbackInfo ci) {
 		this.originalKnownPacks = worldStem.resourceManager().listPacks().flatMap(pack -> pack.location().knownPackInfo().stream()).toList();
 	}
 

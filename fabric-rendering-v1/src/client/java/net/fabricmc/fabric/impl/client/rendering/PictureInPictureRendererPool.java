@@ -21,8 +21,6 @@ import java.util.List;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 
 public final class PictureInPictureRendererPool<T extends PictureInPictureRenderState> implements AutoCloseable {
@@ -33,7 +31,7 @@ public final class PictureInPictureRendererPool<T extends PictureInPictureRender
 		index = 0;
 	}
 
-	public PictureInPictureRenderer<T> substitute(PictureInPictureRenderer<T> original, T elementState, Minecraft client, MultiBufferSource.BufferSource immediate, SubmitNodeCollector submitNodeCollector) {
+	public PictureInPictureRenderer<T> substitute(PictureInPictureRenderer<T> original, T elementState, Minecraft client) {
 		int index = this.index++;
 
 		if (index == 0) {
@@ -41,7 +39,7 @@ public final class PictureInPictureRendererPool<T extends PictureInPictureRender
 		} else if (index <= renderers.size()) {
 			return renderers.get(index - 1);
 		} else {
-			PictureInPictureRenderer<T> newRenderer = PictureInPictureRendererRegistryImpl.createNewRenderer(elementState, client, immediate, submitNodeCollector);
+			PictureInPictureRenderer<T> newRenderer = PictureInPictureRendererRegistryImpl.createNewRenderer(elementState, client);
 
 			if (newRenderer == null) {
 				// This renderer has been registered in an unofficial way (using mixins rather than through FAPI).

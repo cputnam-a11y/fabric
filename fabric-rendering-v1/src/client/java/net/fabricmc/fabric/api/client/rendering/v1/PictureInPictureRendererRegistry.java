@@ -22,8 +22,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 
 import net.fabricmc.fabric.impl.client.rendering.PictureInPictureRendererRegistryImpl;
@@ -55,18 +53,8 @@ public final class PictureInPictureRendererRegistry {
 	@ApiStatus.NonExtendable
 	public interface Context {
 		/**
-		 * @return the {@link MultiBufferSource.BufferSource}.
-		 */
-		MultiBufferSource.BufferSource bufferSource();
-
-		/**
 		 * @return the {@link Minecraft} instance.
 		 */
 		Minecraft minecraft();
-
-		/**
-		 * @return the {@link SubmitNodeCollector} instance.
-		 */
-		SubmitNodeCollector submitNodeCollector();
 	}
 }

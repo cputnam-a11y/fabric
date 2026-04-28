@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -45,9 +44,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
@@ -62,26 +58,20 @@ abstract class GuiRendererMixin implements GuiRendererExtensions {
 	@Final
 	@Mutable
 	private Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRenderer<?>> pictureInPictureRenderers;
-	@Shadow
-	@Final
-	private MultiBufferSource.BufferSource bufferSource;
 
 	@Unique
 	private boolean hasFabricInitialized = false;
 	@Unique
 	private final Map<Class<? extends PictureInPictureRenderState>, PictureInPictureRendererPool<?>> pipRendererPools = new HashMap<>();
-	@Unique
-	private SubmitNodeCollector submitNodeStorage = null;
 
 	@Inject(method = "<init>", at = @At(value = "RETURN"))
-	private void mutableSpecialElementRenderers(GuiRenderState state, MultiBufferSource.BufferSource bufferSource, SubmitNodeCollector submitNodeCollector, FeatureRenderDispatcher renderDispatcher, List list, CallbackInfo ci) {
+	private void mutableSpecialElementRenderers(GuiRenderState renderState, FeatureRenderDispatcher featureRenderDispatcher, List<PictureInPictureRenderer<?>> pictureInPictureRenderers, CallbackInfo ci) {
 		this.pictureInPictureRenderers = new IdentityHashMap<>(this.pictureInPictureRenderers);
 	}
 
 	@Override
-	public void fabric_onReady(SubmitNodeStorage submitNodeStorage) {
-		this.submitNodeStorage = submitNodeStorage;
-		PictureInPictureRendererRegistryImpl.onReady(Minecraft.getInstance(), bufferSource, submitNodeStorage, this.pictureInPictureRenderers);
+	public void fabric_onReady() {
+		PictureInPictureRendererRegistryImpl.onReady(Minecraft.getInstance(), this.pictureInPictureRenderers);
 		this.hasFabricInitialized = true;
 	}
 
@@ -102,7 +92,7 @@ abstract class GuiRendererMixin implements GuiRendererExtensions {
 		}
 
 		PictureInPictureRendererPool<T> rendererPool = (PictureInPictureRendererPool<T>) pipRendererPools.computeIfAbsent(original.getRenderStateClass(), k -> new PictureInPictureRendererPool<>());
-		return rendererPool.substitute(original, elementState, Minecraft.getInstance(), bufferSource, Objects.requireNonNull(submitNodeStorage, "renderDispatcher"));
+		return rendererPool.substitute(original, elementState, Minecraft.getInstance());
 	}
 
 	@Inject(method = "close", at = @At("RETURN"))
