@@ -25,7 +25,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.decoration.Mannequin;
 import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Player;
@@ -267,10 +267,10 @@ public class ContentRegistryGameTest {
 			}
 		}
 
-		helper.spawn(EntityType.ACACIA_BOAT, 2, 5, 2);
-		Mannequin mannequin = helper.spawn(EntityType.MANNEQUIN, 4, 5, 4);
-		Villager villager = helper.spawn(EntityType.VILLAGER, 5, 5, 4);
-		helper.spawn(EntityType.ARMOR_STAND, 7, 1, 7);
+		helper.spawn(EntityTypes.ACACIA_BOAT, 2, 5, 2);
+		Mannequin mannequin = helper.spawn(EntityTypes.MANNEQUIN, 4, 5, 4);
+		Villager villager = helper.spawn(EntityTypes.VILLAGER, 5, 5, 4);
+		helper.spawn(EntityTypes.ARMOR_STAND, 7, 1, 7);
 
 		if (jump) {
 			helper.onEachTick(() -> {
@@ -289,10 +289,10 @@ public class ContentRegistryGameTest {
 		var box = new AABB(0, 4, 0, 8, 6, 8);
 
 		helper.runAtTickTime(100, () -> {
-			helper.assertEntityPresent(EntityType.ACACIA_BOAT, box);
-			helper.assertEntityPresent(EntityType.MANNEQUIN, box);
-			helper.assertEntityPresent(EntityType.VILLAGER, box);
-			helper.assertEntityNotPresent(EntityType.ARMOR_STAND, box);
+			helper.assertEntityPresent(EntityTypes.ACACIA_BOAT, box);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN, box);
+			helper.assertEntityPresent(EntityTypes.VILLAGER, box);
+			helper.assertEntityNotPresent(EntityTypes.ARMOR_STAND, box);
 			helper.succeed();
 		});
 	}
@@ -304,10 +304,10 @@ public class ContentRegistryGameTest {
 		var box = new AABB(0, 4, 0, 8, 6, 8);
 
 		helper.runAtTickTime(100, () -> {
-			helper.assertEntityPresent(EntityType.ACACIA_BOAT, box);
-			helper.assertEntityPresent(EntityType.MANNEQUIN, box);
-			helper.assertEntityPresent(EntityType.VILLAGER, box);
-			helper.assertEntityNotPresent(EntityType.ARMOR_STAND, box);
+			helper.assertEntityPresent(EntityTypes.ACACIA_BOAT, box);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN, box);
+			helper.assertEntityPresent(EntityTypes.VILLAGER, box);
+			helper.assertEntityNotPresent(EntityTypes.ARMOR_STAND, box);
 			helper.succeed();
 		});
 	}
@@ -318,10 +318,10 @@ public class ContentRegistryGameTest {
 		var box = new AABB(0, 4, 0, 8, 6, 8);
 
 		helper.runAtTickTime(100, () -> {
-			helper.assertEntityPresent(EntityType.ACACIA_BOAT, box);
-			helper.assertEntityPresent(EntityType.MANNEQUIN, box);
-			helper.assertEntityPresent(EntityType.VILLAGER, box);
-			helper.assertEntityPresent(EntityType.ARMOR_STAND, box);
+			helper.assertEntityPresent(EntityTypes.ACACIA_BOAT, box);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN, box);
+			helper.assertEntityPresent(EntityTypes.VILLAGER, box);
+			helper.assertEntityPresent(EntityTypes.ARMOR_STAND, box);
 			helper.succeed();
 		});
 	}
@@ -331,8 +331,8 @@ public class ContentRegistryGameTest {
 		setupFluidTestBoxAndEntities(helper, Blocks.WATER, false);
 
 		helper.runAtTickTime(700, () -> {
-			helper.assertEntityNotPresent(EntityType.MANNEQUIN);
-			helper.assertEntityNotPresent(EntityType.VILLAGER);
+			helper.assertEntityNotPresent(EntityTypes.MANNEQUIN);
+			helper.assertEntityNotPresent(EntityTypes.VILLAGER);
 			helper.succeed();
 		});
 	}
@@ -342,8 +342,8 @@ public class ContentRegistryGameTest {
 		setupFluidTestBoxAndEntities(helper, ContentRegistryTest.WATER_LIKE_FLUID_BLOCK, false);
 
 		helper.runAtTickTime(700, () -> {
-			helper.assertEntityNotPresent(EntityType.MANNEQUIN);
-			helper.assertEntityNotPresent(EntityType.VILLAGER);
+			helper.assertEntityNotPresent(EntityTypes.MANNEQUIN);
+			helper.assertEntityNotPresent(EntityTypes.VILLAGER);
 			helper.succeed();
 		});
 	}
@@ -353,8 +353,8 @@ public class ContentRegistryGameTest {
 		setupFluidTestBoxAndEntities(helper, ContentRegistryTest.TEST_FLUID_BLOCK, false);
 
 		helper.runAtTickTime(700, () -> {
-			helper.assertEntityPresent(EntityType.MANNEQUIN);
-			helper.assertEntityPresent(EntityType.VILLAGER);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN);
+			helper.assertEntityPresent(EntityTypes.VILLAGER);
 			helper.succeed();
 		});
 	}
@@ -380,14 +380,14 @@ public class ContentRegistryGameTest {
 		helper.setBlock(8, 1, 4, wall);
 		helper.setBlock(8, 2, 4, wall);
 
-		helper.spawn(EntityType.MANNEQUIN, 4, 1, 4);
+		helper.spawn(EntityTypes.MANNEQUIN, 4, 1, 4);
 	}
 
 	@GameTest(maxTicks = 110)
 	public void entityPushingAndMovementInWater(GameTestHelper helper) {
 		setupPushAndMove(helper, Blocks.WATER);
 		helper.runAtTickTime(100, () -> {
-			helper.assertEntityPresent(EntityType.MANNEQUIN, 7, 1, 4);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN, 7, 1, 4);
 			helper.succeed();
 		});
 	}
@@ -396,7 +396,7 @@ public class ContentRegistryGameTest {
 	public void entityPushingAndMovementInWaterLike(GameTestHelper helper) {
 		setupPushAndMove(helper, ContentRegistryTest.WATER_LIKE_FLUID_BLOCK);
 		helper.runAtTickTime(100, () -> {
-			helper.assertEntityPresent(EntityType.MANNEQUIN, 7, 1, 4);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN, 7, 1, 4);
 			helper.succeed();
 		});
 	}
@@ -405,7 +405,7 @@ public class ContentRegistryGameTest {
 	public void entityPushingAndMovementInCustom(GameTestHelper helper) {
 		setupPushAndMove(helper, ContentRegistryTest.TEST_FLUID_BLOCK);
 		helper.runAtTickTime(100, () -> {
-			helper.assertEntityPresent(EntityType.MANNEQUIN, new BlockPos(1, 1, 4), 1f);
+			helper.assertEntityPresent(EntityTypes.MANNEQUIN, new BlockPos(1, 1, 4), 1f);
 			helper.succeed();
 		});
 	}
