@@ -22,12 +22,14 @@ import java.util.Optional;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.BindGroupLayout;
 import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.PolygonMode;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -78,15 +80,16 @@ class RenderPipelineBuilderMixin implements FabricRenderPipeline.Builder {
 			Optional<Identifier> fragmentShader,
 			Optional<ShaderDefines> shaderDefines,
 			Optional<List<BindGroupLayout>> bindGroupLayouts,
-			Optional<ColorTargetState> colorTargetState,
+			@Nullable ColorTargetState[] colorTargetStates,
+			int activeColorTargetStateCount,
 			Optional<DepthStencilState> depthStencilState,
 			Optional<PolygonMode> polygonMode,
 			Optional<Boolean> cull,
-			Optional<VertexFormat> vertexFormat,
-			Optional<VertexFormat.Mode> vertexFormatMode,
+			@Nullable VertexFormat[] vertexFormatPerBuffer,
+			Optional<PrimitiveTopology> vertexFormatMode,
 			Operation<RenderPipeline.Snippet> original
 	) {
-		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(vertexShader, fragmentShader, shaderDefines, bindGroupLayouts, colorTargetState, depthStencilState, polygonMode, cull, vertexFormat, vertexFormatMode), usePipelineDrawModeForGui);
+		return FabricRenderPipelineInternals.withSnippetUsePipelineVertexFormatForGui(() -> original.call(vertexShader, fragmentShader, shaderDefines, bindGroupLayouts, colorTargetStates, activeColorTargetStateCount, depthStencilState, polygonMode, cull, vertexFormatPerBuffer, vertexFormatMode), usePipelineDrawModeForGui);
 	}
 
 	@ModifyReturnValue(

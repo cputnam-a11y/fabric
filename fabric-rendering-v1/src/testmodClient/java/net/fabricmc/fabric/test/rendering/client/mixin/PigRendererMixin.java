@@ -66,7 +66,7 @@ public class PigRendererMixin {
 		MovingBlockRenderState movingBlockRenderState = state.getData(MOVING_BLOCK);
 
 		if (movingBlockRenderState != null) {
-			queue.submitMovingBlock(poseStack, movingBlockRenderState);
+			queue.submitMovingBlock(poseStack, movingBlockRenderState, 0x0);
 		}
 	}
 }

@@ -25,11 +25,12 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.IndexType;
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Mutable;
@@ -104,14 +105,14 @@ abstract class GuiRendererMixin implements GuiRendererExtensions {
 			method = "executeDraw",
 			at = @At(
 					value = "INVOKE",
-					target = "Lcom/mojang/blaze3d/systems/RenderPass;setIndexBuffer(Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;)V"
+					target = "Lcom/mojang/blaze3d/systems/RenderPass;setIndexBuffer(Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/IndexType;)V"
 			)
 	)
-	private void fixNonQuadIndexing(RenderPass instance, GpuBuffer buffer, VertexFormat.IndexType indexType, Operation<Void> original, @Coerce GuiRendererDrawAccessor draw) {
+	private void fixNonQuadIndexing(RenderPass instance, GpuBuffer buffer, IndexType indexType, Operation<Void> original, @Coerce GuiRendererDrawAccessor draw) {
 		RenderPipeline pipeline = draw.fabric$pipeline();
 
-		if (pipeline.usePipelineDrawModeForGui() && pipeline.getVertexFormatMode() != VertexFormat.Mode.QUADS) {
-			RenderSystem.AutoStorageIndexBuffer shapeIndexBuffer = RenderSystem.getSequentialBuffer(pipeline.getVertexFormatMode());
+		if (pipeline.usePipelineDrawModeForGui() && pipeline.getPrimitiveTopology() != PrimitiveTopology.QUADS) {
+			RenderSystem.AutoStorageIndexBuffer shapeIndexBuffer = RenderSystem.getSequentialBuffer(pipeline.getPrimitiveTopology());
 			buffer = shapeIndexBuffer.getBuffer(((StagedVertexBufferDrawAccessor) draw.fabric$Draw()).fabric$indexCount());
 			indexType = shapeIndexBuffer.type();
 		}
@@ -121,6 +122,6 @@ abstract class GuiRendererMixin implements GuiRendererExtensions {
 
 	@ModifyExpressionValue(method = "addElementToMesh", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;scissorChanged(Lnet/minecraft/client/gui/navigation/ScreenRectangle;Lnet/minecraft/client/gui/navigation/ScreenRectangle;)Z"))
 	private boolean uploadPrimitivesIndividually(boolean original, @Local RenderPipeline pipeline) {
-		return original || pipeline.getVertexFormatMode().connectedPrimitives;
+		return original || pipeline.getPrimitiveTopology().connectedPrimitives;
 	}
 }

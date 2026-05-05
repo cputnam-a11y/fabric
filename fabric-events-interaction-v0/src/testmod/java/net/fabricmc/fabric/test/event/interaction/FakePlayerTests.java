@@ -55,7 +55,7 @@ public class FakePlayerTests {
 		ItemStack signStack = Items.OAK_SIGN.getDefaultInstance();
 		fakePlayer.setItemInHand(InteractionHand.MAIN_HAND, signStack);
 
-		Vec3 hitPos = helper.absolutePos(basePos).getCenter().add(0, 0.5, 0);
+		Vec3 hitPos = Vec3.atCenterOf(helper.absolutePos(basePos)).add(0, 0.5, 0);
 		BlockHitResult hitResult = new BlockHitResult(hitPos, Direction.UP, helper.absolutePos(basePos), false);
 		signStack.useOn(new UseOnContext(fakePlayer, InteractionHand.MAIN_HAND, hitResult));
 

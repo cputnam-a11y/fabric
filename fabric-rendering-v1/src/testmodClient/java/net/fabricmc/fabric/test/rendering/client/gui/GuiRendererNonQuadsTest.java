@@ -18,10 +18,9 @@ package net.fabricmc.fabric.test.rendering.client.gui;
 
 import java.util.function.BiFunction;
 
+import com.mojang.blaze3d.PrimitiveTopology;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import org.joml.Matrix3x2f;
 import org.jspecify.annotations.Nullable;
 
@@ -71,7 +70,7 @@ public class GuiRendererNonQuadsTest implements ClientModInitializer {
 		private static final RenderPipeline PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
 				.withLocation(Identifier.fromNamespaceAndPath("test", "gui_renderer_non_quads_test"))
 				.withUsePipelineDrawModeForGui(true)
-				.withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
+				.withPrimitiveTopology(PrimitiveTopology.TRIANGLE_FAN)
 				.build();
 
 		@Override

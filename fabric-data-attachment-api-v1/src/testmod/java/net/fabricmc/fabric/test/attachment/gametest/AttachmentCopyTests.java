@@ -62,7 +62,7 @@ public class AttachmentCopyTests {
 		entity.setAttached(DUMMY, () -> 10);
 		entity.setAttached(COPY_ON_DEATH, () -> 10);
 
-		Vec3 spawnPos = entity.adjustSpawnLocation(end, end.getRespawnData().pos()).getBottomCenter();
+		Vec3 spawnPos = Vec3.atBottomCenterOf(entity.adjustSpawnLocation(end, end.getRespawnData().pos()));
 		Entity moved = entity.teleport(new TeleportTransition(end, spawnPos, Vec3.ZERO, 0.0F, 0.0F, TeleportTransition.DO_NOTHING));
 		if (moved == null) throw helper.assertionException("Cross-level teleportation failed");
 
