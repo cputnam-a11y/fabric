@@ -30,14 +30,12 @@ import net.minecraft.client.gui.render.pip.GuiBannerResultRenderer;
 import net.minecraft.client.gui.render.pip.GuiBookModelRenderer;
 import net.minecraft.client.gui.render.pip.GuiEntityRenderer;
 import net.minecraft.client.gui.render.pip.GuiProfilerChartRenderer;
-import net.minecraft.client.gui.render.pip.GuiSignRenderer;
 import net.minecraft.client.gui.render.pip.GuiSkinRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.state.gui.pip.GuiBannerResultRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiBookModelRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiEntityRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiProfilerChartRenderState;
-import net.minecraft.client.renderer.state.gui.pip.GuiSignRenderState;
 import net.minecraft.client.renderer.state.gui.pip.GuiSkinRenderState;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 
@@ -87,7 +85,6 @@ public final class PictureInPictureRendererRegistryImpl {
 		REGISTERED_FACTORIES.put(GuiSkinRenderState.class, context -> new GuiSkinRenderer());
 		REGISTERED_FACTORIES.put(GuiBookModelRenderState.class, context -> new GuiBookModelRenderer());
 		REGISTERED_FACTORIES.put(GuiBannerResultRenderState.class, context -> new GuiBannerResultRenderer(context.minecraft().getAtlasManager()));
-		REGISTERED_FACTORIES.put(GuiSignRenderState.class, context -> new GuiSignRenderer(context.minecraft().getAtlasManager()));
 		REGISTERED_FACTORIES.put(GuiProfilerChartRenderState.class, context -> new GuiProfilerChartRenderer());
 	}
 

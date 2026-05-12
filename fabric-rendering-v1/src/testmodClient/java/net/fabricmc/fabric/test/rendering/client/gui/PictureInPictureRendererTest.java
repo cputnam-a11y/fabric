@@ -21,19 +21,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.client.model.Model;
-import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
-import net.minecraft.client.renderer.state.gui.pip.GuiSignRenderState;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.PlainSignBlock;
-import net.minecraft.world.level.block.state.properties.WoodType;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -57,10 +51,6 @@ public class PictureInPictureRendererTest implements ClientModInitializer, Fabri
 			// render it twice to test that PiPs can be added multiple times in the same frame
 			graphics.guiRenderState.addPicturesInPictureState(new BannerGuiElementRenderState(DyeColor.BLUE, 20, 0, 40, 20, new ScreenRectangle(20, 0, 40, 20)));
 			graphics.guiRenderState.addPicturesInPictureState(new BannerGuiElementRenderState(DyeColor.RED, 40, 0, 60, 20, new ScreenRectangle(40, 0, 60, 20)));
-
-			// also render some vanilla PiPs to check that they still work and can be rendered multiple times
-			graphics.guiRenderState.addPicturesInPictureState(createSignState(60, WoodType.BIRCH));
-			graphics.guiRenderState.addPicturesInPictureState(createSignState(80, WoodType.DARK_OAK));
 		});
 
 		// Test that InventoryScreen.drawEntity works with the same type of entity more than once
@@ -73,11 +63,6 @@ public class PictureInPictureRendererTest implements ClientModInitializer, Fabri
 				});
 			}
 		});
-	}
-
-	private static GuiSignRenderState createSignState(int x, WoodType woodType) {
-		Model.Simple signModel = StandingSignRenderer.createSignModel(Minecraft.getInstance().getEntityModels(), woodType, PlainSignBlock.Attachment.WALL);
-		return new GuiSignRenderState(signModel, woodType, x, 0, x + 20, 20, 10f, new ScreenRectangle(x, 0, x + 20, 20));
 	}
 
 	@Override

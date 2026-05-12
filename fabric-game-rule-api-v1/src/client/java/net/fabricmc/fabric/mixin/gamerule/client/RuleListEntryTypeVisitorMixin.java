@@ -29,6 +29,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import net.minecraft.client.gui.screens.worldselection.AbstractGameRulesScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationGameRulesScreen;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleTypeVisitor;
 
@@ -78,7 +79,7 @@ public abstract class RuleListEntryTypeVisitorMixin implements GameRuleTypeVisit
 
 		String translationKey = instance.getDescriptionId() + "." + valueName.toLowerCase(Locale.ROOT);
 
-		if (I18n.exists(translationKey)) {
+		if (Language.getInstance().has(translationKey)) {
 			return I18n.get(translationKey);
 		}
 
