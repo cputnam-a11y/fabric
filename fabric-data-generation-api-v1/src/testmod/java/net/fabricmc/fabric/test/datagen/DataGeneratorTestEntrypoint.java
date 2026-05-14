@@ -59,6 +59,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
+import net.minecraft.references.BlockItemIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
@@ -318,6 +319,21 @@ public class DataGeneratorTestEntrypoint implements DataGeneratorEntrypoint {
 					.add(BlockTags.FLOWERS, BlockTags.FLOWER_POTS);
 			aliasGroup(Identifier.fromNamespaceAndPath("other_namespace", "flowers"))
 					.add(BlockTags.FLOWERS, BlockTags.FLOWER_POTS);
+
+			builder(BlockTags.SUPPORTS_WARPED_FUNGUS)
+					.remove(BlockItemIds.SOUL_SOIL.block())
+					.removeTag(BlockTags.DIRT);
+
+			builder(BlockTags.NEEDS_DIAMOND_TOOL)
+					.remove(
+							BlockItemIds.ANCIENT_DEBRIS.block(),
+							BlockItemIds.NETHERITE_BLOCK.block(),
+							BlockItemIds.OBSIDIAN.block()
+					);
+			builder(BlockTags.CLIMBABLE)
+					.add(BlockItemIds.GLAZED_TERRACOTTA.blue().block())
+					.add(BlockItemIds.GLAZED_TERRACOTTA.brown().block())
+					.remove(BlockItemIds.GLAZED_TERRACOTTA.blue().block());
 		}
 	}
 

@@ -16,16 +16,20 @@
 
 package net.fabricmc.fabric.mixin.datagen;
 
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.data.tags.BlockItemTagAppender;
 import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagAppender;
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
+import net.fabricmc.fabric.impl.datagen.TagBuilderHooks;
 
 /**
  * Extends TagAppender to support setting the replace field.
@@ -40,7 +44,7 @@ abstract class BlockItemTagAppenderMixin<T> implements FabricTagAppender<T> {
 
 	@Override
 	public BlockItemTagAppender<T> setReplace(boolean replace) {
-		if (this.original.getBuilder() instanceof FabricTagBuilder builder) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
 			builder.fabric_setReplace(replace);
 		}
 
@@ -49,8 +53,53 @@ abstract class BlockItemTagAppenderMixin<T> implements FabricTagAppender<T> {
 
 	@Override
 	public BlockItemTagAppender<T> forceAddTag(TagKey<T> tag) {
-		if (this.original.getBuilder() instanceof FabricTagBuilder builder) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
 			builder.fabric_forceAddTag(tag.location());
+		}
+
+		return (BlockItemTagAppender<T>) (Object) this;
+	}
+
+	@Override
+	public BlockItemTagAppender<T> remove(ResourceKey<T> element) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
+			builder.fabric_removeElement(element.identifier());
+		}
+
+		return (BlockItemTagAppender<T>) (Object) this;
+	}
+
+	@Override
+	public BlockItemTagAppender<T> remove(ResourceKey<T>... elements) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
+			Stream.of(elements).forEach(element -> builder.fabric_removeElement(element.identifier()));
+		}
+
+		return (BlockItemTagAppender<T>) (Object) this;
+	}
+
+	@Override
+	public BlockItemTagAppender<T> removeAll(Collection<ResourceKey<T>> elements) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
+			elements.forEach(element -> builder.fabric_removeElement(element.identifier()));
+		}
+
+		return (BlockItemTagAppender<T>) (Object) this;
+	}
+
+	@Override
+	public BlockItemTagAppender<T> removeAll(Stream<ResourceKey<T>> elements) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
+			elements.forEach(element -> builder.fabric_removeElement(element.identifier()));
+		}
+
+		return (BlockItemTagAppender<T>) (Object) this;
+	}
+
+	@Override
+	public BlockItemTagAppender<T> removeTag(TagKey<T> tag) {
+		if (this.original.getBuilder() instanceof TagBuilderHooks builder) {
+			builder.fabric_removeTag(tag.location());
 		}
 
 		return (BlockItemTagAppender<T>) (Object) this;

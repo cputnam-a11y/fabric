@@ -16,19 +16,24 @@
 
 package net.fabricmc.fabric.mixin.datagen;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Stream;
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
 import net.minecraft.data.tags.TagAppender;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
 
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagAppender;
-import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
+import net.fabricmc.fabric.impl.datagen.TagBuilderHooks;
 
 /**
- * Extends TagAppender to support setting the replace field.
+ * Extends TagAppender to support setting the {@code replace} and {@code fabric:remove} fields.
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 @Mixin(TagAppender.class)
@@ -42,13 +47,42 @@ interface TagAppenderMixin<T> extends FabricTagAppender<T> {
 
 		@Override
 		public TagAppender<T> setReplace(boolean replace) {
-			((FabricTagBuilder) this.val$builder).fabric_setReplace(replace);
+			((TagBuilderHooks) this.val$builder).fabric_setReplace(replace);
 			return (TagAppender<T>) this;
 		}
 
 		@Override
 		public TagAppender<T> forceAddTag(TagKey<T> tag) {
-			((FabricTagBuilder) this.val$builder).fabric_forceAddTag(tag.location());
+			((TagBuilderHooks) this.val$builder).fabric_forceAddTag(tag.location());
+			return (TagAppender<T>) this;
+		}
+
+		@Override
+		public TagAppender<T> remove(ResourceKey<T> element) {
+			((TagBuilderHooks) this.val$builder).fabric_removeElement(element.identifier());
+			return (TagAppender<T>) this;
+		}
+
+		@Override
+		public TagAppender<T> remove(final ResourceKey<T>... elements) {
+			return removeAll(Arrays.stream(elements));
+		}
+
+		@Override
+		public TagAppender<T> removeAll(final Collection<ResourceKey<T>> elements) {
+			elements.forEach(element -> ((TagBuilderHooks) this.val$builder).fabric_removeElement(element.identifier()));
+			return (TagAppender<T>) this;
+		}
+
+		@Override
+		public TagAppender<T> removeAll(final Stream<ResourceKey<T>> elements) {
+			elements.forEach(element -> ((TagBuilderHooks) this.val$builder).fabric_removeElement(element.identifier()));
+			return (TagAppender<T>) this;
+		}
+
+		@Override
+		public TagAppender<T> removeTag(TagKey<T> tag) {
+			((TagBuilderHooks) this.val$builder).fabric_removeTag(tag.location());
 			return (TagAppender<T>) this;
 		}
 
