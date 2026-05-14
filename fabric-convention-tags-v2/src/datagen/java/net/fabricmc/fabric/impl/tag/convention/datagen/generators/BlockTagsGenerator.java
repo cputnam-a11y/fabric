@@ -94,6 +94,10 @@ public final class BlockTagsGenerator extends FabricTagsProvider.BlockTagsProvid
 		builder(ConventionalBlockTags.OBSIDIANS)
 				.addOptionalTag(ConventionalBlockTags.NORMAL_OBSIDIANS)
 				.addOptionalTag(ConventionalBlockTags.CRYING_OBSIDIANS);
+		valueLookupBuilder(ConventionalBlockTags.FROGLIGHTS)
+				.add(Blocks.OCHRE_FROGLIGHT)
+				.add(Blocks.PEARLESCENT_FROGLIGHT)
+				.add(Blocks.VERDANT_FROGLIGHT);
 
 		builder(ConventionalBlockTags.COAL_ORES)
 				.addOptionalTag(BlockItemTags.COAL_ORES.block());
