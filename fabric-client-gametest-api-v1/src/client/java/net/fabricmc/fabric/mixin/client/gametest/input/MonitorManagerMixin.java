@@ -17,15 +17,15 @@
 package net.fabricmc.fabric.mixin.client.gametest.input;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.mojang.blaze3d.platform.ScreenManager;
+import com.mojang.blaze3d.platform.MonitorManager;
 import com.mojang.blaze3d.platform.Window;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 import net.fabricmc.fabric.impl.client.gametest.util.WindowHooks;
 
-@Mixin(ScreenManager.class)
-public class ScreenManagerMixin {
+@Mixin(MonitorManager.class)
+public class MonitorManagerMixin {
 	@ModifyExpressionValue(method = "findBestMonitor(Lcom/mojang/blaze3d/platform/Window;)Lcom/mojang/blaze3d/platform/Monitor;", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/Window;getScreenWidth()I"))
 	private int getRealWidth(int original, Window window) {
 		return ((WindowHooks) (Object) window).fabric_getRealWidth();

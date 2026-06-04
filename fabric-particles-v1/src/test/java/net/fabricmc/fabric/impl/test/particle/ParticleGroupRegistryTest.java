@@ -51,7 +51,7 @@ public class ParticleGroupRegistryTest {
 	void insertBefore() {
 		var registry = new ParticleGroupRegistryImpl(sheets);
 
-		var customSheet = new ParticleRenderType("mymod:custom");
+		var customSheet = new ParticleRenderType("mymod:custom", "MC");
 		registry.register(customSheet, particleEngine -> null);
 		registry.registerOrdering(getId(customSheet), getId(ITEM_PICKUP));
 
@@ -67,7 +67,7 @@ public class ParticleGroupRegistryTest {
 	void insertAfter() {
 		var registry = new ParticleGroupRegistryImpl(sheets);
 
-		var customSheet = new ParticleRenderType("mymod:custom");
+		var customSheet = new ParticleRenderType("mymod:custom", "MC");
 		registry.register(customSheet, particleEngine -> null);
 		registry.registerOrdering(getId(ITEM_PICKUP), getId(customSheet));
 

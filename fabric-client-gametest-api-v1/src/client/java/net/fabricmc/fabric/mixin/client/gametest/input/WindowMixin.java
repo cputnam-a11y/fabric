@@ -22,7 +22,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.mojang.blaze3d.platform.DisplayData;
 import com.mojang.blaze3d.platform.Monitor;
-import com.mojang.blaze3d.platform.ScreenManager;
+import com.mojang.blaze3d.platform.MonitorManager;
 import com.mojang.blaze3d.platform.VideoMode;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.platform.WindowEventHandler;
@@ -66,7 +66,7 @@ public abstract class WindowMixin implements WindowHooks {
 	private WindowEventHandler eventHandler;
 	@Shadow
 	@Final
-	private ScreenManager screenManager;
+	private MonitorManager monitorManager;
 	@Shadow
 	private Optional<VideoMode> preferredFullscreenVideoMode;
 
@@ -89,7 +89,7 @@ public abstract class WindowMixin implements WindowHooks {
 	private int realFramebufferHeight;
 
 	@Inject(method = "<init>", at = @At("RETURN"))
-	private void onInit(WindowEventHandler eventHandler, DisplayData displayData, String fullscreenVideoModeString, String title, GpuBackend backend, CallbackInfo ci) {
+	private void onInit(WindowEventHandler eventHandler, DisplayData displayData, String fullscreenVideoModeString, boolean exclusiveFullscreen, String title, MonitorManager monitorManager, GpuBackend backend, CallbackInfo ci) {
 		this.defaultWidth = displayData.width();
 		this.defaultHeight = displayData.height();
 		this.realWidth = this.width;
@@ -178,7 +178,7 @@ public abstract class WindowMixin implements WindowHooks {
 
 		// Move the top left corner of the window so that the window expands/contracts from its center, while also
 		// trying to keep the window within the monitor's bounds
-		Monitor monitor = this.screenManager.findBestMonitor((Window) (Object) this);
+		Monitor monitor = this.monitorManager.findBestMonitor((Window) (Object) this);
 
 		if (monitor != null) {
 			VideoMode videoMode = monitor.getPreferredVidMode(this.preferredFullscreenVideoMode);
@@ -186,20 +186,20 @@ public abstract class WindowMixin implements WindowHooks {
 			this.x += (this.windowedWidth - width) / 2;
 			this.y += (this.windowedHeight - height) / 2;
 
-			if (this.x + width > monitor.getX() + videoMode.getWidth()) {
-				this.x = monitor.getX() + videoMode.getWidth() - width;
+			if (this.x + width > monitor.x() + videoMode.getWidth()) {
+				this.x = monitor.x() + videoMode.getWidth() - width;
 			}
 
-			if (this.x < monitor.getX()) {
-				this.x = monitor.getX();
+			if (this.x < monitor.x()) {
+				this.x = monitor.x();
 			}
 
-			if (this.y + height > monitor.getY() + videoMode.getHeight()) {
-				this.y = monitor.getY() + videoMode.getHeight() - height;
+			if (this.y + height > monitor.y() + videoMode.getHeight()) {
+				this.y = monitor.y() + videoMode.getHeight() - height;
 			}
 
-			if (this.y < monitor.getY()) {
-				this.y = monitor.getY();
+			if (this.y < monitor.y()) {
+				this.y = monitor.y();
 			}
 
 			this.windowedX = this.x;

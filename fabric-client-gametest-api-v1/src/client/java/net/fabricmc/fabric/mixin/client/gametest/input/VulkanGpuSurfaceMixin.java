@@ -19,8 +19,9 @@ package net.fabricmc.fabric.mixin.client.gametest.input;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.opengl.DirectStateAccess;
 import com.mojang.blaze3d.textures.GpuTextureView;
+import org.lwjgl.vulkan.VkImageBlit;
+import org.lwjgl.vulkan.VkOffset3D;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -28,17 +29,19 @@ import net.minecraft.client.Minecraft;
 
 import net.fabricmc.fabric.impl.client.gametest.util.WindowHooks;
 
-@Mixin(targets = "com.mojang.blaze3d.opengl.GlCommandEncoder")
-public class GlCommandEncoderMixin {
-	@WrapOperation(method = "presentTexture", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/opengl/DirectStateAccess;blitFrameBuffers(IIIIIIIIIIII)V"))
-	private void blitFrameBuffer(DirectStateAccess manager, int readFramebuffer, int drawFramebuffer, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter, Operation<Void> original, @Local(argsOnly = true) GpuTextureView gpuTextureView) {
+@Mixin(targets = "com.mojang.blaze3d.vulkan.VulkanGpuSurface")
+public class VulkanGpuSurfaceMixin {
+	@WrapOperation(method = "blitFromTexture", at = @At(value = "INVOKE", target = "Lorg/lwjgl/vulkan/VkImageBlit$Buffer;dstOffsets(Lorg/lwjgl/vulkan/VkOffset3D$Buffer;)Lorg/lwjgl/vulkan/VkImageBlit$Buffer;"))
+	private VkImageBlit.Buffer blitFrameBuffer(VkImageBlit.Buffer blitRegion, VkOffset3D.Buffer dstOffsets, Operation<VkImageBlit.Buffer> original, @Local(argsOnly = true) GpuTextureView gpuTextureView) {
 		if (gpuTextureView.texture() == Minecraft.getInstance().gameRenderer.mainRenderTarget().getColorTexture()) {
 			WindowHooks window = ((WindowHooks) (Object) Minecraft.getInstance().getWindow());
-			dstY0 = 0;
-			dstX1 = window.fabric_getRealFramebufferWidth();
-			dstY1 = window.fabric_getRealFramebufferHeight();
+			dstOffsets.position(0);
+			dstOffsets.x(0).y(window.fabric_getRealFramebufferHeight()).z(0);
+			dstOffsets.position(1);
+			dstOffsets.x(window.fabric_getRealFramebufferWidth()).y(0).z(1);
+			dstOffsets.position(0);
 		}
 
-		original.call(manager, readFramebuffer, drawFramebuffer, srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+		return original.call(blitRegion, dstOffsets);
 	}
 }

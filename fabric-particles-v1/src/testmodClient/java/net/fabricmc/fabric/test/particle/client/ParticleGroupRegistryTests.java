@@ -48,7 +48,7 @@ import net.fabricmc.fabric.api.particle.v1.FabricParticleTypes;
 public class ParticleGroupRegistryTests implements ClientModInitializer {
 	private static final Identifier PARTICLE_ID = Identifier.fromNamespaceAndPath("fabric-particles-v1-testmod", "test");
 	private static final SimpleParticleType TEST_PARTICLE_TYPE = FabricParticleTypes.simple();
-	private static final ParticleRenderType TEST_PARTICLE_TEXTURE_SHEET = new ParticleRenderType(PARTICLE_ID.toString());
+	private static final ParticleRenderType TEST_PARTICLE_TEXTURE_SHEET = new ParticleRenderType(PARTICLE_ID.toString(), "FT");
 
 	@Override
 	public void onInitializeClient() {
